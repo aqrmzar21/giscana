@@ -1,13 +1,14 @@
 <x-guest-layout>
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-primary-600 to-primary-800 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
             <div class="text-center">
-                <div class="mx-auto h-16 w-16 bg-white rounded-full flex items-center justify-center mb-4">
+                {{-- <div class="mx-auto h-16 w-16 bg-white rounded-full flex items-center justify-center mb-4">
                     <svg class="h-8 w-8 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
                     </svg>
-                </div>
-                <h2 class="text-3xl font-bold text-white mb-2">Giscana</h2>
+                </div> --}}
+                <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-gray-700">
+                <h2 class="text-3xl font-bold text-black mb-2">Giscana</h2>
+                </a>
                 <p class="text-primary-100">Masuk ke akun Anda</p>
             </div>
 
@@ -56,21 +57,15 @@
                     </div>
                 </form>
 
-                <div class="mt-6 text-center">
+                {{-- <div class="mt-6 text-center">
                     <p class="text-sm text-gray-600">
                         Belum punya akun? 
                         <a href="{{ route('register') }}" class="font-medium text-primary-600 hover:text-primary-500">
                             Daftar di sini
                         </a>
                     </p>
-                </div>
+                </div> --}}
 
-                <div class="mt-6 text-center">
-                    <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-gray-700">
-                        ← Kembali ke beranda
-                    </a>
-                </div>
             </div>
         </div>
-    </div>
 </x-guest-layout>

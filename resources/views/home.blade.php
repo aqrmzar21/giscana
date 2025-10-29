@@ -23,7 +23,7 @@
                   Daftar Sekarang
                 </a> -->
                 @endguest
-                <a href="{{ route('map.index') }}" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-colors">
+                <a href="{{ route('map.index') }}" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
                       Lihat Peta Interaktif
                     </a>
             </div>
@@ -43,9 +43,9 @@
                 <div class="text-3xl font-bold mb-2">{{ $stats['disaster_zones'] }}</div>
                 <div class="text-red-100">Zona Risiko Bencana</div>
             </div>
-            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-lg text-center">
+            <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6 rounded-lg text-center">
                 <div class="text-3xl font-bold mb-2">{{ $stats['evacuation_routes'] }}</div>
-                <div class="text-blue-100">Rute Evakuasi</div>
+                <div class="text-orange-100">Rute Evakuasi</div>
             </div>
             <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-lg text-center">
                 <div class="text-3xl font-bold mb-2">{{ $stats['evacuation_facilities'] }}</div>
@@ -171,7 +171,8 @@
 <!-- About Section -->
 <section id="about" class="py-16 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        {{-- <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"> --}}
+        <div class="grid grid-cols-1 gap-12 items-center">
             <div>
                 <h2 class="text-3xl font-bold text-gray-900 mb-6">Tentang Giscana</h2>
                 <p class="text-lg text-gray-600 mb-6">
@@ -204,7 +205,7 @@
                     </div>
                 </div>
             </div>
-            <div class="bg-white p-8 rounded-lg shadow-lg">
+            {{-- <div class="bg-white p-8 rounded-lg shadow-lg">
                 <h3 class="text-xl font-semibold mb-4">Teknologi yang Digunakan</h3>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="text-center p-4 bg-gray-50 rounded-lg">
@@ -224,7 +225,7 @@
                         <div class="text-sm text-gray-600">Database</div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
     </div>
 </section>

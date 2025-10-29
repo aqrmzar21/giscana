@@ -1,108 +1,241 @@
-@extends('layouts.app') {{-- Make sure this layout uses AdminLTE 3 base structure --}}
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-@section('title', 'Interactive Disaster Risk Map')
+    <title>{{ config('app.name', 'Giscana') }} - @yield('title', 'Geographic Information System for Natural Disaster Mitigation')</title>
 
-@section('content')
-<div class="row">
-    <!-- Sidebar -->
-    <div class="col-md-3">
-        <div class="card shadow-sm">
-            <div class="card-header">
-                <h3 class="card-title">Map Controls</h3>
-            </div>
-            <div class="card-body">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+    <!-- TailwindCSS -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @stack('styles')
+</head>
+<body class="font-sans antialiased">
+    {{-- <div class="min-h-screen bg-gray-50"> --}}
+{{-- <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+
+    <div class="app-brand demo">
+        <a href="{{url('/')}}" class="app-brand-link">
+            <span class="app-brand-text demo menu-text fw-bold ms-2">{{config('variables.templateName')}}</span>
+        </a>
+
+        <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+            <i class="icon-base bx bx-chevron-left icon-sm d-flex align-items-center justify-content-center"></i>
+        </a>
+    </div>
+
+    <div class="menu-divider mt-0"></div>
+    <div class="menu-inner-shadow"></div>
+
+    <ul class="menu-inner py-1">
+
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">MenuHeader</span>
+        </li>
+
+    </ul>
+
+</aside> --}}
+
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-80 bg-white shadow-lg overflow-y-auto">
+            <div class="p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                    <svg class="w-8 h-8 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-gray-700">
+                        Giscana
+                    </a>
+                </h2>
+                
                 <!-- Search -->
-                <div class="form-group">
-                    <label for="search-input">Search Location</label>
-                    <input type="text" id="search-input" class="form-control" placeholder="Search for locations...">
-                    <div id="search-results" class="position-absolute w-100 mt-1 bg-white border rounded shadow d-none"></div>
-                </div>
+                {{-- <div class="mb-6">
+                    <label for="search-input" class="block text-sm font-medium text-gray-700 mb-2">Search Location</label>
+                    <div class="relative">
+                        <input type="text" id="search-input" placeholder="Search for locations..." 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                        <div id="search-results" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg hidden"></div>
+                    </div>
+                </div> --}}
 
                 <!-- Layer Controls -->
-                <div class="mt-4">
-                    <label class="font-weight-bold">Map Layers</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="layer-disaster-zones" checked>
-                        <label class="form-check-label" for="layer-disaster-zones">Disaster Zones</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="layer-evacuation-routes" checked>
-                        <label class="form-check-label" for="layer-evacuation-routes">Evacuation Routes</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="layer-evacuation-facilities" checked>
-                        <label class="form-check-label" for="layer-evacuation-facilities">Evacuation Facilities</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="layer-aid-points" checked>
-                        <label class="form-check-label" for="layer-aid-points">Aid Distribution Points</label>
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium text-gray-700 mb-3">Map Layers</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="layer-disaster-zones" checked class="mr-2">
+                            <span class="text-sm text-gray-700">Disaster Zones</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="layer-evacuation-routes" checked class="mr-2">
+                            <span class="text-sm text-gray-700">Evacuation Routes</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="layer-evacuation-facilities" checked class="mr-2">
+                            <span class="text-sm text-gray-700">Evacuation Facilities</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="layer-aid-points" checked class="mr-2">
+                            <span class="text-sm text-gray-700">Aid Distribution Points</span>
+                        </label>
                     </div>
                 </div>
 
                 <!-- Legend -->
-                <div class="mt-4">
-                    <label class="font-weight-bold">Legend</label>
-                    <small class="d-block text-muted mb-2">Disaster Risk Levels</small>
-                    <div class="d-flex align-items-center mb-1"><div class="bg-success rounded mr-2" style="width:16px; height:16px;"></div>Low Risk</div>
-                    <div class="d-flex align-items-center mb-1"><div class="bg-warning rounded mr-2" style="width:16px; height:16px;"></div>Medium Risk</div>
-                    <div class="d-flex align-items-center mb-1"><div class="bg-orange rounded mr-2" style="width:16px; height:16px;"></div>High Risk</div>
-                    <div class="d-flex align-items-center mb-1"><div class="bg-danger rounded mr-2" style="width:16px; height:16px;"></div>Critical Risk</div>
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium text-gray-700 mb-3">Legend</h3>
+                    
+                    <!-- Disaster Zones -->
+                    <div class="mb-4">
+                        <h4 class="text-xs font-medium text-gray-600 mb-2">Disaster Risk Levels</h4>
+                        <div class="space-y-1">
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
+                                <span class="text-xs text-gray-600">Low Risk</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-yellow-500 rounded mr-2"></div>
+                                <span class="text-xs text-gray-600">Medium Risk</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-orange-500 rounded mr-2"></div>
+                                <span class="text-xs text-gray-600">High Risk</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-red-500 rounded mr-2"></div>
+                                <span class="text-xs text-gray-600">Critical Risk</span>
+                            </div>
+                        </div>
+                    </div>
 
-                    <small class="d-block text-muted mt-3 mb-2">Evacuation Routes</small>
-                    <div class="d-flex align-items-center mb-1"><div class="bg-primary mr-2" style="width:24px; height:4px;"></div>Primary Route</div>
-                    <div class="d-flex align-items-center mb-1"><div class="bg-info mr-2" style="width:24px; height:4px;"></div>Secondary Route</div>
-                    <div class="d-flex align-items-center mb-1"><div class="bg-danger mr-2" style="width:24px; height:4px;"></div>Emergency Route</div>
+                    <!-- Evacuation Routes -->
+                    <div class="mb-4">
+                        <h4 class="text-xs font-medium text-gray-600 mb-2">Evacuation Routes</h4>
+                        <div class="space-y-1">
+                            <div class="flex items-center">
+                                <div class="w-4 h-1 bg-blue-600 mr-2"></div>
+                                <span class="text-xs text-gray-600">Primary Route</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-1 bg-blue-400 mr-2"></div>
+                                <span class="text-xs text-gray-600">Secondary Route</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-1 bg-red-600 mr-2"></div>
+                                <span class="text-xs text-gray-600">Emergency Route</span>
+                            </div>
+                        </div>
+                    </div>
 
-                    <small class="d-block text-muted mt-3 mb-2">Facilities</small>
-                    <div class="d-flex align-items-center mb-1"><div class="bg-success rounded-circle mr-2" style="width:12px; height:12px;"></div>Evacuation Facility</div>
-                    <div class="d-flex align-items-center mb-1"><div class="bg-purple rounded-circle mr-2" style="width:12px; height:12px;"></div>Aid Distribution</div>
+                    <!-- Facilities -->
+                    <div class="mb-4">
+                        <h4 class="text-xs font-medium text-gray-600 mb-2">Facilities</h4>
+                        <div class="space-y-1">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-green-600 rounded-full mr-2"></div>
+                                <span class="text-xs text-gray-600">Evacuation Facility</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-purple-600 rounded-full mr-2"></div>
+                                <span class="text-xs text-gray-600">Aid Distribution</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Statistics -->
-                <div class="mt-4">
-                    <label class="font-weight-bold">Statistics</label>
-                    <ul class="list-unstyled text-muted small">
-                        <li class="d-flex justify-content-between"><span>Disaster Zones:</span><span id="stats-disaster-zones">0</span></li>
-                        <li class="d-flex justify-content-between"><span>Evacuation Routes:</span><span id="stats-evacuation-routes">0</span></li>
-                        <li class="d-flex justify-content-between"><span>Evacuation Facilities:</span><span id="stats-evacuation-facilities">0</span></li>
-                        <li class="d-flex justify-content-between"><span>Aid Points:</span><span id="stats-aid-points">0</span></li>
-                    </ul>
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium text-gray-700 mb-3">Statistics</h3>
+                    <div class="space-y-2 text-xs text-gray-600">
+                        <div class="flex justify-between">
+                            <span>Disaster Zones:</span>
+                            <span id="stats-disaster-zones">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Evacuation Routes:</span>
+                            <span id="stats-evacuation-routes">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Evacuation Facilities:</span>
+                            <span id="stats-evacuation-facilities">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Aid Points:</span>
+                            <span id="stats-aid-points">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="flex-1 relative">
+            <!-- Filter Controls -->
+            <div class="absolute top-4 left-4 z-50 bg-white bg-opacity-90 rounded-lg shadow-lg p-4 flex space-x-4">
+                <div>
+                    <label for="disaster-type-filter" class="block text-xs font-medium text-gray-700 mb-1">Disaster Type</label>
+                    <select id="disaster-type-filter" class="block w-32 px-2 py-1 border border-gray-300 rounded-md text-xs">
+                        <option value="all">All Types</option>
+                        <option value="flood">Flood</option>
+                        <option value="earthquake">Earthquake</option>
+                        <option value="landslide">Landslide</option>
+                        <option value="tsunami">Tsunami</option>
+                        <!-- Tambahkan jenis lain sesuai kebutuhan -->
+                    </select>
+                </div>
+                <div>
+                    <label for="risk-level-filter" class="block text-xs font-medium text-gray-700 mb-1">Risk Level</label>
+                    <select id="risk-level-filter" class="block w-32 px-2 py-1 border border-gray-300 rounded-md text-xs">
+                        <option value="all">All Levels</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+            </div>
+            <div id="map" class="w-full h-full"></div>
+            <!-- Map Loading Indicator -->
+            <div id="map-loading" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
+                <div class="text-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
+                    <p class="text-sm text-gray-600">Loading map data...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Map Container -->
-    <div class="col-md-9 position-relative">
-        <div id="map" class="w-100" style="height: calc(100vh - 100px);"></div>
-
-        <!-- Map Loading Indicator -->
-        <div id="map-loading" class="position-absolute w-100 h-100 bg-white bg-opacity-75 d-flex align-items-center justify-content-center" style="top:0; left:0; z-index:999;">
-            <div class="text-center">
-                <div class="spinner-border text-primary mb-2" role="status"></div>
-                <p class="text-muted">Loading map data...</p>
+    <!-- Feature Info Modal -->
+    <div id="feature-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-900" id="modal-title">Feature Information</h3>
+                    <button id="close-modal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="modal-content" class="text-sm text-gray-600">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Feature Info Modal -->
-<div id="feature-modal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Feature Information</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close-modal">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="modal-content">
-                <!-- Content will be populated by JavaScript -->
-            </div>
-        </div>
-    </div>
-</div>
-@endsection
+ {{-- </div> --}}
+</body>
+</html>
 
 @push('scripts')
 <script>
