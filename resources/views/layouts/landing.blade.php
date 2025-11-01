@@ -34,16 +34,16 @@
                             </h1>
                         </div>
                         <div class="hidden md:ml-6 md:flex md:space-x-8">
-                            <a href="{{ route('home') }}" class="text-gray-900 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <a href="{{ route('home') }}" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                                 Beranda
                             </a>
-                            <a href="{{ route('map.index') }}" class="text-gray-900 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <a href="{{ route('map.index') }}" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                                 Peta Interaktif
                             </a>
-                            <a href="#features" class="text-gray-900 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <a href="#features" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                                 Fitur
                             </a>
-                            <a href="#about" class="text-gray-900 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <a href="#about" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                                 Tentang
                             </a>
                         </div>
@@ -53,22 +53,19 @@
                         @auth
                             <div class="flex items-center space-x-2">
                                 <span class="text-sm text-gray-700">Halo, {{ Auth::user()->name }}</span>
-                                <a href="{{ route('map.index') }}" class="bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700">
+                                <a href="{{ route('map.index') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
                                     Dashboard
                                 </a>
                                 <form method="POST" action="{{ route('logout') }}" class="inline">
                                     @csrf
-                                    <button type="submit" class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                                    <button type="submit" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                                         Logout
                                     </button>
                                 </form>
                             </div>
                         @else
-                            <a href="{{ route('login') }}" class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <a href="{{ route('login') }}" class="border-2 border-blue text-blue hover:text-white px-8 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
                                 Login
-                            </a>
-                            <a href="{{ route('register') }}" class="bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700">
-                                Daftar
                             </a>
                         @endauth
                     </div>

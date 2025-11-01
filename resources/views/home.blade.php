@@ -32,7 +32,7 @@
 </section>
 
 <!-- Statistics Section -->
-<section class="py-16 bg-white">
+{{-- <section class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
             <h2 class="text-3xl font-bold text-gray-900 mb-4">Data Sistem</h2>
@@ -57,7 +57,7 @@
             </div>
         </div>
     </div>
-</section>
+</section> --}}
 
 <!-- Features Section -->
 <section id="features" class="py-16 bg-gray-50">
@@ -242,7 +242,7 @@
                 <!-- <a href="{{ route('register') }}" class="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
                     Daftar Sekarang
                 </a> -->
-                <a href="{{ route('login') }}" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-colors">
+                <a href="{{ route('login') }}" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
                     Login
                 </a>
             </div>
