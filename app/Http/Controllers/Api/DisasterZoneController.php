@@ -52,7 +52,7 @@ class DisasterZoneController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'disaster_type' => 'required|in:flood,landslide',
+            'disaster_type' => 'required|in:longsor,flood,other',
             'description' => 'nullable|string',
             'risk_level' => 'required|in:low,medium,high,critical',
             'polygon_coordinates' => 'required|array',
@@ -91,7 +91,7 @@ class DisasterZoneController extends Controller
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
-            'disaster_type' => 'sometimes|in:flood,landslide',
+            'disaster_type' => 'sometimes|in:longsor,flood,other',
             'description' => 'nullable|string',
             'risk_level' => 'sometimes|in:low,medium,high,critical',
             'polygon_coordinates' => 'sometimes|array',

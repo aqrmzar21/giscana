@@ -57,7 +57,7 @@ class GiscanaDataSeeder extends Seeder
 
         DisasterZone::create([
             'name' => 'Landslide Risk Zone - Hillside Area',
-            'disaster_type' => 'landslide',
+            'disaster_type' => 'longsor',
             'description' => 'Critical landslide risk area on steep hillsides, especially vulnerable during heavy rainfall.',
             'risk_level' => 'critical',
             'polygon_coordinates' => [
@@ -89,7 +89,7 @@ class GiscanaDataSeeder extends Seeder
         EvacuationRoute::create([
             'name' => 'Primary Evacuation Route - Main Road',
             'description' => 'Main evacuation route connecting high-risk areas to evacuation centers.',
-            'disaster_type' => 'both',
+            'disaster_type' => 'other',
             'line_coordinates' => [
                 [123.16, 0.46], [123.17, 0.47], [123.18, 0.48], [123.19, 0.49]
             ],
@@ -117,7 +117,7 @@ class GiscanaDataSeeder extends Seeder
         EvacuationRoute::create([
             'name' => 'Emergency Route - Hillside',
             'description' => 'Emergency evacuation route for landslide-prone areas.',
-            'disaster_type' => 'landslide',
+            'disaster_type' => 'longsor',
             'line_coordinates' => [
                 [123.21, 0.53], [123.22, 0.54], [123.23, 0.55]
             ],

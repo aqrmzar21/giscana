@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('disaster_zones', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('disaster_type', ['flood', 'landslide']);
+            $table->enum('disaster_type', ['longsor', 'flood', 'other']);
             $table->text('description')->nullable();
             $table->enum('risk_level', ['low', 'medium', 'high', 'critical']);
             $table->json('polygon_coordinates'); // Store GeoJSON polygon coordinates

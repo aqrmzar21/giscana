@@ -47,12 +47,12 @@
             <div>
                 <dt class="text-sm font-medium text-gray-500">Jenis Bencana</dt>
                 <dd class="mt-1 text-sm text-gray-900">
-                    @if($evacuationRoute->disaster_type === 'tsunami')
-                        <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">Tsunami</span>
+                    @if($evacuationRoute->disaster_type === 'longsor')
+                        <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">Longsor</span>
                     @elseif($evacuationRoute->disaster_type === 'flood')
                         <span class="inline-flex rounded-full bg-indigo-100 px-2 text-xs font-semibold leading-5 text-indigo-800">Banjir</span>
                     @else
-                        <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Keduanya</span>
+                        <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Lainnya</span>
                     @endif
                 </dd>
             </div>

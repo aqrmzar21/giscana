@@ -78,9 +78,9 @@
                 <label for="disaster_type">Jenis Bencana</label>
                 <select id="disaster_type" name="disaster_type">
                     <option value="all" {{ $disasterType === 'all' ? 'selected' : '' }}>Semua Jenis</option>
-                    <option value="tsunami" {{ $disasterType === 'tsunami' ? 'selected' : '' }}>Tsunami</option>
+                    <option value="longsor" {{ $disasterType === 'longsor' ? 'selected' : '' }}>Longsor</option>
                     <option value="flood" {{ $disasterType === 'flood' ? 'selected' : '' }}>Banjir</option>
-                    <option value="both" {{ $disasterType === 'both' ? 'selected' : '' }}>Keduanya</option>
+                    <option value="other" {{ $disasterType === 'other' ? 'selected' : '' }}>Lainnya</option>
                 </select>
             </div>
 
