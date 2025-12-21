@@ -41,9 +41,9 @@ class GiscanaDataSeeder extends Seeder
 
         // Sample disaster zones for Bone Bolango Regency
         DisasterZone::create([
-            'name' => 'Flood Risk Zone - Bone River',
-            'disaster_type' => 'flood',
-            'description' => 'High-risk flood zone along the Bone River, prone to seasonal flooding during rainy season.',
+            'name' => 'banjir Risk Zone - Bone River',
+            'disaster_type' => 'banjir',
+            'description' => 'High-risk banjir zone along the Bone River, prone to seasonal banjiring during rainy season.',
             'risk_level' => 'high',
             'polygon_coordinates' => [
                 [
@@ -56,9 +56,9 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         DisasterZone::create([
-            'name' => 'Landslide Risk Zone - Hillside Area',
+            'name' => 'longsor Risk Zone - Hillside Area',
             'disaster_type' => 'longsor',
-            'description' => 'Critical landslide risk area on steep hillsides, especially vulnerable during heavy rainfall.',
+            'description' => 'Critical longsor risk area on steep hillsides, especially vulnerable during heavy rainfall.',
             'risk_level' => 'critical',
             'polygon_coordinates' => [
                 [
@@ -72,8 +72,8 @@ class GiscanaDataSeeder extends Seeder
 
         DisasterZone::create([
             'name' => 'Low Risk Coastal Area',
-            'disaster_type' => 'flood',
-            'description' => 'Low-risk coastal area with minimal flood risk.',
+            'disaster_type' => 'banjir',
+            'description' => 'Low-risk coastal area with minimal banjir risk.',
             'risk_level' => 'low',
             'polygon_coordinates' => [
                 [
@@ -103,7 +103,7 @@ class GiscanaDataSeeder extends Seeder
         EvacuationRoute::create([
             'name' => 'Secondary Route - Village Path',
             'description' => 'Secondary evacuation route through village paths.',
-            'disaster_type' => 'flood',
+            'disaster_type' => 'banjir',
             'line_coordinates' => [
                 [123.14, 0.44], [123.15, 0.45], [123.16, 0.46]
             ],
@@ -116,7 +116,7 @@ class GiscanaDataSeeder extends Seeder
 
         EvacuationRoute::create([
             'name' => 'Emergency Route - Hillside',
-            'description' => 'Emergency evacuation route for landslide-prone areas.',
+            'description' => 'Emergency evacuation route for longsor-prone areas.',
             'disaster_type' => 'longsor',
             'line_coordinates' => [
                 [123.21, 0.53], [123.22, 0.54], [123.23, 0.55]

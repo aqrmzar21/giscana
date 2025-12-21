@@ -4,7 +4,7 @@ A web-based Geographic Information System (GIS) designed to support disaster pre
 
 ## Overview
 
-Giscana is a comprehensive disaster management system that focuses on natural disasters such as floods and landslides. The system provides interactive maps, evacuation planning, and aid distribution management to enhance community resilience.
+Giscana is a comprehensive disaster management system that focuses on natural disasters such as banjirs and longsors. The system provides interactive maps, evacuation planning, and aid distribution management to enhance community resilience.
 
 ## Features
 
@@ -15,7 +15,7 @@ Giscana is a comprehensive disaster management system that focuses on natural di
 - Risk level visualization with color-coded zones
 
 ### 🚨 Disaster Management
-- Flood and landslide risk assessment
+- banjir and longsor risk assessment
 - Evacuation route planning
 - Emergency facility management
 - Aid distribution coordination
@@ -96,7 +96,7 @@ Giscana is a comprehensive disaster management system that focuses on natural di
 ### Core Tables
 
 #### disaster_zones
-- Stores polygon data for flood and landslide risk areas
+- Stores polygon data for banjir and longsor risk areas
 - Includes risk levels, affected population, and area calculations
 
 #### evacuation_routes

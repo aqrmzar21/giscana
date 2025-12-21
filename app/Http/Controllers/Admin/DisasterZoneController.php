@@ -32,7 +32,7 @@ class DisasterZoneController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'disaster_type' => 'required|in:longsor,flood,other',
+            'disaster_type' => 'required|in:longsor,banjir,other',
             'description' => 'nullable|string',
             'risk_level' => 'required|in:low,medium,high,very_high',
             'polygon_coordinates' => 'required|json',
@@ -73,7 +73,7 @@ class DisasterZoneController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'disaster_type' => 'required|in:longsor,flood,other',
+            'disaster_type' => 'required|in:longsor,banjir,other',
             'description' => 'nullable|string',
             'risk_level' => 'required|in:low,medium,high,very_high',
             'polygon_coordinates' => 'required|json',
@@ -102,4 +102,3 @@ class DisasterZoneController extends Controller
             ->with('success', 'Zona bencana berhasil dihapus.');
     }
 }
-

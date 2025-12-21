@@ -44,7 +44,7 @@
                             <select id="disaster_type" name="disaster_type" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('disaster_type') border-red-300 @enderror">
                                 <option value="">Pilih Jenis Bencana</option>
                                 <option value="longsor" {{ old('disaster_type', $disasterZone->disaster_type) === 'longsor' ? 'selected' : '' }}>Longsor</option>
-                                <option value="flood" {{ old('disaster_type', $disasterZone->disaster_type) === 'flood' ? 'selected' : '' }}>Banjir</option>
+                                <option value="banjir" {{ old('disaster_type', $disasterZone->disaster_type) === 'banjir' ? 'selected' : '' }}>Banjir</option>
                                 <option value="other" {{ old('disaster_type', $disasterZone->disaster_type) === 'other' ? 'selected' : '' }}>Lainnya</option>
                             </select>
                             @error('disaster_type')

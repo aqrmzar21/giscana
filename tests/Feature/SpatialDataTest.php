@@ -21,9 +21,9 @@ class SpatialDataTest extends TestCase
     {
         // Create a disaster zone
         $zone = DisasterZone::create([
-            'name' => 'Test Flood Zone',
-            'disaster_type' => 'flood',
-            'description' => 'Test flood zone for testing',
+            'name' => 'Test banjir Zone',
+            'disaster_type' => 'banjir',
+            'description' => 'Test banjir zone for testing',
             'risk_level' => 'high',
             'polygon_coordinates' => [
                 [
@@ -36,8 +36,8 @@ class SpatialDataTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('disaster_zones', [
-            'name' => 'Test Flood Zone',
-            'disaster_type' => 'flood',
+            'name' => 'Test banjir Zone',
+            'disaster_type' => 'banjir',
             'risk_level' => 'high',
         ]);
 
@@ -45,7 +45,7 @@ class SpatialDataTest extends TestCase
         $geoJson = $zone->toGeoJSON();
         $this->assertEquals('Feature', $geoJson['type']);
         $this->assertEquals('Polygon', $geoJson['geometry']['type']);
-        $this->assertEquals('Test Flood Zone', $geoJson['properties']['name']);
+        $this->assertEquals('Test banjir Zone', $geoJson['properties']['name']);
     }
 
     /**
@@ -56,7 +56,7 @@ class SpatialDataTest extends TestCase
         $route = EvacuationRoute::create([
             'name' => 'Test Evacuation Route',
             'description' => 'Test route for testing',
-            'disaster_type' => 'flood',
+            'disaster_type' => 'banjir',
             'line_coordinates' => [
                 [123.0, 0.0], [123.1, 0.1], [123.2, 0.2]
             ],
@@ -69,7 +69,7 @@ class SpatialDataTest extends TestCase
 
         $this->assertDatabaseHas('evacuation_routes', [
             'name' => 'Test Evacuation Route',
-            'disaster_type' => 'flood',
+            'disaster_type' => 'banjir',
             'route_type' => 'primary',
         ]);
 
@@ -147,7 +147,7 @@ class SpatialDataTest extends TestCase
         // Create test data
         DisasterZone::create([
             'name' => 'Test Zone',
-            'disaster_type' => 'flood',
+            'disaster_type' => 'banjir',
             'description' => 'Test',
             'risk_level' => 'high',
             'polygon_coordinates' => [[[123.0, 0.0], [123.1, 0.0], [123.1, 0.1], [123.0, 0.1], [123.0, 0.0]]],
@@ -184,15 +184,15 @@ class SpatialDataTest extends TestCase
     {
         // Create test data
         DisasterZone::create([
-            'name' => 'Flood Zone Test',
-            'disaster_type' => 'flood',
-            'description' => 'Test flood zone',
+            'name' => 'banjir Zone Test',
+            'disaster_type' => 'banjir',
+            'description' => 'Test banjir zone',
             'risk_level' => 'high',
             'polygon_coordinates' => [[[123.0, 0.0], [123.1, 0.0], [123.1, 0.1], [123.0, 0.1], [123.0, 0.0]]],
             'is_active' => true,
         ]);
 
-        $response = $this->get('/map/search?q=flood');
+        $response = $this->get('/map/search?q=banjir');
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
