@@ -50,7 +50,7 @@ class EvacuationRoute extends Model
      */
     public function scopeByDisasterType($query, $type)
     {
-        return $query->where('disaster_type', $type)->orWhere('disaster_type', 'both');
+        return $query->where('disaster_type', $type)->orWhere('disaster_type', 'other');
     }
 
     /**

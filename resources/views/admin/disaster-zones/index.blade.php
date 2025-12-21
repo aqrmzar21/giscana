@@ -56,12 +56,12 @@
                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ $zone->id }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $zone->name }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            @if($zone->disaster_type === 'tsunami')
-                                <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">Tsunami</span>
+                            @if($zone->disaster_type === 'longsor')
+                                <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">Longsor</span>
                             @elseif($zone->disaster_type === 'flood')
                                 <span class="inline-flex rounded-full bg-indigo-100 px-2 text-xs font-semibold leading-5 text-indigo-800">Banjir</span>
                             @else
-                                <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Keduanya</span>
+                                <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Lainnya</span>
                             @endif
                         </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
