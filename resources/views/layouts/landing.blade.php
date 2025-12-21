@@ -52,7 +52,7 @@
                     <div class="flex items-center space-x-4">
                         @auth
                             <div class="flex items-center space-x-2">
-                                <span class="text-sm text-gray-700">Halo, {{ Auth::user()->name }}</span>
+                                <!-- <span class="text-sm text-gray-700">Halo, {{ Auth::user()->name }}</span> -->
                                 <a href="{{ route('map.index') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
                                     Dashboard
                                 </a>
