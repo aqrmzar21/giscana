@@ -179,33 +179,104 @@ class GiscanaDataSeeder extends Seeder
         // ]);
 
         // Sample evacuation routes
-        // EvacuationRoute::create([
-        //     'name' => 'Primary Evacuation Route - Main Road',
-        //     'description' => 'Main evacuation route connecting high-risk areas to evacuation centers.',
-        //     'disaster_type' => 'other',
-        //     'line_coordinates' => [
-        //         [123.16, 0.46], [123.17, 0.47], [123.18, 0.48], [123.19, 0.49]
-        //     ],
-        //     'length_km' => 3.2,
-        //     'route_type' => 'primary',
-        //     'capacity_per_hour' => 500,
-        //     'is_accessible' => true,
-        //     'is_active' => true,
-        // ]);
+        EvacuationRoute::create([
+            'name' => 'Secondary Route - Village Path',
+            'description' => 'Secondary evacuation route through village paths.',
+            'disaster_type' => 'banjir',
+            'line_coordinates' => [
+               [123.27274354360497,0.32568160865849904], [123.27333441180394,0.32810857616267697], [123.27329629127473,0.3285787216328657]
+            ],
+            'length_km' => 2.1,
+            'route_type' => 'secondary',
+            'capacity_per_hour' => 200,
+            'is_accessible' => true,
+            'is_active' => true,
+        ]);
 
-        // EvacuationRoute::create([
-        //     'name' => 'Secondary Route - Village Path',
-        //     'description' => 'Secondary evacuation route through village paths.',
-        //     'disaster_type' => 'banjir',
-        //     'line_coordinates' => [
-        //         [123.14, 0.44], [123.15, 0.45], [123.16, 0.46]
-        //     ],
-        //     'length_km' => 2.1,
-        //     'route_type' => 'secondary',
-        //     'capacity_per_hour' => 200,
-        //     'is_accessible' => true,
-        //     'is_active' => true,
-        // ]);
+        EvacuationRoute::create([
+            'name' => 'Primary Evacuation Route - Main Road',
+            'description' => 'Main evacuation route connecting high-risk areas to evacuation centers.',
+            'disaster_type' => 'other',
+            'line_coordinates' => [
+                [
+            123.28008744958447,
+            0.32173069129049736
+          ],
+          [
+            123.28015140297714,
+            0.3216027865242239
+          ],
+          [
+            123.28018693263726,
+            0.3214393526544086
+          ],
+          [
+            123.2801158733148,
+            0.3211906489323013
+          ],
+          [
+            123.28005191992446,
+            0.32087088699624644
+          ],
+          [
+            123.27979610635828,
+            0.3204090086274647
+          ],
+          [
+            123.27977478856224,
+            0.32019583398793827
+          ],
+          [
+            123.27974636483196,
+            0.31984764873459426
+          ],
+          [
+            123.27976057669827,
+            0.319584733330899
+          ],
+          [
+            123.27989558941107,
+            0.3192720771675823
+          ],
+          [
+            123.28023667416363,
+            0.31907311414806827
+          ],
+          [
+            123.28056354705217,
+            0.3190091617491788
+          ],
+          [
+            123.2805493351882,
+            0.3192720771675823
+          ],
+          [
+            123.28054222925607,
+            0.31951367511246076
+          ],
+          [
+            123.28054222925607,
+            0.31982633126952464
+          ],
+          [
+            123.2806630301049,
+            0.3200608233813682
+          ],
+          [
+            123.2807269834953,
+            0.3202313630942797
+          ],
+          [
+            123.2808477843464,
+            0.32043743191221097
+          ]
+            ],
+            'length_km' => 3.2,
+            'route_type' => 'primary',
+            'capacity_per_hour' => 500,
+            'is_accessible' => true,
+            'is_active' => true,
+        ]);
 
         EvacuationRoute::create([
             'name' => 'Emergency Route - Hillside',
