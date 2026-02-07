@@ -37,20 +37,6 @@
                 </div>
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <div>
-                        <label for="disaster_type" class="block text-sm font-medium text-gray-700">Jenis Bencana <span class="text-red-500">*</span></label>
-                        <div class="mt-1">
-                            <select id="disaster_type" name="disaster_type" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('disaster_type') border-red-300 @enderror">
-                                <option value="">Pilih Jenis Bencana</option>
-                                <option value="longsor" {{ old('disaster_type') === 'longsor' ? 'selected' : '' }}>Longsor</option>
-                                <option value="banjir" {{ old('disaster_type') === 'banjir' ? 'selected' : '' }}>Banjir</option>
-                                <option value="other" {{ old('disaster_type') === 'other' ? 'selected' : '' }}>Lainnya</option>
-                            </select>
-                            @error('disaster_type')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
 
                     <div>
                         <label for="route_type" class="block text-sm font-medium text-gray-700">Tipe Rute <span class="text-red-500">*</span></label>
