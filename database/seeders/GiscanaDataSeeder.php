@@ -46,8 +46,57 @@ class GiscanaDataSeeder extends Seeder
             'risk_level' => 'high',
             'polygon_coordinates' => [
                 [
-                    [123.15, 0.45], [123.18, 0.45], [123.18, 0.48], [123.15, 0.48], [123.15, 0.45]
-                ]
+            123.2070090488328,
+            0.37848842897793133
+        ],
+        [
+            123.207395845135,
+            0.37865659761217785
+        ],
+        [
+            123.20808535158405,
+            0.3783370772048755
+        ],
+        [
+            123.20870758911286,
+            0.3781352748361826
+        ],
+        [
+            123.20904393372189,
+            0.3778830218684987
+        ],
+        [
+            123.20948118171452,
+            0.377462600240591
+        ],
+        [
+            123.20946436448486,
+            0.3771430797893771
+        ],
+        [
+            123.20904393372189,
+            0.3768235593264393
+        ],
+        [
+            123.20856462132303,
+            0.37680024489897335
+        ],
+        [
+            123.20828008766956,
+            0.3769353954610608
+        ],
+        [
+            123.20817338754682,
+            0.3770420932729195
+        ],
+        [
+            123.20756875352988,
+            0.3775542427471521
+        ],
+        [
+            123.2070067995615,
+            0.37849318337418936
+        ]
             ],
             'area_hectares' => 125.5,
             'affected_population' => 2500,
@@ -61,64 +110,192 @@ class GiscanaDataSeeder extends Seeder
             'risk_level' => 'critical',
             'polygon_coordinates' => [
                 [
-                    [123.20, 0.52], [123.25, 0.52], [123.25, 0.55], [123.20, 0.55], [123.20, 0.52]
-                ]
+            123.26951353046944,
+            0.37884733350300337
+        ],
+        [
+            123.28218716059575,
+            0.3850770812959894
+        ],
+        [
+            123.28663727376016,
+            0.38032956096917303
+        ],
+        [
+            123.29118472681398,
+            0.3760771536035037
+        ],
+        [
+            123.28111698382496,
+            0.3726016802589811
+        ],
+        [
+            123.27646372146684,
+            0.3686179726272627
+        ],
+        [
+            123.2717941672999,
+            0.368507931195694
+        ],
+        [
+            123.26950645799565,
+            0.3697982700158491
+        ],
+        [
+            123.26492552138996,
+            0.37128483907936527
+        ],
+        [
+            123.26712377868417,
+            0.37546863892517024
+        ],
+        [
+            123.26971286894953,
+            0.3789463729096809
+        ],
+        [
+            123.2695135803706,
+            0.37882995504054406
+        ]
             ],
             'area_hectares' => 85.2,
             'affected_population' => 1200,
             'is_active' => true,
         ]);
 
-        DisasterZone::create([
-            'name' => 'Low Risk Coastal Area',
-            'disaster_type' => 'banjir',
-            'description' => 'Low-risk coastal area with minimal banjir risk.',
-            'risk_level' => 'low',
-            'polygon_coordinates' => [
-                [
-                    [123.10, 0.40], [123.12, 0.40], [123.12, 0.42], [123.10, 0.42], [123.10, 0.40]
-                ]
-            ],
-            'area_hectares' => 45.8,
-            'affected_population' => 800,
-            'is_active' => true,
-        ]);
+        // DisasterZone::create([
+        //     'name' => 'Low Risk Coastal Area',
+        //     'disaster_type' => 'banjir',
+        //     'description' => 'Low-risk coastal area with minimal banjir risk.',
+        //     'risk_level' => 'low',
+        //     'polygon_coordinates' => [
+        //         [
+        //             [123.10, 0.40], [123.12, 0.40], [123.12, 0.42], [123.10, 0.42], [123.10, 0.40]
+        //         ]
+        //     ],
+        //     'area_hectares' => 45.8,
+        //     'affected_population' => 800,
+        //     'is_active' => true,
+        // ]);
 
         // Sample evacuation routes
-        EvacuationRoute::create([
-            'name' => 'Primary Evacuation Route - Main Road',
-            'description' => 'Main evacuation route connecting high-risk areas to evacuation centers.',
-            'disaster_type' => 'other',
-            'line_coordinates' => [
-                [123.16, 0.46], [123.17, 0.47], [123.18, 0.48], [123.19, 0.49]
-            ],
-            'length_km' => 3.2,
-            'route_type' => 'primary',
-            'capacity_per_hour' => 500,
-            'is_accessible' => true,
-            'is_active' => true,
-        ]);
+        // EvacuationRoute::create([
+        //     'name' => 'Primary Evacuation Route - Main Road',
+        //     'description' => 'Main evacuation route connecting high-risk areas to evacuation centers.',
+        //     'disaster_type' => 'other',
+        //     'line_coordinates' => [
+        //         [123.16, 0.46], [123.17, 0.47], [123.18, 0.48], [123.19, 0.49]
+        //     ],
+        //     'length_km' => 3.2,
+        //     'route_type' => 'primary',
+        //     'capacity_per_hour' => 500,
+        //     'is_accessible' => true,
+        //     'is_active' => true,
+        // ]);
 
-        EvacuationRoute::create([
-            'name' => 'Secondary Route - Village Path',
-            'description' => 'Secondary evacuation route through village paths.',
-            'disaster_type' => 'banjir',
-            'line_coordinates' => [
-                [123.14, 0.44], [123.15, 0.45], [123.16, 0.46]
-            ],
-            'length_km' => 2.1,
-            'route_type' => 'secondary',
-            'capacity_per_hour' => 200,
-            'is_accessible' => true,
-            'is_active' => true,
-        ]);
+        // EvacuationRoute::create([
+        //     'name' => 'Secondary Route - Village Path',
+        //     'description' => 'Secondary evacuation route through village paths.',
+        //     'disaster_type' => 'banjir',
+        //     'line_coordinates' => [
+        //         [123.14, 0.44], [123.15, 0.45], [123.16, 0.46]
+        //     ],
+        //     'length_km' => 2.1,
+        //     'route_type' => 'secondary',
+        //     'capacity_per_hour' => 200,
+        //     'is_accessible' => true,
+        //     'is_active' => true,
+        // ]);
 
         EvacuationRoute::create([
             'name' => 'Emergency Route - Hillside',
             'description' => 'Emergency evacuation route for longsor-prone areas.',
             'disaster_type' => 'longsor',
             'line_coordinates' => [
-                [123.21, 0.53], [123.22, 0.54], [123.23, 0.55]
+    [
+        123.24333913601816,
+        0.3519398498250865
+    ],
+    [
+        123.24432902864044,
+        0.3518498612835259
+    ],
+    [
+        123.24486897007154,
+        0.35179361844471657
+    ],
+    [
+        123.24518393590591,
+        0.3516248899271801
+    ],
+    [
+        123.245678882218,
+        0.35144491283801926
+    ],
+    [
+        123.24606134073171,
+        0.35135492429174064
+    ],
+    [
+        123.24623007242826,
+        0.351073710079433
+    ],
+    [
+        123.24663502850068,
+        0.35103996437410956
+    ],
+    [
+        123.24732164250496,
+        0.3510036620480719
+    ],
+    [
+        123.24741163274284,
+        0.35075619353349907
+    ],
+    [
+        123.24754661812584,
+        0.35058746497502113
+    ],
+    [
+        123.24815405223428,
+        0.3505312221286232
+    ],
+    [
+        123.2481877986387,
+        0.35036249354658366
+    ],
+    [
+        123.24895271566449,
+        0.34987880504563407
+    ],
+    [
+        123.24914394492134,
+        0.35003628502531114
+    ],
+    [
+        123.24980762292984,
+        0.34986755647604184
+    ],
+    [
+        123.24996510584714,
+        0.3496988279229072
+    ],
+    [
+        123.25014508632466,
+        0.3496088393598171
+    ],
+    [
+        123.25075252043324,
+        0.3495638450783787
+    ],
+    [
+        123.25107873504884,
+        0.34933887366621263
+    ],
+    [
+        123.25146119356252,
+        0.34940636509077194
+    ]
             ],
             'length_km' => 1.8,
             'route_type' => 'emergency',
@@ -129,9 +306,9 @@ class GiscanaDataSeeder extends Seeder
 
         // Sample evacuation facilities
         EvacuationFacility::create([
-            'name' => 'SD Negeri Bone 1',
+            'name' => 'SMK Negeri Bone 1',
             'description' => 'Primary evacuation center located in Bone village.',
-            'point_coordinates' => [123.19, 0.49],
+            'point_coordinates' => [123.2180174509013, 0.3739372685927513],
             'capacity' => 300,
             'address' => 'Jl. Pendidikan No. 1, Bone, Bone Bolango',
             'contact_person' => 'Bapak Ahmad',
@@ -145,7 +322,7 @@ class GiscanaDataSeeder extends Seeder
         EvacuationFacility::create([
             'name' => 'Masjid Al-Ikhlas',
             'description' => 'Mosque serving as evacuation center with basic facilities.',
-            'point_coordinates' => [123.17, 0.47],
+            'point_coordinates' => [123.2514177981202,0.3494345195302344],
             'capacity' => 200,
             'address' => 'Jl. Masjid Raya, Bone, Bone Bolango',
             'contact_person' => 'Ustadz Rahman',
@@ -159,7 +336,7 @@ class GiscanaDataSeeder extends Seeder
         EvacuationFacility::create([
             'name' => 'Balai Desa Bone',
             'description' => 'Village hall equipped for emergency situations.',
-            'point_coordinates' => [123.15, 0.45],
+            'point_coordinates' => [123.2514177981202,0.3494345195302344],
             'capacity' => 150,
             'address' => 'Jl. Pemuda No. 5, Bone, Bone Bolango',
             'contact_person' => 'Kepala Desa Bone',
