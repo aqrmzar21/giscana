@@ -210,7 +210,6 @@ class GiscanaDataSeeder extends Seeder
         EvacuationRoute::create([
             'name' => 'Emergency Route - Hillside',
             'description' => 'Emergency evacuation route for longsor-prone areas.',
-            'disaster_type' => 'longsor',
             'line_coordinates' => [
     [
         123.24333913601816,

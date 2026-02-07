@@ -33,7 +33,6 @@ class EvacuationRouteController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'disaster_type' => 'required|in:longsor,banjir,other',
             'line_coordinates' => 'required|json',
             'length_km' => 'nullable|numeric|min:0',
             'route_type' => 'required|in:primary,secondary,emergency',
@@ -76,7 +75,6 @@ class EvacuationRouteController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'disaster_type' => 'required|in:longsor,banjir,other',
             'line_coordinates' => 'required|json',
             'length_km' => 'nullable|numeric|min:0',
             'route_type' => 'required|in:primary,secondary,emergency',
