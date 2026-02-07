@@ -51,8 +51,10 @@
                         <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">Shelter</span>
                     @elseif($evacuationFacility->facility_type === 'evacuation_center')
                         <span class="inline-flex rounded-full bg-indigo-100 px-2 text-xs font-semibold leading-5 text-indigo-800">Pusat Evakuasi</span>
-                    @else
+                    @elseif($evacuationFacility->facility_type === 'assembly_point')
                         <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Titik Kumpul</span>
+                    @else
+                        <span class="inline-flex rounded-full bg-purple-100 px-2 text-xs font-semibold leading-5 text-purple-800">Lainnya</span>
                     @endif
                 </dd>
             </div>

@@ -247,7 +247,7 @@
                 </a>
             </div>
         @else
-            <a href="{{ route('map.index') }}" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+            <a href="{{ route('dashboard') }}" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
                 Akses Dashboard
             </a>
         @endguest

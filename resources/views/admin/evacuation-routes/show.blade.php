@@ -59,12 +59,12 @@
             <div>
                 <dt class="text-sm font-medium text-gray-500">Tipe Rute</dt>
                 <dd class="mt-1 text-sm text-gray-900">
-                    @if($evacuationRoute->route_type === 'road')
-                        Jalan
-                    @elseif($evacuationRoute->route_type === 'path')
-                        Jalan Setapak
+                    @if($evacuationRoute->route_type === 'primary')
+                        Utama
+                    @elseif($evacuationRoute->route_type === 'secondary')
+                        Sekunder
                     @else
-                        Jalur Air
+                        Darurat
                     @endif
                 </dd>
             </div>

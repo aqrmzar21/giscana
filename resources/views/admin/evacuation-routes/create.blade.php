@@ -57,9 +57,9 @@
                         <div class="mt-1">
                             <select id="route_type" name="route_type" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('route_type') border-red-300 @enderror">
                                 <option value="">Pilih Tipe Rute</option>
-                                <option value="road" {{ old('route_type') === 'road' ? 'selected' : '' }}>Jalan</option>
-                                <option value="path" {{ old('route_type') === 'path' ? 'selected' : '' }}>Jalan Setapak</option>
-                                <option value="waterway" {{ old('route_type') === 'waterway' ? 'selected' : '' }}>Jalur Air</option>
+                                <option value="primary" {{ old('route_type') === 'primary' ? 'selected' : '' }}>Utama</option>
+                                <option value="secondary" {{ old('route_type') === 'secondary' ? 'selected' : '' }}>Sekunder</option>
+                                <option value="emergency" {{ old('route_type') === 'emergency' ? 'selected' : '' }}>Darurat</option>
                             </select>
                             @error('route_type')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

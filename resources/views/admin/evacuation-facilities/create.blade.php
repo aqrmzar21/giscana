@@ -44,6 +44,7 @@
                             <option value="shelter" {{ old('facility_type') === 'shelter' ? 'selected' : '' }}>Shelter</option>
                             <option value="evacuation_center" {{ old('facility_type') === 'evacuation_center' ? 'selected' : '' }}>Pusat Evakuasi</option>
                             <option value="assembly_point" {{ old('facility_type') === 'assembly_point' ? 'selected' : '' }}>Titik Kumpul</option>
+                            <option value="other" {{ old('facility_type') === 'other' ? 'selected' : '' }}>Lainnya</option>
                         </select>
                         @error('facility_type')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

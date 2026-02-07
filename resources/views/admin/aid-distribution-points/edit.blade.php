@@ -43,11 +43,10 @@
                         <select id="aid_type" name="aid_type" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_type') border-red-300 @enderror">
                             <option value="">Pilih Tipe Bantuan</option>
                             <option value="food" {{ old('aid_type', $aidDistributionPoint->aid_type) === 'food' ? 'selected' : '' }}>Makanan</option>
-                            <option value="water" {{ old('aid_type', $aidDistributionPoint->aid_type) === 'water' ? 'selected' : '' }}>Air</option>
                             <option value="medical" {{ old('aid_type', $aidDistributionPoint->aid_type) === 'medical' ? 'selected' : '' }}>Medis</option>
-                            <option value="shelter" {{ old('aid_type', $aidDistributionPoint->aid_type) === 'shelter' ? 'selected' : '' }}>Shelter</option>
                             <option value="clothing" {{ old('aid_type', $aidDistributionPoint->aid_type) === 'clothing' ? 'selected' : '' }}>Pakaian</option>
-                            <option value="other" {{ old('aid_type', $aidDistributionPoint->aid_type) === 'other' ? 'selected' : '' }}>Lainnya</option>
+                            <option value="shelter" {{ old('aid_type', $aidDistributionPoint->aid_type) === 'shelter' ? 'selected' : '' }}>Shelter</option>
+                            <option value="mixed" {{ old('aid_type', $aidDistributionPoint->aid_type) === 'mixed' ? 'selected' : '' }}>Campuran</option>
                         </select>
                         @error('aid_type')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

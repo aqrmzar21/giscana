@@ -58,8 +58,10 @@
                                 <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">Shelter</span>
                             @elseif($facility->facility_type === 'evacuation_center')
                                 <span class="inline-flex rounded-full bg-indigo-100 px-2 text-xs font-semibold leading-5 text-indigo-800">Pusat Evakuasi</span>
-                            @else
+                            @elseif($facility->facility_type === 'assembly_point')
                                 <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Titik Kumpul</span>
+                            @else
+                                <span class="inline-flex rounded-full bg-purple-100 px-2 text-xs font-semibold leading-5 text-purple-800">Lainnya</span>
                             @endif
                         </td>
                         <td class="px-3 py-4 text-sm text-gray-500">{{ Str::limit($facility->address ?? '-', 30) }}</td>

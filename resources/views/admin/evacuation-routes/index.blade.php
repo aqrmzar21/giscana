@@ -63,12 +63,12 @@
                             @endif
                         </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            @if($route->route_type === 'road')
-                                Jalan
-                            @elseif($route->route_type === 'path')
-                                Jalan Setapak
+                            @if($route->route_type === 'primary')
+                                Utama
+                            @elseif($route->route_type === 'secondary')
+                                Sekunder
                             @else
-                                Jalur Air
+                                Darurat
                             @endif
                         </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($route->length_km ?? 0, 2) }}</td>

@@ -30,8 +30,7 @@ class GiscanaDataSeeder extends Seeder
 
         User::create([
             'name' => 'BPBD Staff',
-            'email' => 'staff@giscana.l
-            ocal',
+            'email' => 'staff@giscana.local',
             'password' => bcrypt('password'),
             'role' => 'staff',
             'phone' => '+6281234567891',
@@ -132,7 +131,7 @@ class GiscanaDataSeeder extends Seeder
         EvacuationFacility::create([
             'name' => 'SD Negeri Bone 1',
             'description' => 'Primary evacuation center located in Bone village.',
-            'facility_type' => 'school',
+            'facility_type' => 'evacuation_center',
             'point_coordinates' => [123.19, 0.49],
             'capacity' => 300,
             'address' => 'Jl. Pendidikan No. 1, Bone, Bone Bolango',
@@ -147,7 +146,7 @@ class GiscanaDataSeeder extends Seeder
         EvacuationFacility::create([
             'name' => 'Masjid Al-Ikhlas',
             'description' => 'Mosque serving as evacuation center with basic facilities.',
-            'facility_type' => 'mosque',
+            'facility_type' => 'shelter',
             'point_coordinates' => [123.17, 0.47],
             'capacity' => 200,
             'address' => 'Jl. Masjid Raya, Bone, Bone Bolango',
@@ -162,7 +161,7 @@ class GiscanaDataSeeder extends Seeder
         EvacuationFacility::create([
             'name' => 'Balai Desa Bone',
             'description' => 'Village hall equipped for emergency situations.',
-            'facility_type' => 'government_building',
+            'facility_type' => 'assembly_point',
             'point_coordinates' => [123.15, 0.45],
             'capacity' => 150,
             'address' => 'Jl. Pemuda No. 5, Bone, Bone Bolango',

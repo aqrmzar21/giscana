@@ -49,16 +49,14 @@
                 <dd class="mt-1 text-sm text-gray-900">
                     @if($aidDistributionPoint->aid_type === 'food')
                         <span class="inline-flex rounded-full bg-yellow-100 px-2 text-xs font-semibold leading-5 text-yellow-800">Makanan</span>
-                    @elseif($aidDistributionPoint->aid_type === 'water')
-                        <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">Air</span>
                     @elseif($aidDistributionPoint->aid_type === 'medical')
                         <span class="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800">Medis</span>
-                    @elseif($aidDistributionPoint->aid_type === 'shelter')
-                        <span class="inline-flex rounded-full bg-indigo-100 px-2 text-xs font-semibold leading-5 text-indigo-800">Shelter</span>
                     @elseif($aidDistributionPoint->aid_type === 'clothing')
                         <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Pakaian</span>
+                    @elseif($aidDistributionPoint->aid_type === 'shelter')
+                        <span class="inline-flex rounded-full bg-indigo-100 px-2 text-xs font-semibold leading-5 text-indigo-800">Shelter</span>
                     @else
-                        <span class="inline-flex rounded-full bg-purple-100 px-2 text-xs font-semibold leading-5 text-purple-800">Lainnya</span>
+                        <span class="inline-flex rounded-full bg-purple-100 px-2 text-xs font-semibold leading-5 text-purple-800">Campuran</span>
                     @endif
                 </dd>
             </div>

@@ -37,9 +37,9 @@
                             <a href="{{ route('home') }}" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                                 Beranda
                             </a>
-                            <a href="{{ route('map.index') }}" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                            {{-- <a href="{{ route('map.index') }}" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                                 Peta Interaktif
-                            </a>
+                            </a> --}}
                             <a href="#features" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                                 Fitur
                             </a>
@@ -53,7 +53,7 @@
                         @auth
                             <div class="flex items-center space-x-2">
                                 <!-- <span class="text-sm text-gray-700">Halo, {{ Auth::user()->name }}</span> -->
-                                <a href="{{ route('map.index') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+                                <a href="{{ route('dashboard') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
                                     Dashboard
                                 </a>
                                 <form method="POST" action="{{ route('logout') }}" class="inline">

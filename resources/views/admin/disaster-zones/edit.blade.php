@@ -61,7 +61,7 @@
                                 <option value="low" {{ old('risk_level', $disasterZone->risk_level) === 'low' ? 'selected' : '' }}>Rendah</option>
                                 <option value="medium" {{ old('risk_level', $disasterZone->risk_level) === 'medium' ? 'selected' : '' }}>Sedang</option>
                                 <option value="high" {{ old('risk_level', $disasterZone->risk_level) === 'high' ? 'selected' : '' }}>Tinggi</option>
-                                <option value="very_high" {{ old('risk_level', $disasterZone->risk_level) === 'very_high' ? 'selected' : '' }}>Sangat Tinggi</option>
+                                <option value="critical" {{ old('risk_level', $disasterZone->risk_level) === 'critical' ? 'selected' : '' }}>Sangat Tinggi / Kritis</option>
                             </select>
                             @error('risk_level')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

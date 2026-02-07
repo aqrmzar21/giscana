@@ -33,7 +33,7 @@ class AidDistributionPointController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'aid_type' => 'required|in:food,water,medical,shelter,clothing,other',
+            'aid_type' => 'required|in:food,medical,clothing,shelter,mixed',
             'point_coordinates' => 'required|json',
             'address' => 'nullable|string|max:500',
             'contact_person' => 'nullable|string|max:255',
@@ -77,7 +77,7 @@ class AidDistributionPointController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'aid_type' => 'required|in:food,water,medical,shelter,clothing,other',
+            'aid_type' => 'required|in:food,medical,clothing,shelter,mixed',
             'point_coordinates' => 'required|json',
             'address' => 'nullable|string|max:500',
             'contact_person' => 'nullable|string|max:255',
