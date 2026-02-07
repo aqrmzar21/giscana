@@ -33,7 +33,6 @@ class EvacuationFacilityController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'facility_type' => 'required|in:shelter,evacuation_center,assembly_point,other',
             'point_coordinates' => 'required|json',
             'capacity' => 'nullable|integer|min:0',
             'address' => 'nullable|string|max:500',
@@ -81,7 +80,6 @@ class EvacuationFacilityController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'facility_type' => 'required|in:shelter,evacuation_center,assembly_point,other',
             'point_coordinates' => 'required|json',
             'capacity' => 'nullable|integer|min:0',
             'address' => 'nullable|string|max:500',

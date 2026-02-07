@@ -80,7 +80,7 @@
                     <option value="all" {{ $disasterType === 'all' ? 'selected' : '' }}>Semua Jenis</option>
                     <option value="longsor" {{ $disasterType === 'longsor' ? 'selected' : '' }}>Longsor</option>
                     <option value="banjir" {{ $disasterType === 'banjir' ? 'selected' : '' }}>Banjir</option>
-                    <option value="other" {{ $disasterType === 'other' ? 'selected' : '' }}>Lainnya</option>
+                    <!-- <option value="other" {{ $disasterType === 'other' ? 'selected' : '' }}>Lainnya</option> -->
                 </select>
             </div>
 
@@ -107,7 +107,7 @@
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: #10b981;"></div>
-                    <span>Fasilitas Evakuasi</span>
+                    <span>Titik Kumpul</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: #f59e0b;"></div>

@@ -1,8 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', 'Tambah Fasilitas Evakuasi - Admin')
+@section('title', 'Tambah Titik Kumpul - Admin')
 
-@section('page-title', 'Tambah Fasilitas Evakuasi Baru')
+@section('page-title', 'Tambah Titik Kumpul Baru')
 
 @section('breadcrumb')
 <li class="inline-flex items-center">
@@ -10,7 +10,7 @@
     <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
 </li>
 <li class="inline-flex items-center">
-    <a href="{{ route('admin.evacuation-facilities.index') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-indigo-600">Fasilitas Evakuasi</a>
+    <a href="{{ route('admin.evacuation-facilities.index') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-indigo-600">Titik Kumpul</a>
     <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
 </li>
 <li class="inline-flex items-center">
@@ -21,7 +21,7 @@
 @section('content')
 <div class="bg-white shadow rounded-lg">
     <div class="px-4 py-5 sm:p-6">
-        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-6">Form Tambah Fasilitas Evakuasi</h3>
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-6">Form Tambah Titik Kumpul</h3>
         
         <form action="{{ route('admin.evacuation-facilities.store') }}" method="POST">
             @csrf
@@ -31,22 +31,6 @@
                     <div class="mt-1">
                         <input type="text" name="name" id="name" value="{{ old('name') }}" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('name') border-red-300 @enderror">
                         @error('name')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                <div>
-                    <label for="facility_type" class="block text-sm font-medium text-gray-700">Tipe Fasilitas <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <select id="facility_type" name="facility_type" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('facility_type') border-red-300 @enderror">
-                            <option value="">Pilih Tipe Fasilitas</option>
-                            <option value="shelter" {{ old('facility_type') === 'shelter' ? 'selected' : '' }}>Shelter</option>
-                            <option value="evacuation_center" {{ old('facility_type') === 'evacuation_center' ? 'selected' : '' }}>Pusat Evakuasi</option>
-                            <option value="assembly_point" {{ old('facility_type') === 'assembly_point' ? 'selected' : '' }}>Titik Kumpul</option>
-                            <option value="other" {{ old('facility_type') === 'other' ? 'selected' : '' }}>Lainnya</option>
-                        </select>
-                        @error('facility_type')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>

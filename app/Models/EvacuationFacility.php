@@ -12,7 +12,6 @@ class EvacuationFacility extends Model
     protected $fillable = [
         'name',
         'description',
-        'facility_type',
         'point_coordinates',
         'capacity',
         'address',
@@ -75,7 +74,6 @@ class EvacuationFacility extends Model
             'properties' => [
                 'id' => $this->id,
                 'name' => $this->name,
-                'facility_type' => $this->facility_type,
                 'capacity' => $this->capacity,
                 'address' => $this->address,
                 'contact_person' => $this->contact_person,
