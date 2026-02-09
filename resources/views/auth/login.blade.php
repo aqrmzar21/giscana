@@ -9,7 +9,8 @@
                 <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-gray-700">
                 <h2 class="text-3xl font-bold text-black mb-2">Giscana</h2>
                 </a>
-                <p class="text-primary-100">Masuk ke akun Anda</p>
+                <p class="text-primary-100">Silahkan masukkan email dan Password</p>
+                <!-- <p class="text-primary-100">Masuk ke akun Anda</p> -->
             </div>
 
             <div class="bg-white rounded-lg shadow-xl p-8">
@@ -37,12 +38,12 @@
                     </div>
 
                     <!-- Remember Me -->
-                    <div class="block mt-4">
+                    <!-- <div class="block mt-4">
                         <label for="remember_me" class="inline-flex items-center">
                             <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-primary-600 shadow-sm focus:ring-primary-500" name="remember">
                             <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
                         </label>
-                    </div>
+                    </div> -->
 
                     <div class="flex items-center justify-between mt-6">
                         @if (Route::has('password.request'))
