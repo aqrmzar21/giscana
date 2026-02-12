@@ -70,8 +70,8 @@
 <!-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"> -->
 <div class="max-f mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-blue-600">
     <div class="mb-6 text-center text-white">
-        <h1 class="text-3xl font-bold  mb-2">Peta Interaktif</h1>
-        <p class="text-sm">Visualisasi zona risiko bencana, rute evakuasi, fasilitas evakuasi, dan titik distribusi bantuan</p>
+        <!-- <h1 class="text-3xl font-bold  mb-2">Peta Interaktif</h1> -->
+        <!-- <p class="text-sm">Visualisasi zona risiko bencana, rute evakuasi, fasilitas evakuasi, dan titik distribusi bantuan</p> -->
     </div>
 
     <div class="map-container">
