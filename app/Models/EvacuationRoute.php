@@ -12,6 +12,7 @@ class EvacuationRoute extends Model
     protected $fillable = [
         'name',
         'description',
+        'disaster_type',
         'line_coordinates',
         'length_km',
         'route_type',

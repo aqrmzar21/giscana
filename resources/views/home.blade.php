@@ -52,7 +52,7 @@
                 <div class="text-green-100">Fasilitas Evakuasi</div>
             </div>
             <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-lg text-center">
-                <div class="text-3xl font-bold mb-2">{{ $stats['aid_distribution_points'] }}</div>
+                <div class="text-3xl font-bold mb-2">{{ $stats['aid_disasters'] }}</div>
                 <div class="text-purple-100">Pusat Bantuan</div>
             </div>
         </div>

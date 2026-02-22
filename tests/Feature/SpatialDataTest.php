@@ -8,7 +8,7 @@ use Tests\TestCase;
 use App\Models\DisasterZone;
 use App\Models\EvacuationRoute;
 use App\Models\EvacuationFacility;
-use App\Models\AidDistributionPoint;
+use App\Models\AidDisaster;
 
 class SpatialDataTest extends TestCase
 {
@@ -111,32 +111,25 @@ class SpatialDataTest extends TestCase
     }
 
     /**
-     * Test aid distribution point creation and retrieval
+     * Test aid disaster creation and retrieval
      */
-    public function test_aid_distribution_point_crud(): void
+    public function test_aid_disaster_crud(): void
     {
-        $aidPoint = AidDistributionPoint::create([
-            'name' => 'Test Aid Point',
-            'description' => 'Test aid point for testing',
-            'aid_type' => 'food',
-            'point_coordinates' => [123.0, 0.0],
-            'address' => 'Test Address',
-            'contact_person' => 'Test Person',
-            'contact_phone' => '+6281234567890',
-            'capacity_per_day' => 500,
-            'is_accessible' => true,
-            'is_active' => true,
+        $aidDisaster = AidDisaster::create([
+            'nama_kecamatan'          => 'Kecamatan Bone',
+            'jumlah_penerima_bantuan' => 500,
+            'bantuan_terdistribusi'   => 300,
+            'is_active'               => true,
         ]);
 
-        $this->assertDatabaseHas('aid_distribution_points', [
-            'name' => 'Test Aid Point',
-            'aid_type' => 'food',
+        $this->assertDatabaseHas('aid_disasters', [
+            'nama_kecamatan' => 'Kecamatan Bone',
+            'is_active'      => true,
         ]);
 
-        // Test GeoJSON conversion
-        $geoJson = $aidPoint->toGeoJSON();
-        $this->assertEquals('Feature', $geoJson['type']);
-        $this->assertEquals('Point', $geoJson['geometry']['type']);
+        // Test computed attributes
+        $this->assertEquals(200, $aidDisaster->sisa_bantuan);
+        $this->assertEquals(60, $aidDisaster->persentase_distribusi);
     }
 
     /**
@@ -170,7 +163,7 @@ class SpatialDataTest extends TestCase
                 'type',
                 'features'
             ],
-            'aid_distribution_points' => [
+            'aid_disasters' => [
                 'type',
                 'features'
             ],

@@ -107,9 +107,14 @@ Giscana is a comprehensive disaster management system that focuses on natural di
 - Point data for evacuation centers and shelters
 - Includes capacity, contact information, and facility types
 
-#### aid_distribution_points
-- Point data for aid distribution locations
-- Manages different types of aid and daily capacity
+#### aid_disasters
+- `id` (Primary Key)
+- `nama_kecamatan` (string)
+- `jumlah_penerima_bantuan` (integer)
+- `bantuan_terdistribusi` (integer)
+- `is_active` (boolean)
+- `last_synced_at` (timestamp)
+- `timestamps`
 
 ## API Endpoints
 
@@ -135,11 +140,11 @@ Giscana is a comprehensive disaster management system that focuses on natural di
 - `DELETE /api/evacuation-facilities/{id}` - Delete evacuation facility
 
 ### Aid Distribution Points
-- `GET /api/aid-distribution-points` - List all aid distribution points
-- `POST /api/aid-distribution-points` - Create new aid distribution point
-- `GET /api/aid-distribution-points/{id}` - Get specific aid distribution point
-- `PUT /api/aid-distribution-points/{id}` - Update aid distribution point
-- `DELETE /api/aid-distribution-points/{id}` - Delete aid distribution point
+- `GET /api/aid-disasters` - List all aid disasters data
+- `POST /api/aid-disasters` - Create new aid disaster record
+- `GET /api/aid-disasters/{id}` - Get specific aid disaster data
+- `PUT /api/aid-disasters/{id}` - Update aid disaster record
+- `DELETE /api/aid-disasters/{id}` - Delete aid disaster record
 
 ## Usage
 
