@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->enum('facility_type', ['shelter', 'evacuation_center', 'assembly_point', 'other']);
             $table->json('point_coordinates'); // Store GeoJSON point coordinates
             $table->integer('capacity')->nullable();
             $table->string('address')->nullable();

@@ -21,7 +21,10 @@
         <aside class="w-64 bg-white shadow-lg fixed h-screen overflow-y-auto">
             <div class="p-4">
                 <a href="{{ route('dashboard') }}" class="flex items-center space-x-2">
-                    <x-application-logo class="block h-8 w-auto fill-current text-gray-800" />
+                    <!-- <x-application-logo class="block h-8 w-auto fill-current text-gray-800" /> -->
+                     <svg class="w-8 h-8 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                    </svg>
                     <span class="text-xl font-bold text-gray-800">Giscana</span>
                 </a>
             </div>

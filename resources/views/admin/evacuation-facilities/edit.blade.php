@@ -37,21 +37,6 @@
                     </div>
                 </div>
 
-                <div>
-                    <label for="facility_type" class="block text-sm font-medium text-gray-700">Tipe Fasilitas <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <select id="facility_type" name="facility_type" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('facility_type') border-red-300 @enderror">
-                            <option value="">Pilih Tipe Fasilitas</option>
-                            <option value="shelter" {{ old('facility_type', $evacuationFacility->facility_type) === 'shelter' ? 'selected' : '' }}>Shelter</option>
-                            <option value="evacuation_center" {{ old('facility_type', $evacuationFacility->facility_type) === 'evacuation_center' ? 'selected' : '' }}>Pusat Evakuasi</option>
-                            <option value="assembly_point" {{ old('facility_type', $evacuationFacility->facility_type) === 'assembly_point' ? 'selected' : '' }}>Titik Kumpul</option>
-                            <option value="other" {{ old('facility_type', $evacuationFacility->facility_type) === 'other' ? 'selected' : '' }}>Lainnya</option>
-                        </select>
-                        @error('facility_type')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
 
                 <div>
                     <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>

@@ -12,8 +12,11 @@
     }
     .map-controls {
         position: absolute;
-        top: 10px;
-        right: 10px;
+        /* top: 10px;
+        right: 10px; */
+        top: 180px;
+        bottom: 10px;
+        left: 10px;
         z-index: 1000;
         background: white;
         padding: 15px;
@@ -64,10 +67,11 @@
 @endpush
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Peta Interaktif</h1>
-        <p class="text-gray-600">Visualisasi zona risiko bencana, rute evakuasi, fasilitas evakuasi, dan titik distribusi bantuan</p>
+<!-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"> -->
+<div class="max-f mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-blue-600">
+    <div class="mb-6 text-center text-white">
+        <!-- <h1 class="text-3xl font-bold  mb-2">Peta Interaktif</h1> -->
+        <!-- <p class="text-sm">Visualisasi zona risiko bencana, rute evakuasi, fasilitas evakuasi, dan titik distribusi bantuan</p> -->
     </div>
 
     <div class="map-container">
@@ -80,7 +84,7 @@
                     <option value="all" {{ $disasterType === 'all' ? 'selected' : '' }}>Semua Jenis</option>
                     <option value="longsor" {{ $disasterType === 'longsor' ? 'selected' : '' }}>Longsor</option>
                     <option value="banjir" {{ $disasterType === 'banjir' ? 'selected' : '' }}>Banjir</option>
-                    <option value="other" {{ $disasterType === 'other' ? 'selected' : '' }}>Lainnya</option>
+                    <!-- <option value="other" {{ $disasterType === 'other' ? 'selected' : '' }}>Lainnya</option> -->
                 </select>
             </div>
 
@@ -107,7 +111,7 @@
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: #10b981;"></div>
-                    <span>Fasilitas Evakuasi</span>
+                    <span>Titik Kumpul</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: #f59e0b;"></div>
