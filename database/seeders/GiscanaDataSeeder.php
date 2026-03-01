@@ -229,7 +229,7 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         $facilitySmk = EvacuationFacility::where('name', 'SMK Negeri Bone 1')->first();
-        $facilityMasjid = EvacuationFacility::where('name', 'Masjid Al-Ikhlas')->first();
+        $facilityMasjid = EvacuationFacility::where('name', 'Masjid Oluhuta')->first();
         $facilityBalai = EvacuationFacility::where('name', 'Balai Desa Bone')->first();
         $facilityGedung = EvacuationFacility::where('name', 'Gedung Pertemuan Kaidundu')->first();
 
@@ -241,9 +241,13 @@ class GiscanaDataSeeder extends Seeder
             'description' => 'Secondary evacuation route through village paths.',
             'disaster_type' => 'banjir',
             'line_coordinates' => [
-                [123.27274354360497, 0.32568160865849904],
-                [123.27333441180394, 0.32810857616267697],
-                [123.27329629127473, 0.3285787216328657]
+                [123.30000216080441,0.32138895529709544],
+                [123.29920593791996,0.31983634498158153],
+                [123.29917408912803,0.3195974820427381],
+                [123.30064608692544,0.3188280472324152],
+                [123.30104419836829,0.3189713651314037],
+                [123.30154581878514,0.3187165777539036],
+                [123.30124950328184,0.3181495056982868]
             ],
             'length_km' => 2.1,
             'route_type' => 'secondary',
