@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Giscana') }} - @yield('title', 'Geographic Information System for Natural Disaster Mitigation')</title>
+    <title>{{ config('app.name', 'Giscana') }} - @yield('title', 'GIScana')</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -83,9 +83,9 @@
             <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
-                        <h3 class="text-lg font-semibold mb-4">Giscana</h3>
+                        <h3 class="text-lg font-semibold mb-4">Gisnater</h3>
                         <p class="text-gray-400 mb-4">
-                            Geographic Information System for Natural Disaster Mitigation 
+                            Geographic Information System for Natural Disaster  
                             di Kawasan Pesisir Bone, Kabupaten Bone Bolango, Provinsi Gorontalo.
                         </p>
                     </div>

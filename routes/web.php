@@ -28,7 +28,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::resource('disaster-zones', \App\Http\Controllers\Admin\DisasterZoneController::class);
     Route::resource('evacuation-routes', \App\Http\Controllers\Admin\EvacuationRouteController::class);
     Route::resource('evacuation-facilities', \App\Http\Controllers\Admin\EvacuationFacilityController::class);
-    Route::resource('aid-distribution-points', \App\Http\Controllers\Admin\AidDistributionPointController::class);
+    Route::resource('aid-disasters', \App\Http\Controllers\Admin\AidDisasterController::class);
 });
 
 require __DIR__.'/auth.php';

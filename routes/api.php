@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\DisasterZoneController;
 use App\Http\Controllers\Api\EvacuationRouteController;
 use App\Http\Controllers\Api\EvacuationFacilityController;
-use App\Http\Controllers\Api\AidDistributionPointController;
+use App\Http\Controllers\Api\AidDisasterController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -15,4 +15,4 @@ Route::get('/user', function (Request $request) {
 Route::apiResource('disaster-zones', DisasterZoneController::class);
 Route::apiResource('evacuation-routes', EvacuationRouteController::class);
 Route::apiResource('evacuation-facilities', EvacuationFacilityController::class);
-Route::apiResource('aid-distribution-points', AidDistributionPointController::class);
+Route::apiResource('aid-disasters', AidDisasterController::class);

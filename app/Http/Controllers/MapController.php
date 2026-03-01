@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DisasterZone;
 use App\Models\EvacuationRoute;
 use App\Models\EvacuationFacility;
-use App\Models\AidDistributionPoint;
+use App\Models\AidDisaster;
 use Illuminate\Http\Request;
 
 class MapController extends Controller
@@ -49,8 +49,8 @@ class MapController extends Controller
         // Get evacuation facilities
         $facilities = EvacuationFacility::active()->accessible()->get();
 
-        // Get aid distribution points
-        $aidPoints = AidDistributionPoint::active()->accessible()->get();
+        // Get aid disasters data
+        $aidDisasters = AidDisaster::active()->get();
 
         return response()->json([
             'disaster_zones' => [
@@ -65,9 +65,19 @@ class MapController extends Controller
                 'type' => 'FeatureCollection',
                 'features' => $facilities->map(fn($facility) => $facility->toGeoJSON()),
             ],
-            'aid_distribution_points' => [
+            'aid_disasters' => [
                 'type' => 'FeatureCollection',
-                'features' => $aidPoints->map(fn($point) => $point->toGeoJSON()),
+                'features' => $aidDisasters->map(fn($item) => [
+                    'type' => 'Feature',
+                    'properties' => [
+                        'id'                      => $item->id,
+                        'nama_kecamatan'          => $item->nama_kecamatan,
+                        'jumlah_penerima_bantuan' => $item->jumlah_penerima_bantuan,
+                        'bantuan_terdistribusi'   => $item->bantuan_terdistribusi,
+                        'persentase_distribusi'   => $item->persentase_distribusi,
+                    ],
+                    'geometry' => null, // No coordinates — data statistik
+                ]),
             ],
         ]);
     }

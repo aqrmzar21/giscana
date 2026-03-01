@@ -94,13 +94,13 @@
                 </div>
                 <div class="ml-5 w-0 flex-1">
                     <dl>
-                        <dt class="text-sm font-medium text-gray-500 truncate">Titik Distribusi Bantuan</dt>
-                        <dd class="text-lg font-semibold text-gray-900">{{ \App\Models\AidDistributionPoint::count() }}</dd>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Data Bantuan Bencana</dt>
+                        <dd class="text-lg font-semibold text-gray-900">{{ \App\Models\AidDisaster::count() }}</dd>
                     </dl>
                 </div>
             </div>
             <div class="mt-4">
-                <a href="{{ route('admin.aid-distribution-points.index') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                <a href="{{ route('admin.aid-disasters.index') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                     Lihat Detail <span aria-hidden="true">&rarr;</span>
                 </a>
             </div>

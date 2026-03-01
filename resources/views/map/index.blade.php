@@ -114,8 +114,10 @@
                     <span>Titik Kumpul</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #f59e0b;"></div>
-                    <span>Titik Distribusi Bantuan</span>
+                    <div class="w-5 h-5 mr-2 flex items-center justify-center">
+                        <i class="fas fa-info-circle text-orange-500"></i>
+                    </div>
+                    <span>Data Bantuan Bencana</span>
                 </div>
             </div>
         </div>
@@ -217,32 +219,16 @@
                     `);
                 });
 
-                // Add aid distribution points (points)
-                data.aid_distribution_points.features.forEach(feature => {
-                    const [lng, lat] = feature.geometry.coordinates;
-                    const marker = L.marker([lat, lng], {
-                        icon: L.divIcon({
-                            className: 'aid-point-marker',
-                            html: '<div style="background-color: #f59e0b; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;"></div>',
-                            iconSize: [20, 20]
-                        })
-                    }).addTo(layers.aidDistributionPoints);
-
-                    marker.bindPopup(`
-                        <strong>${feature.properties.name}</strong><br>
-                        Tipe Bantuan: ${feature.properties.aid_type}<br>
-                        Alamat: ${feature.properties.address || '-'}<br>
-                        Kapasitas: ${feature.properties.capacity_per_day} orang/hari<br>
-                        Kontak: ${feature.properties.contact_person || '-'}<br>
-                        Telp: ${feature.properties.contact_phone || '-'}
-                    `);
-                });
+                // Add aid disasters data (statistik per kecamatan — tanpa koordinat)
+                // Data ini ditampilkan sebagai info panel, bukan marker di peta
+                if (data.aid_disasters && data.aid_disasters.features.length > 0) {
+                    console.log('Data bantuan bencana:', data.aid_disasters.features.length, 'kecamatan');
+                }
 
                 // Fit map to bounds if there are features
                 if (data.disaster_zones.features.length > 0 || 
                     data.evacuation_routes.features.length > 0 ||
-                    data.evacuation_facilities.features.length > 0 ||
-                    data.aid_distribution_points.features.length > 0) {
+                    data.evacuation_facilities.features.length > 0) {
                     const allBounds = [];
                     Object.values(layers).forEach(layer => {
                         layer.eachLayer(l => {
