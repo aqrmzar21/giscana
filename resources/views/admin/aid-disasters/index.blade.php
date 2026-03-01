@@ -26,7 +26,7 @@
 
         <div class="sm:flex sm:items-center mb-4">
             <div class="sm:flex-auto">
-                <h3 class="text-lg font-medium leading-6 text-gray-900">Daftar Data Bantuan Bencana</h3>
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Daftar Bantuan Bencana</h3>
                 <p class="mt-2 text-sm text-gray-700">Data jumlah penerima dan distribusi bantuan per kecamatan.</p>
             </div>
             <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
