@@ -238,23 +238,33 @@ class GiscanaDataSeeder extends Seeder
 
         // Sample aid disasters data
         AidDisaster::create([
-            'nama_kecamatan'          => 'Kecamatan Bone',
-            'jumlah_penerima_bantuan' => 500,
-            'bantuan_terdistribusi'   => 320,
-            'is_active'               => true,
-        ]);
-
-        AidDisaster::create([
             'nama_kecamatan'          => 'Kecamatan Kabila Bone',
             'jumlah_penerima_bantuan' => 350,
             'bantuan_terdistribusi'   => 150,
             'is_active'               => true,
         ]);
-
         AidDisaster::create([
-            'nama_kecamatan'          => 'Kecamatan Suwawa',
+            'nama_kecamatan'          => 'Kecamatan Bone',
+            'jumlah_penerima_bantuan' => 100,
+            'bantuan_terdistribusi'   => 80,
+            'is_active'               => true,
+        ]);
+        AidDisaster::create([
+            'nama_kecamatan'          => 'Kecamatan Bone Pantai',
             'jumlah_penerima_bantuan' => 700,
-            'bantuan_terdistribusi'   => 680,
+            'bantuan_terdistribusi'   => 460,
+            'is_active'               => true,
+        ]);
+        AidDisaster::create([
+            'nama_kecamatan'          => 'Kecamatan Bone Raya',
+            'jumlah_penerima_bantuan' => 200,
+            'bantuan_terdistribusi'   => 130,
+            'is_active'               => true,
+        ]);
+        AidDisaster::create([
+            'nama_kecamatan'          => 'Kecamatan Bulawa',
+            'jumlah_penerima_bantuan' => 500,
+            'bantuan_terdistribusi'   => 280,
             'is_active'               => true,
         ]);
     }
