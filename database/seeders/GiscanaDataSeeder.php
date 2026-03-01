@@ -199,6 +199,22 @@ class GiscanaDataSeeder extends Seeder
         EvacuationFacility::create([
             'aid_disaster_id' => $kecamatanBulawa->id,
             'nama_kecamatan' => $kecamatanBulawa->nama_kecamatan,
+            'name' => 'Titik Kumpul',
+            'description' => 'area null as evacuation center with basic facilities.',
+            'point_coordinates' => [123.2514177981202, 0.3494345195302344],
+            'capacity' => 200,
+            'address' => 'Jl. Masjid Raya, Bone, Bone Bolango',
+            'contact_person' => 'Ustadz Rahman',
+            'contact_phone' => '+6281234567893',
+            'has_medical_facility' => false,
+            'has_food_storage' => true,
+            'is_accessible' => true,
+            'is_active' => true,
+        ]);
+        
+        EvacuationFacility::create([
+            'aid_disaster_id' => $kecamatanBulawa->id,
+            'nama_kecamatan' => $kecamatanBulawa->nama_kecamatan,
             'name' => 'Gedung Pertemuan',
             'description' => 'Gedung pertemuan yang sering digunakan untuk kegiatan masyarakat',
             'point_coordinates' => [123.28091613555262,0.3204120222883091],
