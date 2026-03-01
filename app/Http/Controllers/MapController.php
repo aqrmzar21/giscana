@@ -39,15 +39,15 @@ class MapController extends Controller
         }
         $zones = $zonesQuery->get();
 
-        // Get evacuation routes
-        $routesQuery = EvacuationRoute::active()->accessible();
+        // Get evacuation routes (dengan relasi ke evacuation_facility untuk nama_fasilitas)
+        $routesQuery = EvacuationRoute::with('evacuationFacility')->active()->accessible();
         if ($disasterType && $disasterType !== 'all') {
             $routesQuery->byDisasterType($disasterType);
         }
         $routes = $routesQuery->get();
 
-        // Get evacuation facilities
-        $facilities = EvacuationFacility::active()->accessible()->get();
+        // Get evacuation facilities (dengan relasi ke aid_disaster untuk nama_kecamatan)
+        $facilities = EvacuationFacility::with('aidDisaster')->active()->accessible()->get();
 
         // Get aid disasters data
         $aidDisasters = AidDisaster::active()->get();

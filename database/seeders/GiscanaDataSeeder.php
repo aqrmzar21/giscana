@@ -111,8 +111,97 @@ class GiscanaDataSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        // Sample evacuation routes
+        // 5 kecamatan inti (default) — data bantuan bencana per kecamatan
+        AidDisaster::create([
+            'nama_kecamatan'          => 'Kecamatan Kabila Bone',
+            'jumlah_penerima_bantuan' => 350,
+            'bantuan_terdistribusi'   => 150,
+            'is_active'               => true,
+        ]);
+        AidDisaster::create([
+            'nama_kecamatan'          => 'Kecamatan Bone',
+            'jumlah_penerima_bantuan' => 100,
+            'bantuan_terdistribusi'   => 80,
+            'is_active'               => true,
+        ]);
+        AidDisaster::create([
+            'nama_kecamatan'          => 'Kecamatan Bone Pantai',
+            'jumlah_penerima_bantuan' => 700,
+            'bantuan_terdistribusi'   => 460,
+            'is_active'               => true,
+        ]);
+        AidDisaster::create([
+            'nama_kecamatan'          => 'Kecamatan Bone Raya',
+            'jumlah_penerima_bantuan' => 200,
+            'bantuan_terdistribusi'   => 130,
+            'is_active'               => true,
+        ]);
+        AidDisaster::create([
+            'nama_kecamatan'          => 'Kecamatan Bulawa',
+            'jumlah_penerima_bantuan' => 500,
+            'bantuan_terdistribusi'   => 280,
+            'is_active'               => true,
+        ]);
+
+        $kecamatanBone = AidDisaster::where('nama_kecamatan', 'Kecamatan Bone')->first();
+
+        // Sample evacuation facilities (terkait kecamatan via aid_disaster_id + nama_kecamatan)
+        EvacuationFacility::create([
+            'aid_disaster_id' => $kecamatanBone->id,
+            'nama_kecamatan' => $kecamatanBone->nama_kecamatan,
+            'name' => 'SMK Negeri Bone 1',
+            'description' => 'Primary evacuation center located in Bone village.',
+            'point_coordinates' => [123.2180174509013, 0.3739372685927513],
+            'capacity' => 300,
+            'address' => 'Jl. Pendidikan No. 1, Bone, Bone Bolango',
+            'contact_person' => 'Bapak Ahmad',
+            'contact_phone' => '+6281234567892',
+            'has_medical_facility' => true,
+            'has_food_storage' => true,
+            'is_accessible' => true,
+            'is_active' => true,
+        ]);
+
+        EvacuationFacility::create([
+            'aid_disaster_id' => $kecamatanBone->id,
+            'nama_kecamatan' => $kecamatanBone->nama_kecamatan,
+            'name' => 'Masjid Al-Ikhlas',
+            'description' => 'Mosque serving as evacuation center with basic facilities.',
+            'point_coordinates' => [123.2514177981202, 0.3494345195302344],
+            'capacity' => 200,
+            'address' => 'Jl. Masjid Raya, Bone, Bone Bolango',
+            'contact_person' => 'Ustadz Rahman',
+            'contact_phone' => '+6281234567893',
+            'has_medical_facility' => false,
+            'has_food_storage' => true,
+            'is_accessible' => true,
+            'is_active' => true,
+        ]);
+
+        EvacuationFacility::create([
+            'aid_disaster_id' => $kecamatanBone->id,
+            'nama_kecamatan' => $kecamatanBone->nama_kecamatan,
+            'name' => 'Balai Desa Bone',
+            'description' => 'Village hall equipped for emergency situations.',
+            'point_coordinates' => [123.220285, 0.391023],
+            'capacity' => 150,
+            'address' => 'Jl. Pemuda No. 5, Bone, Bone Bolango',
+            'contact_person' => 'Bapak Rusi',
+            'contact_phone' => '+6281234567894',
+            'has_medical_facility' => false,
+            'has_food_storage' => false,
+            'is_accessible' => true,
+            'is_active' => true,
+        ]);
+
+        $facilitySmk = EvacuationFacility::where('name', 'SMK Negeri Bone 1')->first();
+        $facilityMasjid = EvacuationFacility::where('name', 'Masjid Al-Ikhlas')->first();
+        $facilityBalai = EvacuationFacility::where('name', 'Balai Desa Bone')->first();
+
+        // Sample evacuation routes (terkait fasilitas via evacuation_facility_id + nama_fasilitas dari evacuation_facilities.name)
         EvacuationRoute::create([
+            'evacuation_facility_id' => $facilitySmk->id,
+            'nama_fasilitas' => $facilitySmk->name,
             'name' => 'Secondary Route - Village Path',
             'description' => 'Secondary evacuation route through village paths.',
             'disaster_type' => 'banjir',
@@ -129,6 +218,8 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         EvacuationRoute::create([
+            'evacuation_facility_id' => $facilitySmk->id,
+            'nama_fasilitas' => $facilitySmk->name,
             'name' => 'Primary Evacuation Route - Main Road',
             'description' => 'Main evacuation route connecting high-risk areas to evacuation centers.',
             'disaster_type' => 'other',
@@ -160,6 +251,8 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         EvacuationRoute::create([
+            'evacuation_facility_id' => $facilityMasjid->id,
+            'nama_fasilitas' => $facilityMasjid->name,
             'name' => 'Emergency Route - Hillside',
             'description' => 'Emergency evacuation route for longsor-prone areas.',
             'disaster_type' => 'longsor',
@@ -191,81 +284,6 @@ class GiscanaDataSeeder extends Seeder
             'capacity_per_hour' => 150,
             'is_accessible' => true,
             'is_active' => true,
-        ]);
-
-        // Sample evacuation facilities
-        EvacuationFacility::create([
-            'name' => 'SMK Negeri Bone 1',
-            'description' => 'Primary evacuation center located in Bone village.',
-            'point_coordinates' => [123.2180174509013, 0.3739372685927513],
-            'capacity' => 300,
-            'address' => 'Jl. Pendidikan No. 1, Bone, Bone Bolango',
-            'contact_person' => 'Bapak Ahmad',
-            'contact_phone' => '+6281234567892',
-            'has_medical_facility' => true,
-            'has_food_storage' => true,
-            'is_accessible' => true,
-            'is_active' => true,
-        ]);
-
-        EvacuationFacility::create([
-            'name' => 'Masjid Al-Ikhlas',
-            'description' => 'Mosque serving as evacuation center with basic facilities.',
-            'point_coordinates' => [123.2514177981202, 0.3494345195302344],
-            'capacity' => 200,
-            'address' => 'Jl. Masjid Raya, Bone, Bone Bolango',
-            'contact_person' => 'Ustadz Rahman',
-            'contact_phone' => '+6281234567893',
-            'has_medical_facility' => false,
-            'has_food_storage' => true,
-            'is_accessible' => true,
-            'is_active' => true,
-        ]);
-
-        EvacuationFacility::create([
-            'name' => 'Balai Desa Bone',
-            'description' => 'Village hall equipped for emergency situations.',
-            'point_coordinates' => [123.220285, 0.391023],
-            'capacity' => 150,
-            'address' => 'Jl. Pemuda No. 5, Bone, Bone Bolango',
-            'contact_person' => 'Bapak Rusi',
-            'contact_phone' => '+6281234567894',
-            'has_medical_facility' => false,
-            'has_food_storage' => false,
-            'is_accessible' => true,
-            'is_active' => true,
-        ]);
-
-        // Sample aid disasters data
-        AidDisaster::create([
-            'nama_kecamatan'          => 'Kecamatan Kabila Bone',
-            'jumlah_penerima_bantuan' => 350,
-            'bantuan_terdistribusi'   => 150,
-            'is_active'               => true,
-        ]);
-        AidDisaster::create([
-            'nama_kecamatan'          => 'Kecamatan Bone',
-            'jumlah_penerima_bantuan' => 100,
-            'bantuan_terdistribusi'   => 80,
-            'is_active'               => true,
-        ]);
-        AidDisaster::create([
-            'nama_kecamatan'          => 'Kecamatan Bone Pantai',
-            'jumlah_penerima_bantuan' => 700,
-            'bantuan_terdistribusi'   => 460,
-            'is_active'               => true,
-        ]);
-        AidDisaster::create([
-            'nama_kecamatan'          => 'Kecamatan Bone Raya',
-            'jumlah_penerima_bantuan' => 200,
-            'bantuan_terdistribusi'   => 130,
-            'is_active'               => true,
-        ]);
-        AidDisaster::create([
-            'nama_kecamatan'          => 'Kecamatan Bulawa',
-            'jumlah_penerima_bantuan' => 500,
-            'bantuan_terdistribusi'   => 280,
-            'is_active'               => true,
         ]);
     }
 }

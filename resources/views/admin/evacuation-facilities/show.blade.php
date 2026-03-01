@@ -45,6 +45,10 @@
                 <dd class="mt-1 text-sm text-gray-900">{{ $evacuationFacility->name }}</dd>
             </div>
             <div>
+                <dt class="text-sm font-medium text-gray-500">Kecamatan</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ $evacuationFacility->nama_kecamatan ?? $evacuationFacility->aidDisaster?->nama_kecamatan ?? '-' }}</dd>
+            </div>
+            <div>
                 <dt class="text-sm font-medium text-gray-500">Tipe Fasilitas</dt>
                 <dd class="mt-1 text-sm text-gray-900">
                     @if($evacuationFacility->facility_type === 'shelter')

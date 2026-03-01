@@ -211,7 +211,6 @@
 
                     marker.bindPopup(`
                         <strong>${feature.properties.name}</strong><br>
-                        Tipe: ${feature.properties.facility_type}<br>
                         Alamat: ${feature.properties.address || '-'}<br>
                         Kapasitas: ${feature.properties.capacity} orang<br>
                         ${feature.properties.has_medical_facility ? '✓ Fasilitas Medis' : ''}<br>

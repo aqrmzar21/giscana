@@ -45,6 +45,10 @@
                 <dd class="mt-1 text-sm text-gray-900">{{ $evacuationRoute->name }}</dd>
             </div>
             <div>
+                <dt class="text-sm font-medium text-gray-500">Nama Fasilitas (Tujuan)</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ $evacuationRoute->nama_fasilitas ?? $evacuationRoute->evacuationFacility?->name ?? '-' }}</dd>
+            </div>
+            <div>
                 <dt class="text-sm font-medium text-gray-500">Jenis Bencana</dt>
                 <dd class="mt-1 text-sm text-gray-900">
                     @if($evacuationRoute->disaster_type === 'longsor')
