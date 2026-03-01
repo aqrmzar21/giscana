@@ -199,15 +199,15 @@ class GiscanaDataSeeder extends Seeder
         EvacuationFacility::create([
             'aid_disaster_id' => $kecamatanBulawa->id,
             'nama_kecamatan' => $kecamatanBulawa->nama_kecamatan,
-            'name' => 'Titik Kumpul',
-            'description' => 'area null as evacuation center with basic facilities.',
-            'point_coordinates' => [123.2514177981202, 0.3494345195302344],
-            'capacity' => 200,
-            'address' => 'Jl. Masjid Raya, Bone, Bone Bolango',
-            'contact_person' => 'Ustadz Rahman',
-            'contact_phone' => '+6281234567893',
+            'name' => 'Gedung Pertemuan',
+            'description' => 'Gedung pertemuan yang sering digunakan untuk kegiatan masyarakat',
+            'point_coordinates' => [123.28091613555262,0.3204120222883091],
+            'capacity' => 150,
+            'address' => 'Jl. Raya No. 8, Desa Patoa',
+            'contact_person' => 'Bapak Supriyadi',
+            'contact_phone' => '+6282198765432',
             'has_medical_facility' => false,
-            'has_food_storage' => true,
+            'has_food_storage' => false,
             'is_accessible' => true,
             'is_active' => true,
         ]);
@@ -215,13 +215,13 @@ class GiscanaDataSeeder extends Seeder
         EvacuationFacility::create([
             'aid_disaster_id' => $kecamatanBulawa->id,
             'nama_kecamatan' => $kecamatanBulawa->nama_kecamatan,
-            'name' => 'Gedung Pertemuan Kaidundu',
-            'description' => 'Gedung pertemuan yang sering digunakan untuk kegiatan masyarakat',
-            'point_coordinates' => [123.28091613555262,0.3204120222883091],
-            'capacity' => 150,
-            'address' => 'Jl. Raya No. 8, Desa Kaidundu',
-            'contact_person' => 'Bapak Supriyadi',
-            'contact_phone' => '+6282198765432',
+            'name' => 'Lapangan Pertemuan',
+            'description' => 'lahan kososng tempat kumpul masyarakat dengan ketinggian yang cukup',
+            'point_coordinates' => [123.30000155640084,0.3213922903642299],
+            'capacity' => 50,
+            'address' => 'Jl. Trans Sulawesi, Desa Mamunga Timur',
+            'contact_person' => 'Bapak Hasan',
+            'contact_phone' => '+6287889900112',
             'has_medical_facility' => false,
             'has_food_storage' => false,
             'is_accessible' => true,
@@ -231,7 +231,7 @@ class GiscanaDataSeeder extends Seeder
         $facilitySmk = EvacuationFacility::where('name', 'SMK Negeri Bone 1')->first();
         $facilityMasjid = EvacuationFacility::where('name', 'Masjid Oluhuta')->first();
         $facilityBalai = EvacuationFacility::where('name', 'Balai Desa Bone')->first();
-        $facilityGedung = EvacuationFacility::where('name', 'Gedung Pertemuan Kaidundu')->first();
+        $facilityGedung = EvacuationFacility::where('name', 'Gedung Pertemuan')->first();
 
         // Sample evacuation routes (terkait fasilitas via evacuation_facility_id + nama_fasilitas dari evacuation_facilities.name)
         EvacuationRoute::create([
