@@ -228,7 +228,7 @@ class GiscanaDataSeeder extends Seeder
             'point_coordinates' => [123.220285, 0.391023],
             'capacity' => 150,
             'address' => 'Jl. Pemuda No. 5, Bone, Bone Bolango',
-            'contact_person' => 'Kepala Desa Bone',
+            'contact_person' => 'Bapak Rusi',
             'contact_phone' => '+6281234567894',
             'has_medical_facility' => false,
             'has_food_storage' => false,
