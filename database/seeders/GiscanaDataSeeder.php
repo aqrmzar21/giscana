@@ -144,6 +144,7 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         $kecamatanBone = AidDisaster::where('nama_kecamatan', 'Kecamatan Bone')->first();
+        $kecamatanBulawa = AidDisaster::where('nama_kecamatan', 'Kecamatan Bulawa')->first();
 
         // Sample evacuation facilities (terkait kecamatan via aid_disaster_id + nama_kecamatan)
         EvacuationFacility::create([
@@ -194,9 +195,26 @@ class GiscanaDataSeeder extends Seeder
             'is_active' => true,
         ]);
 
+        EvacuationFacility::create([
+            'aid_disaster_id' => $kecamatanBulawa->id,
+            'nama_kecamatan' => $kecamatanBulawa->nama_kecamatan,
+            'name' => 'Gedung Pertemuan Kaidundu',
+            'description' => 'Gedung pertemuan yang sering digunakan untuk kegiatan masyarakat',
+            'point_coordinates' => [123.28091613555262,0.3204120222883091],
+            'capacity' => 150,
+            'address' => 'Jl. Raya No. 8, Desa Kaidundu',
+            'contact_person' => 'Bapak Supriyadi',
+            'contact_phone' => '+6282198765432',
+            'has_medical_facility' => false,
+            'has_food_storage' => false,
+            'is_accessible' => true,
+            'is_active' => true,
+        ]);
+
         $facilitySmk = EvacuationFacility::where('name', 'SMK Negeri Bone 1')->first();
         $facilityMasjid = EvacuationFacility::where('name', 'Masjid Al-Ikhlas')->first();
         $facilityBalai = EvacuationFacility::where('name', 'Balai Desa Bone')->first();
+        $facilityGedung = EvacuationFacility::where('name', 'Gedung Pertemuan Kaidundu')->first();
 
         // Sample evacuation routes (terkait fasilitas via evacuation_facility_id + nama_fasilitas dari evacuation_facilities.name)
         EvacuationRoute::create([
@@ -218,8 +236,8 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         EvacuationRoute::create([
-            'evacuation_facility_id' => $facilitySmk->id,
-            'nama_fasilitas' => $facilitySmk->name,
+            'evacuation_facility_id' => $facilityGedung->id,
+            'nama_fasilitas' => $facilitk->name,
             'name' => 'Primary Evacuation Route - Main Road',
             'description' => 'Main evacuation route connecting high-risk areas to evacuation centers.',
             'disaster_type' => 'other',
