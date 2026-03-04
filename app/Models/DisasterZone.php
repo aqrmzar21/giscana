@@ -14,14 +14,14 @@ class DisasterZone extends Model
         'disaster_type',
         'description',
         'risk_level',
-        'polygon_coordinates',
+        'point_coordinates',
         'area_hectares',
         'affected_population',
         'is_active',
     ];
 
     protected $casts = [
-        'polygon_coordinates' => 'array',
+        'point_coordinates' => 'array',
         'area_hectares' => 'decimal:2',
         'affected_population' => 'integer',
         'is_active' => 'boolean',
@@ -67,8 +67,8 @@ class DisasterZone extends Model
                 'affected_population' => $this->affected_population,
             ],
             'geometry' => [
-                'type' => 'Polygon',
-                'coordinates' => $this->polygon_coordinates,
+                'type' => 'Point',
+                'coordinates' => $this->point_coordinates,
             ],
         ];
     }

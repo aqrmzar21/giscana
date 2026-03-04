@@ -94,7 +94,7 @@
                 </div>
                 <div class="ml-5 w-0 flex-1">
                     <dl>
-                        <dt class="text-sm font-medium text-gray-500 truncate">Data Bantuan Bencana</dt>
+                        <dt class="text-sm font-medium text-gray-500 truncate">Bantuan Bencana</dt>
                         <dd class="text-lg font-semibold text-gray-900">{{ \App\Models\AidDisaster::count() }}</dd>
                     </dl>
                 </div>

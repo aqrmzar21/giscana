@@ -38,6 +38,7 @@
                     <tr>
                         <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">NO</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nama</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kecamatan</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Alamat</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kapasitas</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Fasilitas</th>
@@ -52,6 +53,7 @@
                     <tr>
                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ $loop->iteration }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $facility->name }}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $facility->nama_kecamatan ?? $facility->aidDisaster?->nama_kecamatan ?? '-' }}</td>
                         <td class="px-3 py-4 text-sm text-gray-500">{{ Str::limit($facility->address ?? '-', 30) }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             <span class="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800">
@@ -103,7 +105,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 text-center sm:pl-6">
+                        <td colspan="9" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 text-center sm:pl-6">
                             Tidak ada data fasilitas evakuasi.
                         </td>
                     </tr>

@@ -39,18 +39,69 @@ class MapController extends Controller
         }
         $zones = $zonesQuery->get();
 
-        // Get evacuation routes
-        $routesQuery = EvacuationRoute::active()->accessible();
+        // Get evacuation routes (dengan relasi ke evacuation_facility untuk nama_fasilitas)
+        $routesQuery = EvacuationRoute::with('evacuationFacility')->active()->accessible();
         if ($disasterType && $disasterType !== 'all') {
             $routesQuery->byDisasterType($disasterType);
         }
         $routes = $routesQuery->get();
 
-        // Get evacuation facilities
-        $facilities = EvacuationFacility::active()->accessible()->get();
+        // Get evacuation facilities (dengan relasi ke aid_disaster untuk nama_kecamatan)
+        $facilities = EvacuationFacility::with('aidDisaster')->active()->accessible()->get();
 
         // Get aid disasters data
         $aidDisasters = AidDisaster::active()->get();
+
+        // Build district boundaries (batas kecamatan) from static GeoJSON + database aid_disasters
+        $districtFeatures = [];
+        $geojsonPath = public_path('geojson/kawasan-pesisir.geojson');
+
+        if (file_exists($geojsonPath)) {
+            $raw = file_get_contents($geojsonPath);
+            $geo = json_decode($raw, true);
+
+            if (is_array($geo) && isset($geo['features']) && is_array($geo['features'])) {
+                // Index fitur berdasarkan nama objek (NAMOBJ)
+                $byName = [];
+                foreach ($geo['features'] as $feature) {
+                    $name = $feature['properties']['NAMOBJ'] ?? null;
+                    if ($name) {
+                        $byName[$name] = $feature;
+                    }
+                }
+
+                // Cocokkan setiap aid_disaster (\"Kecamatan X\") dengan NAMOBJ di GeoJSON
+                // Catatan: beberapa nama di GeoJSON bisa sedikit berbeda penulisan (mis. \"Bonepantai\")
+                $nameMap = [
+                    'Bone Pantai' => 'Bonepantai',
+                ];
+
+                foreach ($aidDisasters as $item) {
+                    $namaKec = $item->nama_kecamatan;
+                    $namaTrim = preg_replace('/^Kecamatan\\s+/i', '', $namaKec);
+
+                    $lookupName = $nameMap[$namaTrim] ?? $namaTrim;
+
+                    if (isset($byName[$lookupName])) {
+                        $src = $byName[$lookupName];
+
+                        $districtFeatures[] = [
+                            'type' => 'Feature',
+                            'properties' => [
+                                'id'                      => $item->id,
+                                'nama_kecamatan'          => $item->nama_kecamatan,
+                                'jumlah_penerima_bantuan' => $item->jumlah_penerima_bantuan,
+                                'bantuan_terdistribusi'   => $item->bantuan_terdistribusi,
+                                'persentase_distribusi'   => $item->persentase_distribusi,
+                                // properti tambahan dari file geojson jika dibutuhkan
+                                'luas'                    => $src['properties']['SHAPE_Area'] ?? null,
+                            ],
+                            'geometry' => $src['geometry'] ?? null,
+                        ];
+                    }
+                }
+            }
+        }
 
         return response()->json([
             'disaster_zones' => [
@@ -76,8 +127,12 @@ class MapController extends Controller
                         'bantuan_terdistribusi'   => $item->bantuan_terdistribusi,
                         'persentase_distribusi'   => $item->persentase_distribusi,
                     ],
-                    'geometry' => null, // No coordinates — data statistik
+                    'geometry' => null, // Data statistik tanpa batas wilayah
                 ]),
+            ],
+            'district_boundaries' => [
+                'type' => 'FeatureCollection',
+                'features' => $districtFeatures,
             ],
         ]);
     }
@@ -109,7 +164,7 @@ class MapController extends Controller
                 'description' => $zone->description,
                 'disaster_type' => $zone->disaster_type,
                 'risk_level' => $zone->risk_level,
-                'coordinates' => $zone->polygon_coordinates[0][0] ?? null, // First coordinate of polygon
+                'coordinates' => $zone->point_coordinates ?? null,
             ]);
         }
 

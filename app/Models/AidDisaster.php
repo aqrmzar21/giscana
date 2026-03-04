@@ -27,6 +27,14 @@ class AidDisaster extends Model
     ];
 
     /**
+     * Relasi: satu kecamatan (aid_disaster) punya banyak fasilitas evakuasi.
+     */
+    public function evacuationFacilities()
+    {
+        return $this->hasMany(EvacuationFacility::class, 'aid_disaster_id');
+    }
+
+    /**
      * Scope untuk data aktif
      */
     public function scopeActive($query)
