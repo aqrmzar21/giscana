@@ -102,7 +102,7 @@
             <div class="legend">
                 <div class="font-semibold mb-2">Legenda</div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #ef4444;"></div>
+                    <div class="legend-color" style="background-color: #e91717ff;"></div>
                     <span>Zona Bencana</span>
                 </div>
                 <div class="legend-item">
@@ -113,12 +113,10 @@
                     <div class="legend-color" style="background-color: #10b981;"></div>
                     <span>Titik Kumpul</span>
                 </div>
-                <div class="legend-item">
-                    <div class="w-5 h-5 mr-2 flex items-center justify-center">
-                        <i class="fas fa-info-circle text-orange-500"></i>
-                    </div>
+                <!-- <div class="legend-item">
+                    <div class="w-5 h-5 mr-2 flex items-center justify-center"></div>
                     <span>Data Bantuan Bencana</span>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -144,7 +142,7 @@
         disasterZones: L.layerGroup().addTo(map),
         evacuationRoutes: L.layerGroup().addTo(map),
         evacuationFacilities: L.layerGroup().addTo(map),
-        aidDistributionPoints: L.layerGroup().addTo(map)
+        // aidDistributionPoints: L.layerGroup().addTo(map)
     };
 
     // Function to load map data
@@ -211,6 +209,7 @@
 
                     marker.bindPopup(`
                         <strong>${feature.properties.name}</strong><br>
+                        Tipe: ${feature.properties.facility_type}<br>
                         Alamat: ${feature.properties.address || '-'}<br>
                         Kapasitas: ${feature.properties.capacity} orang<br>
                         ${feature.properties.has_medical_facility ? '✓ Fasilitas Medis' : ''}<br>
