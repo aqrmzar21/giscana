@@ -52,6 +52,50 @@ class MapController extends Controller
         // Get aid disasters data
         $aidDisasters = AidDisaster::active()->get();
 
+        // Build district boundaries (batas kecamatan) from static GeoJSON + database aid_disasters
+        $districtFeatures = [];
+        $geojsonPath = public_path('geojson/kawasan-pesisir.geojson');
+
+        if (file_exists($geojsonPath)) {
+            $raw = file_get_contents($geojsonPath);
+            $geo = json_decode($raw, true);
+
+            if (is_array($geo) && isset($geo['features']) && is_array($geo['features'])) {
+                // Index fitur berdasarkan nama objek (NAMOBJ)
+                $byName = [];
+                foreach ($geo['features'] as $feature) {
+                    $name = $feature['properties']['NAMOBJ'] ?? null;
+                    if ($name) {
+                        $byName[$name] = $feature;
+                    }
+                }
+
+                // Cocokkan setiap aid_disaster (\"Kecamatan X\") dengan NAMOBJ (\"X\")
+                foreach ($aidDisasters as $item) {
+                    $namaKec = $item->nama_kecamatan;
+                    $namaTrim = preg_replace('/^Kecamatan\\s+/i', '', $namaKec);
+
+                    if (isset($byName[$namaTrim])) {
+                        $src = $byName[$namaTrim];
+
+                        $districtFeatures[] = [
+                            'type' => 'Feature',
+                            'properties' => [
+                                'id'                      => $item->id,
+                                'nama_kecamatan'          => $item->nama_kecamatan,
+                                'jumlah_penerima_bantuan' => $item->jumlah_penerima_bantuan,
+                                'bantuan_terdistribusi'   => $item->bantuan_terdistribusi,
+                                'persentase_distribusi'   => $item->persentase_distribusi,
+                                // properti tambahan dari file geojson jika dibutuhkan
+                                'luas'                    => $src['properties']['SHAPE_Area'] ?? null,
+                            ],
+                            'geometry' => $src['geometry'] ?? null,
+                        ];
+                    }
+                }
+            }
+        }
+
         return response()->json([
             'disaster_zones' => [
                 'type' => 'FeatureCollection',
@@ -76,8 +120,12 @@ class MapController extends Controller
                         'bantuan_terdistribusi'   => $item->bantuan_terdistribusi,
                         'persentase_distribusi'   => $item->persentase_distribusi,
                     ],
-                    'geometry' => null, // No coordinates — data statistik
+                    'geometry' => null, // Data statistik tanpa batas wilayah
                 ]),
+            ],
+            'district_boundaries' => [
+                'type' => 'FeatureCollection',
+                'features' => $districtFeatures,
             ],
         ]);
     }

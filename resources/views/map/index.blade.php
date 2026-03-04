@@ -144,6 +144,7 @@
         disasterZones: L.layerGroup().addTo(map),
         evacuationRoutes: L.layerGroup().addTo(map),
         evacuationFacilities: L.layerGroup().addTo(map),
+        districtBoundaries: L.layerGroup().addTo(map),
         aidDistributionPoints: L.layerGroup().addTo(map)
     };
 
@@ -217,6 +218,44 @@
                         ${feature.properties.has_food_storage ? '✓ Penyimpanan Makanan' : ''}
                     `);
                 });
+
+                // Add district boundaries (batas administrasi kecamatan dari GeoJSON + DB aid_disasters)
+                if (data.district_boundaries && data.district_boundaries.features.length > 0) {
+                    data.district_boundaries.features.forEach(feature => {
+                        // MultiPolygon -> array tingkat paling dalam adalah [lng, lat, (z?)]
+                        const geom = feature.geometry;
+                        if (!geom || !geom.coordinates) return;
+
+                        const polys = [];
+                        if (geom.type === 'MultiPolygon') {
+                            geom.coordinates.forEach(poly => {
+                                const coords = poly[0].map(coord => [coord[1], coord[0]]);
+                                polys.push(coords);
+                            });
+                        } else if (geom.type === 'Polygon') {
+                            const coords = geom.coordinates[0].map(coord => [coord[1], coord[0]]);
+                            polys.push(coords);
+                        }
+
+                        polys.forEach(coords => {
+                            const polygon = L.polygon(coords, {
+                                color: '#facc15',
+                                fillColor: '#fde68a',
+                                fillOpacity: 0.15,
+                                weight: 2,
+                                dashArray: '4 2'
+                            }).addTo(layers.districtBoundaries);
+
+                            const p = feature.properties;
+                            polygon.bindPopup(`
+                                <strong>${p.nama_kecamatan}</strong><br>
+                                Penerima Bantuan: ${p.jumlah_penerima_bantuan ?? '-'}<br>
+                                Terdistribusi: ${p.bantuan_terdistribusi ?? '-'}<br>
+                                Persentase: ${p.persentase_distribusi ?? '-'}%
+                            `);
+                        });
+                    });
+                }
 
                 // Add aid disasters data (statistik per kecamatan — tanpa koordinat)
                 // Data ini ditampilkan sebagai info panel, bukan marker di peta
