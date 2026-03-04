@@ -106,6 +106,10 @@
                     <span>Zona Bencana</span>
                 </div>
                 <div class="legend-item">
+                    <div class="legend-color" style="background-color: #fde68a; border: 1px dashed #facc15;"></div>
+                    <span>Batas Kecamatan</span>
+                </div>
+                <div class="legend-item">
                     <div class="legend-color" style="background-color: #3b82f6;"></div>
                     <span>Rute Evakuasi</span>
                 </div>
@@ -113,11 +117,12 @@
                     <div class="legend-color" style="background-color: #10b981;"></div>
                     <span>Titik Kumpul</span>
                 </div>
-                <div class="legend-item">
-                    <div class="w-5 h-5 mr-2 flex items-center justify-center">
-                        <i class="fas fa-info-circle text-orange-500"></i>
-                    </div>
-                    <span>Data Bantuan Bencana</span>
+                
+                <div class="mt-3">
+                    <label class="inline-flex items-center text-xs text-gray-700">
+                        <input type="checkbox" id="toggle_district_boundaries" class="mr-2" checked>
+                        Tampilkan Batas Kecamatan
+                    </label>
                 </div>
             </div>
         </div>
@@ -152,6 +157,7 @@
     function loadMapData() {
         const disasterType = document.getElementById('disaster_type').value;
         const riskLevel = document.getElementById('risk_level').value;
+        const districtToggle = document.getElementById('toggle_district_boundaries');
         
         const url = new URL('{{ route("map.data") }}', window.location.origin);
         if (disasterType !== 'all') url.searchParams.append('disaster_type', disasterType);
@@ -257,6 +263,13 @@
                     });
                 }
 
+                // Atur visibilitas layer batas kecamatan sesuai toggle
+                if (districtToggle && !districtToggle.checked) {
+                    map.removeLayer(layers.districtBoundaries);
+                } else {
+                    layers.districtBoundaries.addTo(map);
+                }
+
                 // Add aid disasters data (statistik per kecamatan — tanpa koordinat)
                 // Data ini ditampilkan sebagai info panel, bukan marker di peta
                 if (data.aid_disasters && data.aid_disasters.features.length > 0) {
@@ -294,6 +307,18 @@
     // Add event listeners to filters
     document.getElementById('disaster_type').addEventListener('change', loadMapData);
     document.getElementById('risk_level').addEventListener('change', loadMapData);
+
+    // Toggle batas kecamatan on/off
+    const districtToggle = document.getElementById('toggle_district_boundaries');
+    if (districtToggle) {
+        districtToggle.addEventListener('change', () => {
+            if (districtToggle.checked) {
+                layers.districtBoundaries.addTo(map);
+            } else {
+                map.removeLayer(layers.districtBoundaries);
+            }
+        });
+    }
 </script>
 @endpush
 

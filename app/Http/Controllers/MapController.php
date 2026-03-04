@@ -70,13 +70,20 @@ class MapController extends Controller
                     }
                 }
 
-                // Cocokkan setiap aid_disaster (\"Kecamatan X\") dengan NAMOBJ (\"X\")
+                // Cocokkan setiap aid_disaster (\"Kecamatan X\") dengan NAMOBJ di GeoJSON
+                // Catatan: beberapa nama di GeoJSON bisa sedikit berbeda penulisan (mis. \"Bonepantai\")
+                $nameMap = [
+                    'Bone Pantai' => 'Bonepantai',
+                ];
+
                 foreach ($aidDisasters as $item) {
                     $namaKec = $item->nama_kecamatan;
                     $namaTrim = preg_replace('/^Kecamatan\\s+/i', '', $namaKec);
 
-                    if (isset($byName[$namaTrim])) {
-                        $src = $byName[$namaTrim];
+                    $lookupName = $nameMap[$namaTrim] ?? $namaTrim;
+
+                    if (isset($byName[$lookupName])) {
+                        $src = $byName[$lookupName];
 
                         $districtFeatures[] = [
                             'type' => 'Feature',
