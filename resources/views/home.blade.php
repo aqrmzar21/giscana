@@ -11,7 +11,7 @@
                 Giscana
             </h1>
             <p class="text-xl md:text-2xl mb-8 text-primary-100">
-                Geographic Information System for Natural Disaster Mitigation
+                Geographic Information System for Natural Disaster
             </p>
             <p class="text-lg mb-10 text-primary-200 max-w-3xl mx-auto">
                 Sistem informasi geografis berbasis web untuk mendukung kesiapsiagaan dan penanggulangan bencana alam 

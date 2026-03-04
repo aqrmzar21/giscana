@@ -102,7 +102,7 @@
             <div class="legend">
                 <div class="font-semibold mb-2">Legenda</div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #ef4444; opacity: 0.5;"></div>
+                    <div class="legend-color" style="background-color: #ef4444;"></div>
                     <span>Zona Bencana</span>
                 </div>
                 <div class="legend-item">
