@@ -102,8 +102,8 @@
             <div class="legend">
                 <div class="font-semibold mb-2">Legenda</div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #ef4444; opacity: 0.5;"></div>
-                    <span>Zona Bencana</span>
+                    <div class="legend-color" style="background-color:rgb(250, 11, 11); opacity: 0.5;"></div>
+                    <span>Area Bencana</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: #fde68a; border: 1px dashed #facc15;"></div>
@@ -169,22 +169,24 @@
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                // Add disaster zones (polygons)
+                // Add disaster zones (points / marker merah)
                 data.disaster_zones.features.forEach(feature => {
-                    const coordinates = feature.geometry.coordinates[0].map(coord => [coord[1], coord[0]]);
-                    const polygon = L.polygon(coordinates, {
-                        color: '#ef4444',
-                        fillColor: '#ef4444',
-                        fillOpacity: 0.3,
-                        weight: 2
+                    if (!feature.geometry || !feature.geometry.coordinates) return;
+                    const [lng, lat] = feature.geometry.coordinates;
+                    const marker = L.marker([lat, lng], {
+                        icon: L.divIcon({
+                            className: 'disaster-zone-marker',
+                            html: '<div style="background-color: #ef4444; width: 18px; height: 18px; border-radius: 50%; border: 2px solid white;"></div>',
+                            iconSize: [18, 18]
+                        })
                     }).addTo(layers.disasterZones);
 
-                    polygon.bindPopup(`
+                    marker.bindPopup(`
                         <strong>${feature.properties.name}</strong><br>
                         Jenis: ${feature.properties.disaster_type}<br>
                         Risiko: ${feature.properties.risk_level}<br>
-                        Luas: ${feature.properties.area_hectares} ha<br>
-                        Populasi Terdampak: ${feature.properties.affected_population}
+                        Luas: ${feature.properties.area_hectares ?? '-'} ha<br>
+                        Populasi Terdampak: ${feature.properties.affected_population ?? '-'}
                     `);
                 });
 

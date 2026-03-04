@@ -164,7 +164,7 @@ class MapController extends Controller
                 'description' => $zone->description,
                 'disaster_type' => $zone->disaster_type,
                 'risk_level' => $zone->risk_level,
-                'coordinates' => $zone->polygon_coordinates[0][0] ?? null, // First coordinate of polygon
+                'coordinates' => $zone->point_coordinates ?? null,
             ]);
         }
 

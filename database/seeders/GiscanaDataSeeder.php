@@ -56,30 +56,14 @@ class GiscanaDataSeeder extends Seeder
             ]
         );
 
-        // Sample disaster zones for Bone Bolango Regency
+        // Sample disaster zones for Bone Bolango Regency (sebagai titik lokasi, bukan poligon)
         DisasterZone::create([
             'name' => 'banjir Risk Zone - Bone River',
             'disaster_type' => 'banjir',
             'description' => 'High-risk banjir zone along the Bone River, prone to seasonal banjiring during rainy season.',
             'risk_level' => 'high',
-            'polygon_coordinates' => [
-                [
-                    [123.2070090488328, 0.37848842897793133],
-                    [123.207395845135, 0.37865659761217785],
-                    [123.20808535158405, 0.3783370772048755],
-                    [123.20870758911286, 0.3781352748361826],
-                    [123.20904393372189, 0.3778830218684987],
-                    [123.20948118171452, 0.377462600240591],
-                    [123.20946436448486, 0.3771430797893771],
-                    [123.20904393372189, 0.3768235593264393],
-                    [123.20856462132303, 0.37680024489897335],
-                    [123.20828008766956, 0.3769353954610608],
-                    [123.20817338754682, 0.3770420932729195],
-                    [123.20756875352988, 0.3775542427471521],
-                    [123.2070067995615, 0.37849318337418936],
-                    [123.2070090488328, 0.37848842897793133] // Closing the ring
-                ]
-            ],
+            // Titik representatif (lng, lat)
+            'point_coordinates' => [123.20808535158405, 0.3783370772048755],
             'area_hectares' => 125.5,
             'affected_population' => 2500,
             'is_active' => true,
@@ -90,22 +74,8 @@ class GiscanaDataSeeder extends Seeder
             'disaster_type' => 'longsor',
             'description' => 'Critical longsor risk area on steep hillsides, especially vulnerable during heavy rainfall.',
             'risk_level' => 'critical',
-            'polygon_coordinates' => [
-                [
-                    [123.16172939034311, 0.4237336935567555],
-                    [123.16182818942173, 0.4236989814222625],
-                    [123.16220690120934, 0.42357767861840045],
-                    [123.1625441913971, 0.4237315260769634],
-                    [123.16263886934354, 0.42366939537311055],
-                    [123.16265048943472, 0.4234229698245997],
-                    [123.1630943926121, 0.42321212157057175],
-                    [123.16353829578776, 0.4236893044531911],
-                    [123.16371585705912, 0.4242552655078242],
-                    [123.16251731848257, 0.4247213510521419],
-                    [123.16172939034311, 0.4240999036537687],
-                    [123.16172939034311, 0.4237336935567555] // Closing the ring
-                ]
-            ],
+            // Titik representatif (lng, lat)
+            'point_coordinates' => [123.16263718062282, 0.42377850503008574],
             'area_hectares' => 85.2,
             'affected_population' => 1200,
             'is_active' => true,
