@@ -29,14 +29,14 @@
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Daftar Bantuan Bencana</h3>
                 <p class="mt-2 text-sm text-gray-700">Data jumlah penerima dan distribusi bantuan per kecamatan.</p>
             </div>
-            <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+            <!-- <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
                 <a href="{{ route('admin.aid-disasters.create') }}" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto">
                     <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     Tambah Data Baru
                 </a>
-            </div>
+            </div> -->
         </div>
 
         <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
