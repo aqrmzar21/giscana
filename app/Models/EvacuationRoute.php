@@ -18,7 +18,6 @@ class EvacuationRoute extends Model
         'line_coordinates',
         'length_km',
         'route_type',
-        'capacity_per_hour',
         'is_accessible',
         'is_active',
     ];
@@ -27,7 +26,6 @@ class EvacuationRoute extends Model
         'line_coordinates' => 'array',
         'evacuation_facility_id' => 'integer',
         'length_km' => 'decimal:2',
-        'capacity_per_hour' => 'integer',
         'is_accessible' => 'boolean',
         'is_active' => 'boolean',
     ];
@@ -78,7 +76,6 @@ class EvacuationRoute extends Model
                 'disaster_type' => $this->disaster_type,
                 'route_type' => $this->route_type,
                 'length_km' => $this->length_km,
-                'capacity_per_hour' => $this->capacity_per_hour,
             ],
             'geometry' => [
                 'type' => 'LineString',

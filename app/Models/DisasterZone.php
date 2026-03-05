@@ -16,14 +16,12 @@ class DisasterZone extends Model
         'risk_level',
         'point_coordinates',
         'area_hectares',
-        'affected_population',
         'is_active',
     ];
 
     protected $casts = [
         'point_coordinates' => 'array',
         'area_hectares' => 'decimal:2',
-        'affected_population' => 'integer',
         'is_active' => 'boolean',
     ];
 
@@ -64,7 +62,6 @@ class DisasterZone extends Model
                 'disaster_type' => $this->disaster_type,
                 'risk_level' => $this->risk_level,
                 'area_hectares' => $this->area_hectares,
-                'affected_population' => $this->affected_population,
             ],
             'geometry' => [
                 'type' => 'Point',

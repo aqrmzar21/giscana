@@ -91,16 +91,6 @@
                             @enderror
                         </div>
                     </div>
-
-                    <div>
-                        <label for="capacity_per_hour" class="block text-sm font-medium text-gray-700">Kapasitas per Jam</label>
-                        <div class="mt-1">
-                            <input type="number" name="capacity_per_hour" id="capacity_per_hour" value="{{ old('capacity_per_hour', $evacuationRoute->capacity_per_hour) }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('capacity_per_hour') border-red-300 @enderror">
-                            @error('capacity_per_hour')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
                 </div>
 
                 <div>

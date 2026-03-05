@@ -65,7 +65,6 @@ class GiscanaDataSeeder extends Seeder
             // Titik representatif (lng, lat)
             'point_coordinates' => [123.20808535158405, 0.3783370772048755],
             'area_hectares' => 125.5,
-            'affected_population' => 2500,
             'is_active' => true,
         ]);
 
@@ -77,7 +76,6 @@ class GiscanaDataSeeder extends Seeder
             // Titik representatif (lng, lat)
             'point_coordinates' => [123.16263718062282, 0.42377850503008574],
             'area_hectares' => 85.2,
-            'affected_population' => 1200,
             'is_active' => true,
         ]);
 

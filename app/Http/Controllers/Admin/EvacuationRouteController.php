@@ -39,7 +39,6 @@ class EvacuationRouteController extends Controller
             'line_coordinates' => 'required|json',
             'length_km' => 'nullable|numeric|min:0',
             'route_type' => 'required|in:primary,secondary,emergency',
-            'capacity_per_hour' => 'nullable|integer|min:0',
             'is_accessible' => 'boolean',
             'is_active' => 'boolean',
         ]);
@@ -88,7 +87,6 @@ class EvacuationRouteController extends Controller
             'line_coordinates' => 'required|json',
             'length_km' => 'nullable|numeric|min:0',
             'route_type' => 'required|in:primary,secondary,emergency',
-            'capacity_per_hour' => 'nullable|integer|min:0',
             'is_accessible' => 'boolean',
             'is_active' => 'boolean',
         ]);
