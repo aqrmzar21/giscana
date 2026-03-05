@@ -102,12 +102,17 @@
             <div class="legend">
                 <div class="font-semibold mb-2">Legenda</div>
                 <div class="legend-item">
+<<<<<<< HEAD
                     <div class="legend-color" style="background-color: #ef4444;"></div>
                     <span>Area Bencana</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: #fde68a; border: 1px dashed #facc15;"></div>
                     <span>Batas Kecamatan</span>
+=======
+                    <div class="legend-color" style="background-color: #e91717ff;"></div>
+                    <span>Zona Bencana</span>
+>>>>>>> main
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: #3b82f6;"></div>
@@ -117,6 +122,7 @@
                     <div class="legend-color" style="background-color: #10b981;"></div>
                     <span>Titik Kumpul</span>
                 </div>
+<<<<<<< HEAD
                 
                 <div class="mt-3">
                     <label class="inline-flex items-center text-xs text-gray-700">
@@ -124,6 +130,12 @@
                         Tampilkan Batas Kecamatan
                     </label>
                 </div>
+=======
+                <!-- <div class="legend-item">
+                    <div class="w-5 h-5 mr-2 flex items-center justify-center"></div>
+                    <span>Data Bantuan Bencana</span>
+                </div> -->
+>>>>>>> main
             </div>
         </div>
 
@@ -149,8 +161,12 @@
         disasterZones: L.layerGroup().addTo(map),
         evacuationRoutes: L.layerGroup().addTo(map),
         evacuationFacilities: L.layerGroup().addTo(map),
+<<<<<<< HEAD
         districtBoundaries: L.layerGroup().addTo(map),
         aidDistributionPoints: L.layerGroup().addTo(map)
+=======
+        // aidDistributionPoints: L.layerGroup().addTo(map)
+>>>>>>> main
     };
 
     // Function to load map data
@@ -220,6 +236,7 @@
 
                     marker.bindPopup(`
                         <strong>${feature.properties.name}</strong><br>
+                        Tipe: ${feature.properties.facility_type}<br>
                         Alamat: ${feature.properties.address || '-'}<br>
                         Kapasitas: ${feature.properties.capacity} orang<br>
                         ${feature.properties.has_medical_facility ? '✓ Fasilitas Medis' : ''}<br>
