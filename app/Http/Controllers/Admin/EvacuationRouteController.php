@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\EvacuationRoute;
-use App\Models\EvacuationFacility;
 use Illuminate\Http\Request;
 
 class EvacuationRouteController extends Controller
@@ -14,7 +13,7 @@ class EvacuationRouteController extends Controller
      */
     public function index()
     {
-        $routes = EvacuationRoute::with('evacuationFacility')->latest()->paginate(15);
+        $routes = EvacuationRoute::latest()->paginate(15);
         return view('admin.evacuation-routes.index', compact('routes'));
     }
 
@@ -23,8 +22,7 @@ class EvacuationRouteController extends Controller
      */
     public function create()
     {
-        $facilities = EvacuationFacility::active()->orderBy('name')->get();
-        return view('admin.evacuation-routes.create', compact('facilities'));
+        return view('admin.evacuation-routes.create');
     }
 
     /**
@@ -33,13 +31,10 @@ class EvacuationRouteController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'evacuation_facility_id' => 'nullable|exists:evacuation_facilities,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'line_coordinates' => 'required|json',
-            'length_km' => 'nullable|numeric|min:0',
             'route_type' => 'required|in:primary,secondary,emergency',
-            'capacity_per_hour' => 'nullable|integer|min:0',
             'is_accessible' => 'boolean',
             'is_active' => 'boolean',
         ]);
@@ -47,11 +42,6 @@ class EvacuationRouteController extends Controller
         $validated['line_coordinates'] = json_decode($validated['line_coordinates'], true);
         $validated['is_accessible'] = $request->has('is_accessible');
         $validated['is_active'] = $request->has('is_active');
-
-        if (!empty($validated['evacuation_facility_id'])) {
-            $facility = EvacuationFacility::find($validated['evacuation_facility_id']);
-            $validated['nama_fasilitas'] = $facility?->name;
-        }
 
         EvacuationRoute::create($validated);
 
@@ -72,8 +62,7 @@ class EvacuationRouteController extends Controller
      */
     public function edit(EvacuationRoute $evacuationRoute)
     {
-        $facilities = EvacuationFacility::active()->orderBy('name')->get();
-        return view('admin.evacuation-routes.edit', compact('evacuationRoute', 'facilities'));
+        return view('admin.evacuation-routes.edit', compact('evacuationRoute'));
     }
 
     /**
@@ -82,13 +71,10 @@ class EvacuationRouteController extends Controller
     public function update(Request $request, EvacuationRoute $evacuationRoute)
     {
         $validated = $request->validate([
-            'evacuation_facility_id' => 'nullable|exists:evacuation_facilities,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'line_coordinates' => 'required|json',
-            'length_km' => 'nullable|numeric|min:0',
             'route_type' => 'required|in:primary,secondary,emergency',
-            'capacity_per_hour' => 'nullable|integer|min:0',
             'is_accessible' => 'boolean',
             'is_active' => 'boolean',
         ]);
@@ -96,13 +82,6 @@ class EvacuationRouteController extends Controller
         $validated['line_coordinates'] = json_decode($validated['line_coordinates'], true);
         $validated['is_accessible'] = $request->has('is_accessible');
         $validated['is_active'] = $request->has('is_active');
-
-        if (!empty($validated['evacuation_facility_id'])) {
-            $facility = EvacuationFacility::find($validated['evacuation_facility_id']);
-            $validated['nama_fasilitas'] = $facility?->name;
-        } else {
-            $validated['nama_fasilitas'] = null;
-        }
 
         $evacuationRoute->update($validated);
 

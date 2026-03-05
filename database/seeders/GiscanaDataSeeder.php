@@ -56,30 +56,14 @@ class GiscanaDataSeeder extends Seeder
             ]
         );
 
-        // Sample disaster zones for Bone Bolango Regency
+        // Sample disaster zones for Bone Bolango Regency (sebagai titik lokasi, bukan poligon)
         DisasterZone::create([
             'name' => 'banjir Risk Zone - Bone River',
             'disaster_type' => 'banjir',
             'description' => 'High-risk banjir zone along the Bone River, prone to seasonal banjiring during rainy season.',
             'risk_level' => 'high',
-            'polygon_coordinates' => [
-                [
-                    [123.2070090488328, 0.37848842897793133],
-                    [123.207395845135, 0.37865659761217785],
-                    [123.20808535158405, 0.3783370772048755],
-                    [123.20870758911286, 0.3781352748361826],
-                    [123.20904393372189, 0.3778830218684987],
-                    [123.20948118171452, 0.377462600240591],
-                    [123.20946436448486, 0.3771430797893771],
-                    [123.20904393372189, 0.3768235593264393],
-                    [123.20856462132303, 0.37680024489897335],
-                    [123.20828008766956, 0.3769353954610608],
-                    [123.20817338754682, 0.3770420932729195],
-                    [123.20756875352988, 0.3775542427471521],
-                    [123.2070067995615, 0.37849318337418936],
-                    [123.2070090488328, 0.37848842897793133] // Closing the ring
-                ]
-            ],
+            // Titik representatif (lng, lat)
+            'point_coordinates' => [123.20808535158405, 0.3783370772048755],
             'area_hectares' => 125.5,
             'affected_population' => 2500,
             'is_active' => true,
@@ -90,22 +74,8 @@ class GiscanaDataSeeder extends Seeder
             'disaster_type' => 'longsor',
             'description' => 'Critical longsor risk area on steep hillsides, especially vulnerable during heavy rainfall.',
             'risk_level' => 'critical',
-            'polygon_coordinates' => [
-                [
-                    [123.16172939034311, 0.4237336935567555],
-                    [123.16182818942173, 0.4236989814222625],
-                    [123.16220690120934, 0.42357767861840045],
-                    [123.1625441913971, 0.4237315260769634],
-                    [123.16263886934354, 0.42366939537311055],
-                    [123.16265048943472, 0.4234229698245997],
-                    [123.1630943926121, 0.42321212157057175],
-                    [123.16353829578776, 0.4236893044531911],
-                    [123.16371585705912, 0.4242552655078242],
-                    [123.16251731848257, 0.4247213510521419],
-                    [123.16172939034311, 0.4240999036537687],
-                    [123.16172939034311, 0.4237336935567555] // Closing the ring
-                ]
-            ],
+            // Titik representatif (lng, lat)
+            'point_coordinates' => [123.16263718062282, 0.42377850503008574],
             'area_hectares' => 85.2,
             'affected_population' => 1200,
             'is_active' => true,
@@ -144,6 +114,8 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         $kecamatanBone = AidDisaster::where('nama_kecamatan', 'Kecamatan Bone')->first();
+        $kecamatanKabilaBone = AidDisaster::where('nama_kecamatan', 'Kecamatan Kabila Bone')->first();
+        $kecamatanBulawa = AidDisaster::where('nama_kecamatan', 'Kecamatan Bulawa')->first();
 
         // Sample evacuation facilities (terkait kecamatan via aid_disaster_id + nama_kecamatan)
         EvacuationFacility::create([
@@ -163,13 +135,13 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         EvacuationFacility::create([
-            'aid_disaster_id' => $kecamatanBone->id,
-            'nama_kecamatan' => $kecamatanBone->nama_kecamatan,
-            'name' => 'Masjid Al-Ikhlas',
+            'aid_disaster_id' => $kecamatanKabilaBone->id,
+            'nama_kecamatan' => $kecamatanKabilaBone->nama_kecamatan,
+            'name' => 'Masjid Oluhuta',
             'description' => 'Mosque serving as evacuation center with basic facilities.',
-            'point_coordinates' => [123.2514177981202, 0.3494345195302344],
+            'point_coordinates' => [123.16027286986488, 0.4298848194426226],
             'capacity' => 200,
-            'address' => 'Jl. Masjid Raya, Bone, Bone Bolango',
+            'address' => 'Jl. Masjid Raya, Desa Olele',
             'contact_person' => 'Ustadz Rahman',
             'contact_phone' => '+6281234567893',
             'has_medical_facility' => false,
@@ -177,7 +149,7 @@ class GiscanaDataSeeder extends Seeder
             'is_accessible' => true,
             'is_active' => true,
         ]);
-
+        
         EvacuationFacility::create([
             'aid_disaster_id' => $kecamatanBone->id,
             'nama_kecamatan' => $kecamatanBone->nama_kecamatan,
@@ -193,10 +165,59 @@ class GiscanaDataSeeder extends Seeder
             'is_accessible' => true,
             'is_active' => true,
         ]);
+        
+        EvacuationFacility::create([
+            'aid_disaster_id' => $kecamatanBulawa->id,
+            'nama_kecamatan' => $kecamatanBulawa->nama_kecamatan,
+            'name' => 'Titik Kumpul',
+            'description' => 'area null as evacuation center with basic facilities.',
+            'point_coordinates' => [123.2514177981202, 0.3494345195302344],
+            'capacity' => 200,
+            'address' => 'Jl. Masjid Raya, Bone, Bone Bolango',
+            'contact_person' => 'Ustadz Rahman',
+            'contact_phone' => '+6281234567893',
+            'has_medical_facility' => false,
+            'has_food_storage' => true,
+            'is_accessible' => true,
+            'is_active' => true,
+        ]);
+        
+        EvacuationFacility::create([
+            'aid_disaster_id' => $kecamatanBulawa->id,
+            'nama_kecamatan' => $kecamatanBulawa->nama_kecamatan,
+            'name' => 'Gedung Pertemuan',
+            'description' => 'Gedung pertemuan yang sering digunakan untuk kegiatan masyarakat',
+            'point_coordinates' => [123.28091613555262,0.3204120222883091],
+            'capacity' => 150,
+            'address' => 'Jl. Raya No. 8, Desa Patoa',
+            'contact_person' => 'Bapak Supriyadi',
+            'contact_phone' => '+6282198765432',
+            'has_medical_facility' => false,
+            'has_food_storage' => false,
+            'is_accessible' => true,
+            'is_active' => true,
+        ]);
+        
+        EvacuationFacility::create([
+            'aid_disaster_id' => $kecamatanBulawa->id,
+            'nama_kecamatan' => $kecamatanBulawa->nama_kecamatan,
+            'name' => 'Lapangan Pertemuan',
+            'description' => 'lahan kososng tempat kumpul masyarakat dengan ketinggian yang cukup',
+            'point_coordinates' => [123.30000155640084,0.3213922903642299],
+            'capacity' => 50,
+            'address' => 'Jl. Trans Sulawesi, Desa Mamunga Timur',
+            'contact_person' => 'Bapak Hasan',
+            'contact_phone' => '+6287889900112',
+            'has_medical_facility' => false,
+            'has_food_storage' => false,
+            'is_accessible' => true,
+            'is_active' => true,
+        ]);
 
         $facilitySmk = EvacuationFacility::where('name', 'SMK Negeri Bone 1')->first();
-        $facilityMasjid = EvacuationFacility::where('name', 'Masjid Al-Ikhlas')->first();
+        $facilityMasjid = EvacuationFacility::where('name', 'Masjid Oluhuta')->first();
         $facilityBalai = EvacuationFacility::where('name', 'Balai Desa Bone')->first();
+        $facilityGedung = EvacuationFacility::where('name', 'Gedung Pertemuan')->first();
 
         // Sample evacuation routes (terkait fasilitas via evacuation_facility_id + nama_fasilitas dari evacuation_facilities.name)
         EvacuationRoute::create([
@@ -206,20 +227,23 @@ class GiscanaDataSeeder extends Seeder
             'description' => 'Secondary evacuation route through village paths.',
             'disaster_type' => 'banjir',
             'line_coordinates' => [
-                [123.27274354360497, 0.32568160865849904],
-                [123.27333441180394, 0.32810857616267697],
-                [123.27329629127473, 0.3285787216328657]
+                [123.30000216080441,0.32138895529709544],
+                [123.29920593791996,0.31983634498158153],
+                [123.29917408912803,0.3195974820427381],
+                [123.30064608692544,0.3188280472324152],
+                [123.30104419836829,0.3189713651314037],
+                [123.30154581878514,0.3187165777539036],
+                [123.30124950328184,0.3181495056982868]
             ],
             'length_km' => 2.1,
             'route_type' => 'secondary',
-            'capacity_per_hour' => 200,
             'is_accessible' => true,
             'is_active' => true,
         ]);
 
         EvacuationRoute::create([
-            'evacuation_facility_id' => $facilitySmk->id,
-            'nama_fasilitas' => $facilitySmk->name,
+            'evacuation_facility_id' => $facilityGedung->id,
+            'nama_fasilitas' => $facilityGedung->name,
             'name' => 'Primary Evacuation Route - Main Road',
             'description' => 'Main evacuation route connecting high-risk areas to evacuation centers.',
             'disaster_type' => 'other',
@@ -245,7 +269,6 @@ class GiscanaDataSeeder extends Seeder
             ],
             'length_km' => 3.2,
             'route_type' => 'primary',
-            'capacity_per_hour' => 500,
             'is_accessible' => true,
             'is_active' => true,
         ]);
@@ -281,7 +304,6 @@ class GiscanaDataSeeder extends Seeder
             ],
             'length_km' => 1.8,
             'route_type' => 'emergency',
-            'capacity_per_hour' => 150,
             'is_accessible' => true,
             'is_active' => true,
         ]);
