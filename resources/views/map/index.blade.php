@@ -98,7 +98,7 @@
                     <option value="very_high" {{ $riskLevel === 'very_high' ? 'selected' : '' }}>Sangat Tinggi</option>
                 </select>
             </div>
-            
+
             <div class="legend">
                 <div class="font-semibold mb-2">Legenda</div>
                 <div class="legend-item">
@@ -106,28 +106,28 @@
                     <span>Titik Rawan</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #fde68a; border: 1px dashed #facc15;"></div>
-                    <span>Batas Kecamatan</span>
+                    <div class="legend-color" style="background-color: #10b981;"></div>
+                    <span>Titik Kumpul</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: #3b82f6;"></div>
                     <span>Rute Evakuasi</span>
                 </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #10b981;"></div>
-                    <span>Titik Kumpul</span>
-                </div>
                 
-                <!-- <div class="legend-item">
-                    <div class="legend-color" style="background-color: #17dbdbff;"></div>
-                    <span>Data Bantuan Bencana</span>
-                </div> -->
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #fde68a; border: 1px dashed #facc15;"></div>
+                    <span>Batas Kecamatan</span>
+                </div>
                 <div class="mt-3">
                     <label class="inline-flex items-center text-xs text-gray-700">
                         <input type="checkbox" id="toggle_district_boundaries" class="mr-2" checked>
                         Tampilkan Batas Kecamatan
                     </label>
                 </div>
+                <!-- <div class="legend-item">
+                    <div class="w-5 h-5 mr-2 flex items-center justify-center"></div>
+                    <span>Data Bantuan Bencana</span>
+                </div> -->
             </div>
         </div>
 
@@ -155,6 +155,7 @@
         evacuationFacilities: L.layerGroup().addTo(map),
         districtBoundaries: L.layerGroup().addTo(map),
         aidDistributionPoints: L.layerGroup().addTo(map)
+        // aidDistributionPoints: L.layerGroup().addTo(map)
     };
 
     // Function to load map data
@@ -173,18 +174,10 @@
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                if (!data || typeof data !== 'object') return;
-
-                // Disaster zones: Point [lng,lat] atau Polygon (ambil titik pertama)
-                (data.disaster_zones?.features || []).forEach(feature => {
-                    const geom = feature.geometry;
-                    if (!geom || !geom.coordinates) return;
-                    let lng, lat;
-                    if (geom.type === 'Point' && Array.isArray(geom.coordinates) && geom.coordinates.length >= 2) {
-                        [lng, lat] = geom.coordinates;
-                    } else if (geom.type === 'Polygon' && geom.coordinates?.[0]?.[0]) {
-                        [lng, lat] = geom.coordinates[0][0];
-                    } else return;
+                // Add disaster zones (points / marker merah)
+                data.disaster_zones.features.forEach(feature => {
+                    if (!feature.geometry || !feature.geometry.coordinates) return;
+                    const [lng, lat] = feature.geometry.coordinates;
                     const marker = L.marker([lat, lng], {
                         icon: L.divIcon({
                             className: 'disaster-zone-marker',
@@ -202,9 +195,8 @@
                     `);
                 });
 
-                // Evacuation routes (lines)
-                (data.evacuation_routes?.features || []).forEach(feature => {
-                    if (!feature.geometry?.coordinates?.length) return;
+                // Add evacuation routes (lines)
+                data.evacuation_routes.features.forEach(feature => {
                     const coordinates = feature.geometry.coordinates.map(coord => [coord[1], coord[0]]);
                     const polyline = L.polyline(coordinates, {
                         color: '#3b82f6',
@@ -213,16 +205,15 @@
                     }).addTo(layers.evacuationRoutes);
 
                     polyline.bindPopup(`
-                        <strong>${feature.properties.name || '-'}</strong><br>
-                        Jenis: ${feature.properties.route_type || '-'}<br>
-                        Panjang: ${feature.properties.length_km ?? '-'} km<br>
-                        Kapasitas: ${feature.properties.capacity_per_hour ?? '-'} orang/jam
+                        <strong>${feature.properties.name}</strong><br>
+                        Jenis: ${feature.properties.route_type}<br>
+                        Panjang: ${feature.properties.length_km} km<br>
+                        Kapasitas: ${feature.properties.capacity_per_hour} orang/jam
                     `);
                 });
 
-                // Evacuation facilities (points)
-                (data.evacuation_facilities?.features || []).forEach(feature => {
-                    if (!feature.geometry?.coordinates || feature.geometry.coordinates.length < 2) return;
+                // Add evacuation facilities (points)
+                data.evacuation_facilities.features.forEach(feature => {
                     const [lng, lat] = feature.geometry.coordinates;
                     const marker = L.marker([lat, lng], {
                         icon: L.divIcon({
@@ -233,9 +224,10 @@
                     }).addTo(layers.evacuationFacilities);
 
                     marker.bindPopup(`
-                        <strong>${feature.properties.name || '-'}</strong><br>
+                        <strong>${feature.properties.name}</strong><br>
+                        Tipe: ${feature.properties.facility_type}<br>
                         Alamat: ${feature.properties.address || '-'}<br>
-                        Kapasitas: ${feature.properties.capacity ?? '-'} orang<br>
+                        Kapasitas: ${feature.properties.capacity} orang<br>
                         ${feature.properties.has_medical_facility ? '✓ Fasilitas Medis' : ''}<br>
                         ${feature.properties.has_food_storage ? '✓ Penyimpanan Makanan' : ''}
                     `);
@@ -279,13 +271,11 @@
                     });
                 }
 
-                // Visibilitas layer batas kecamatan
-                if (layers.districtBoundaries) {
-                    if (districtToggle && !districtToggle.checked) {
-                        map.removeLayer(layers.districtBoundaries);
-                    } else if (!map.hasLayer(layers.districtBoundaries)) {
-                        layers.districtBoundaries.addTo(map);
-                    }
+                // Atur visibilitas layer batas kecamatan sesuai toggle
+                if (districtToggle && !districtToggle.checked) {
+                    map.removeLayer(layers.districtBoundaries);
+                } else {
+                    layers.districtBoundaries.addTo(map);
                 }
 
                 // Add aid disasters data (statistik per kecamatan — tanpa koordinat)
@@ -294,21 +284,24 @@
                     console.log('Data bantuan bencana:', data.aid_disasters.features.length, 'kecamatan');
                 }
 
-                // Fit map to bounds jika ada fitur
-                const nZ = (data.disaster_zones?.features?.length || 0);
-                const nR = (data.evacuation_routes?.features?.length || 0);
-                const nF = (data.evacuation_facilities?.features?.length || 0);
-                if (nZ > 0 || nR > 0 || nF > 0) {
-                    try {
-                        const allLayers = [];
-                        Object.values(layers).forEach(layer => {
-                            if (layer && layer.getLayers) layer.getLayers().forEach(l => allLayers.push(l));
+                // Fit map to bounds if there are features
+                if (data.disaster_zones.features.length > 0 || 
+                    data.evacuation_routes.features.length > 0 ||
+                    data.evacuation_facilities.features.length > 0) {
+                    const allBounds = [];
+                    Object.values(layers).forEach(layer => {
+                        layer.eachLayer(l => {
+                            if (l.getBounds) {
+                                allBounds.push(l.getBounds());
+                            } else if (l.getLatLng) {
+                                allBounds.push([[l.getLatLng().lat, l.getLatLng().lng], [l.getLatLng().lat, l.getLatLng().lng]]);
+                            }
                         });
-                        if (allLayers.length > 0) {
-                            const group = new L.featureGroup(allLayers);
-                            map.fitBounds(group.getBounds().pad(0.1));
-                        }
-                    } catch (e) { console.warn('fitBounds:', e); }
+                    });
+                    if (allBounds.length > 0) {
+                        const group = new L.featureGroup(Object.values(layers).flatMap(l => Array.from(l.getLayers())));
+                        map.fitBounds(group.getBounds().pad(0.1));
+                    }
                 }
             })
             .catch(error => {
