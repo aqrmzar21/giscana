@@ -237,7 +237,6 @@ class GiscanaDataSeeder extends Seeder
             ],
             'length_km' => 2.1,
             'route_type' => 'secondary',
-            'capacity_per_hour' => 200,
             'is_accessible' => true,
             'is_active' => true,
         ]);
@@ -270,7 +269,6 @@ class GiscanaDataSeeder extends Seeder
             ],
             'length_km' => 3.2,
             'route_type' => 'primary',
-            'capacity_per_hour' => 500,
             'is_accessible' => true,
             'is_active' => true,
         ]);
@@ -306,7 +304,6 @@ class GiscanaDataSeeder extends Seeder
             ],
             'length_km' => 1.8,
             'route_type' => 'emergency',
-            'capacity_per_hour' => 150,
             'is_accessible' => true,
             'is_active' => true,
         ]);
