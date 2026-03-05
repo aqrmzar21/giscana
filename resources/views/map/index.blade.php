@@ -106,12 +106,12 @@
                     <span>Titik Rawan</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #3b82f6;"></div>
-                    <span>Rute Evakuasi</span>
-                </div>
-                <div class="legend-item">
                     <div class="legend-color" style="background-color: #10b981;"></div>
                     <span>Titik Kumpul</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #3b82f6;"></div>
+                    <span>Rute Evakuasi</span>
                 </div>
                 
                 <div class="legend-item">
@@ -140,7 +140,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     // Initialize map centered on Bone Bolango, Gorontalo
-    const map = L.map('map').setView([0.5, 123.2], 8);
+    const map = L.map('map').setView([0.5, 123.2], 11);
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

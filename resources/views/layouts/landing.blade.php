@@ -37,9 +37,9 @@
                             <a href="{{ route('home') }}" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                                 Beranda
                             </a>
-                            {{-- <a href="{{ route('map.index') }}" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <a href="{{ route('map.index') }}" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                                 Peta Interaktif
-                            </a> --}}
+                            </a> 
                             <a href="#features" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                                 Fitur
                             </a>
