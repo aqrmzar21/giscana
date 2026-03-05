@@ -56,14 +56,13 @@ class GiscanaDataSeeder extends Seeder
             ]
         );
 
-        // Sample disaster zones for Bone Bolango Regency (sebagai titik lokasi, bukan poligon)
+        // Sample disaster zones (titik lokasi: simpan [lng, lat] di polygon_coordinates, toGeoJSON baca sebagai Point)
         DisasterZone::create([
             'name' => 'banjir Risk Zone - Bone River',
             'disaster_type' => 'banjir',
             'description' => 'High-risk banjir zone along the Bone River, prone to seasonal banjiring during rainy season.',
             'risk_level' => 'high',
-            // Titik representatif (lng, lat)
-            'point_coordinates' => [123.20808535158405, 0.3783370772048755],
+            'polygon_coordinates' => [123.20808535158405, 0.3783370772048755],
             'area_hectares' => 125.5,
             'affected_population' => 2500,
             'is_active' => true,
@@ -74,8 +73,7 @@ class GiscanaDataSeeder extends Seeder
             'disaster_type' => 'longsor',
             'description' => 'Critical longsor risk area on steep hillsides, especially vulnerable during heavy rainfall.',
             'risk_level' => 'critical',
-            // Titik representatif (lng, lat)
-            'point_coordinates' => [123.16263718062282, 0.42377850503008574],
+            'polygon_coordinates' => [123.16263718062282, 0.42377850503008574],
             'area_hectares' => 85.2,
             'affected_population' => 1200,
             'is_active' => true,

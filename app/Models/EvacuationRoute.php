@@ -62,10 +62,12 @@ class EvacuationRoute extends Model
                 'name' => $this->name,
                 'disaster_type' => $this->disaster_type,
                 'route_type' => $this->route_type,
+                'length_km' => $this->length_km,
+                'capacity_per_hour' => $this->capacity_per_hour,
             ],
             'geometry' => [
                 'type' => 'LineString',
-                'coordinates' => $this->line_coordinates,
+                'coordinates' => $this->line_coordinates ?? [],
             ],
         ];
     }

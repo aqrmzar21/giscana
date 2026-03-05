@@ -52,10 +52,15 @@ class DisasterZone extends Model
     }
 
     /**
-     * Get GeoJSON representation
+     * Get GeoJSON representation.
+     * Mendukung point [lng, lat] atau polygon (array of rings).
      */
     public function toGeoJSON()
     {
+        $coords = $this->polygon_coordinates;
+        $isPoint = is_array($coords) && count($coords) === 2
+            && is_numeric($coords[0] ?? null) && is_numeric($coords[1] ?? null);
+
         return [
             'type' => 'Feature',
             'properties' => [
@@ -66,10 +71,9 @@ class DisasterZone extends Model
                 'area_hectares' => $this->area_hectares,
                 'affected_population' => $this->affected_population,
             ],
-            'geometry' => [
-                'type' => 'Polygon',
-                'coordinates' => $this->polygon_coordinates,
-            ],
+            'geometry' => $isPoint
+                ? ['type' => 'Point', 'coordinates' => $coords]
+                : ['type' => 'Polygon', 'coordinates' => $coords],
         ];
     }
 }

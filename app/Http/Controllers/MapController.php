@@ -52,6 +52,43 @@ class MapController extends Controller
         // Get aid disasters data
         $aidDisasters = AidDisaster::active()->get();
 
+        // Batas kecamatan dari GeoJSON + data aid_disasters (nama dari DB)
+        $districtFeatures = [];
+        $geojsonPath = public_path('geojson/kawasan-pesisir.geojson');
+        if (file_exists($geojsonPath)) {
+            $raw = file_get_contents($geojsonPath);
+            $geo = json_decode($raw, true);
+            if (is_array($geo) && !empty($geo['features'])) {
+                $byName = [];
+                foreach ($geo['features'] as $feature) {
+                    $name = $feature['properties']['NAMOBJ'] ?? null;
+                    if ($name) {
+                        $byName[$name] = $feature;
+                    }
+                }
+                $nameMap = ['Bone Pantai' => 'Bonepantai'];
+                foreach ($aidDisasters as $item) {
+                    $namaKec = $item->nama_kecamatan;
+                    $namaTrim = preg_replace('/^Kecamatan\s+/i', '', $namaKec);
+                    $lookupName = $nameMap[$namaTrim] ?? $namaTrim;
+                    if (isset($byName[$lookupName])) {
+                        $src = $byName[$lookupName];
+                        $districtFeatures[] = [
+                            'type' => 'Feature',
+                            'properties' => [
+                                'id' => $item->id,
+                                'nama_kecamatan' => $item->nama_kecamatan,
+                                'jumlah_penerima_bantuan' => $item->jumlah_penerima_bantuan,
+                                'bantuan_terdistribusi' => $item->bantuan_terdistribusi,
+                                'persentase_distribusi' => $item->persentase_distribusi,
+                            ],
+                            'geometry' => $src['geometry'] ?? null,
+                        ];
+                    }
+                }
+            }
+        }
+
         return response()->json([
             'disaster_zones' => [
                 'type' => 'FeatureCollection',
@@ -70,14 +107,18 @@ class MapController extends Controller
                 'features' => $aidDisasters->map(fn($item) => [
                     'type' => 'Feature',
                     'properties' => [
-                        'id'                      => $item->id,
-                        'nama_kecamatan'          => $item->nama_kecamatan,
+                        'id' => $item->id,
+                        'nama_kecamatan' => $item->nama_kecamatan,
                         'jumlah_penerima_bantuan' => $item->jumlah_penerima_bantuan,
-                        'bantuan_terdistribusi'   => $item->bantuan_terdistribusi,
-                        'persentase_distribusi'   => $item->persentase_distribusi,
+                        'bantuan_terdistribusi' => $item->bantuan_terdistribusi,
+                        'persentase_distribusi' => $item->persentase_distribusi,
                     ],
-                    'geometry' => null, // No coordinates — data statistik
+                    'geometry' => null,
                 ]),
+            ],
+            'district_boundaries' => [
+                'type' => 'FeatureCollection',
+                'features' => $districtFeatures,
             ],
         ]);
     }
@@ -109,7 +150,9 @@ class MapController extends Controller
                 'description' => $zone->description,
                 'disaster_type' => $zone->disaster_type,
                 'risk_level' => $zone->risk_level,
-                'coordinates' => $zone->polygon_coordinates[0][0] ?? null, // First coordinate of polygon
+                'coordinates' => is_array($zone->polygon_coordinates) && count($zone->polygon_coordinates) === 2
+                    ? $zone->polygon_coordinates
+                    : ($zone->polygon_coordinates[0][0] ?? null),
             ]);
         }
 
