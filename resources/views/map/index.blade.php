@@ -106,10 +106,6 @@
                     <span>Titik Rawan</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #fde68a; border: 1px dashed #facc15;"></div>
-                    <span>Batas Kecamatan</span>
-                </div>
-                <div class="legend-item">
                     <div class="legend-color" style="background-color: #3b82f6;"></div>
                     <span>Rute Evakuasi</span>
                 </div>
@@ -118,6 +114,10 @@
                     <span>Titik Kumpul</span>
                 </div>
                 
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #fde68a; border: 1px dashed #facc15;"></div>
+                    <span>Batas Kecamatan</span>
+                </div>
                 <div class="mt-3">
                     <label class="inline-flex items-center text-xs text-gray-700">
                         <input type="checkbox" id="toggle_district_boundaries" class="mr-2" checked>
@@ -140,7 +140,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     // Initialize map centered on Bone Bolango, Gorontalo
-    const map = L.map('map').setView([0.5, 123.2], 11);
+    const map = L.map('map').setView([0.5, 123.2], 8);
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
