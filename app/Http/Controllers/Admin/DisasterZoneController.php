@@ -37,7 +37,6 @@ class DisasterZoneController extends Controller
             'risk_level' => 'required|in:low,medium,high,critical',
             'polygon_coordinates' => 'required|json',
             'area_hectares' => 'nullable|numeric|min:0',
-            'affected_population' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ]);
 
@@ -78,7 +77,6 @@ class DisasterZoneController extends Controller
             'risk_level' => 'required|in:low,medium,high,critical',
             'polygon_coordinates' => 'required|json',
             'area_hectares' => 'nullable|numeric|min:0',
-            'affected_population' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ]);
 
