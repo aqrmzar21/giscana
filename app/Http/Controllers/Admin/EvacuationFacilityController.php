@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\EvacuationFacility;
+use App\Models\AidDisaster;
 use Illuminate\Http\Request;
 
 class EvacuationFacilityController extends Controller
@@ -13,7 +14,7 @@ class EvacuationFacilityController extends Controller
      */
     public function index()
     {
-        $facilities = EvacuationFacility::latest()->paginate(15);
+        $facilities = EvacuationFacility::with('aidDisaster')->latest()->paginate(15);
         return view('admin.evacuation-facilities.index', compact('facilities'));
     }
 
@@ -22,7 +23,8 @@ class EvacuationFacilityController extends Controller
      */
     public function create()
     {
-        return view('admin.evacuation-facilities.create');
+        $aidDisasters = AidDisaster::active()->orderBy('nama_kecamatan')->get();
+        return view('admin.evacuation-facilities.create', compact('aidDisasters'));
     }
 
     /**
@@ -31,6 +33,7 @@ class EvacuationFacilityController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'aid_disaster_id' => 'nullable|exists:aid_disasters,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'point_coordinates' => 'required|json',
@@ -49,6 +52,11 @@ class EvacuationFacilityController extends Controller
         $validated['has_food_storage'] = $request->has('has_food_storage');
         $validated['is_accessible'] = $request->has('is_accessible');
         $validated['is_active'] = $request->has('is_active');
+
+        if (!empty($validated['aid_disaster_id'])) {
+            $aid = AidDisaster::find($validated['aid_disaster_id']);
+            $validated['nama_kecamatan'] = $aid?->nama_kecamatan;
+        }
 
         EvacuationFacility::create($validated);
 
@@ -69,7 +77,8 @@ class EvacuationFacilityController extends Controller
      */
     public function edit(EvacuationFacility $evacuationFacility)
     {
-        return view('admin.evacuation-facilities.edit', compact('evacuationFacility'));
+        $aidDisasters = AidDisaster::active()->orderBy('nama_kecamatan')->get();
+        return view('admin.evacuation-facilities.edit', compact('evacuationFacility', 'aidDisasters'));
     }
 
     /**
@@ -78,6 +87,7 @@ class EvacuationFacilityController extends Controller
     public function update(Request $request, EvacuationFacility $evacuationFacility)
     {
         $validated = $request->validate([
+            'aid_disaster_id' => 'nullable|exists:aid_disasters,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'point_coordinates' => 'required|json',
@@ -96,6 +106,13 @@ class EvacuationFacilityController extends Controller
         $validated['has_food_storage'] = $request->has('has_food_storage');
         $validated['is_accessible'] = $request->has('is_accessible');
         $validated['is_active'] = $request->has('is_active');
+
+        if (!empty($validated['aid_disaster_id'])) {
+            $aid = AidDisaster::find($validated['aid_disaster_id']);
+            $validated['nama_kecamatan'] = $aid?->nama_kecamatan;
+        } else {
+            $validated['nama_kecamatan'] = null;
+        }
 
         $evacuationFacility->update($validated);
 

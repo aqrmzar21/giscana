@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\DisasterZone;
 use App\Models\EvacuationRoute;
 use App\Models\EvacuationFacility;
-use App\Models\AidDistributionPoint;
+use App\Models\AidDisaster;
 
 class HomeController extends Controller
 {
@@ -20,7 +20,7 @@ class HomeController extends Controller
             'disaster_zones' => DisasterZone::active()->count(),
             'evacuation_routes' => EvacuationRoute::active()->count(),
             'evacuation_facilities' => EvacuationFacility::active()->count(),
-            'aid_distribution_points' => AidDistributionPoint::active()->count(),
+            'aid_disasters' => AidDisaster::active()->count(),
         ];
 
         // Get recent disaster zones for showcase

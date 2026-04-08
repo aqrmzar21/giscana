@@ -86,25 +86,25 @@
                     </li>
                 </ul>
             </li>
-            <li class="nav-item {{ request()->routeIs('admin.aid-distribution-points.*') ? 'menu-open' : '' }}">
-                <a href="#" class="nav-link {{ request()->routeIs('admin.aid-distribution-points.*') ? 'active' : '' }}">
+            <li class="nav-item {{ request()->routeIs('admin.aid-disasters.*') ? 'menu-open' : '' }}">
+                <a href="#" class="nav-link {{ request()->routeIs('admin.aid-disasters.*') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-hand-holding-heart"></i>
                     <p>
-                        Titik Distribusi Bantuan
+                        Bantuan Bencana
                         <i class="right fas fa-angle-left"></i>
                     </p>
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
-                        <a href="{{ route('admin.aid-distribution-points.index') }}" class="nav-link {{ request()->routeIs('admin.aid-distribution-points.index') ? 'active' : '' }}">
+                        <a href="{{ route('admin.aid-disasters.index') }}" class="nav-link {{ request()->routeIs('admin.aid-disasters.index') ? 'active' : '' }}">
                             <i class="far fa-circle nav-icon"></i>
-                            <p>Daftar Titik</p>
+                            <p>Daftar Bantuan</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('admin.aid-distribution-points.create') }}" class="nav-link {{ request()->routeIs('admin.aid-distribution-points.create') ? 'active' : '' }}">
+                        <a href="{{ route('admin.aid-disasters.create') }}" class="nav-link {{ request()->routeIs('admin.aid-disasters.create') ? 'active' : '' }}">
                             <i class="far fa-circle nav-icon"></i>
-                            <p>Tambah Titik Baru</p>
+                            <p>Tambah Data Baru</p>
                         </a>
                     </li>
                 </ul>

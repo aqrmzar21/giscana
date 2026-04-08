@@ -10,8 +10,11 @@ class EvacuationRoute extends Model
     use HasFactory;
 
     protected $fillable = [
+        'evacuation_facility_id',
+        'nama_fasilitas',
         'name',
         'description',
+        'disaster_type',
         'line_coordinates',
         'length_km',
         'route_type',
@@ -22,11 +25,20 @@ class EvacuationRoute extends Model
 
     protected $casts = [
         'line_coordinates' => 'array',
+        'evacuation_facility_id' => 'integer',
         'length_km' => 'decimal:2',
         'capacity_per_hour' => 'integer',
         'is_accessible' => 'boolean',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Relasi: rute evakuasi menuju satu fasilitas evakuasi (evacuation_facility).
+     */
+    public function evacuationFacility()
+    {
+        return $this->belongsTo(EvacuationFacility::class, 'evacuation_facility_id');
+    }
 
     /**
      * Scope for active routes
@@ -62,6 +74,7 @@ class EvacuationRoute extends Model
             'properties' => [
                 'id' => $this->id,
                 'name' => $this->name,
+                'nama_fasilitas' => $this->nama_fasilitas ?? $this->evacuationFacility?->name,
                 'disaster_type' => $this->disaster_type,
                 'route_type' => $this->route_type,
                 'length_km' => $this->length_km,

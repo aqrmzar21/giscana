@@ -102,8 +102,12 @@
             <div class="legend">
                 <div class="font-semibold mb-2">Legenda</div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #ef4444; opacity: 0.5;"></div>
-                    <span>Zona Bencana</span>
+                    <div class="legend-color" style="background-color: #ef4444;"></div>
+                    <span>Area Bencana</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #fde68a; border: 1px dashed #facc15;"></div>
+                    <span>Batas Kecamatan</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: #3b82f6;"></div>
@@ -113,9 +117,12 @@
                     <div class="legend-color" style="background-color: #10b981;"></div>
                     <span>Titik Kumpul</span>
                 </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #f59e0b;"></div>
-                    <span>Titik Distribusi Bantuan</span>
+                
+                <div class="mt-3">
+                    <label class="inline-flex items-center text-xs text-gray-700">
+                        <input type="checkbox" id="toggle_district_boundaries" class="mr-2" checked>
+                        Tampilkan Batas Kecamatan
+                    </label>
                 </div>
             </div>
         </div>
@@ -142,6 +149,7 @@
         disasterZones: L.layerGroup().addTo(map),
         evacuationRoutes: L.layerGroup().addTo(map),
         evacuationFacilities: L.layerGroup().addTo(map),
+        districtBoundaries: L.layerGroup().addTo(map),
         aidDistributionPoints: L.layerGroup().addTo(map)
     };
 
@@ -149,6 +157,7 @@
     function loadMapData() {
         const disasterType = document.getElementById('disaster_type').value;
         const riskLevel = document.getElementById('risk_level').value;
+        const districtToggle = document.getElementById('toggle_district_boundaries');
         
         const url = new URL('{{ route("map.data") }}', window.location.origin);
         if (disasterType !== 'all') url.searchParams.append('disaster_type', disasterType);
@@ -160,22 +169,24 @@
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                // Add disaster zones (polygons)
+                // Add disaster zones (points / marker merah)
                 data.disaster_zones.features.forEach(feature => {
-                    const coordinates = feature.geometry.coordinates[0].map(coord => [coord[1], coord[0]]);
-                    const polygon = L.polygon(coordinates, {
-                        color: '#ef4444',
-                        fillColor: '#ef4444',
-                        fillOpacity: 0.3,
-                        weight: 2
+                    if (!feature.geometry || !feature.geometry.coordinates) return;
+                    const [lng, lat] = feature.geometry.coordinates;
+                    const marker = L.marker([lat, lng], {
+                        icon: L.divIcon({
+                            className: 'disaster-zone-marker',
+                            html: '<div style="background-color: #ef4444; width: 18px; height: 18px; border-radius: 50%; border: 2px solid white;"></div>',
+                            iconSize: [18, 18]
+                        })
                     }).addTo(layers.disasterZones);
 
-                    polygon.bindPopup(`
+                    marker.bindPopup(`
                         <strong>${feature.properties.name}</strong><br>
                         Jenis: ${feature.properties.disaster_type}<br>
                         Risiko: ${feature.properties.risk_level}<br>
-                        Luas: ${feature.properties.area_hectares} ha<br>
-                        Populasi Terdampak: ${feature.properties.affected_population}
+                        Luas: ${feature.properties.area_hectares ?? '-'} ha<br>
+                        Populasi Terdampak: ${feature.properties.affected_population ?? '-'}
                     `);
                 });
 
@@ -209,7 +220,6 @@
 
                     marker.bindPopup(`
                         <strong>${feature.properties.name}</strong><br>
-                        Tipe: ${feature.properties.facility_type}<br>
                         Alamat: ${feature.properties.address || '-'}<br>
                         Kapasitas: ${feature.properties.capacity} orang<br>
                         ${feature.properties.has_medical_facility ? '✓ Fasilitas Medis' : ''}<br>
@@ -217,32 +227,61 @@
                     `);
                 });
 
-                // Add aid distribution points (points)
-                data.aid_distribution_points.features.forEach(feature => {
-                    const [lng, lat] = feature.geometry.coordinates;
-                    const marker = L.marker([lat, lng], {
-                        icon: L.divIcon({
-                            className: 'aid-point-marker',
-                            html: '<div style="background-color: #f59e0b; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;"></div>',
-                            iconSize: [20, 20]
-                        })
-                    }).addTo(layers.aidDistributionPoints);
+                // Add district boundaries (batas administrasi kecamatan dari GeoJSON + DB aid_disasters)
+                if (data.district_boundaries && data.district_boundaries.features.length > 0) {
+                    data.district_boundaries.features.forEach(feature => {
+                        // MultiPolygon -> array tingkat paling dalam adalah [lng, lat, (z?)]
+                        const geom = feature.geometry;
+                        if (!geom || !geom.coordinates) return;
 
-                    marker.bindPopup(`
-                        <strong>${feature.properties.name}</strong><br>
-                        Tipe Bantuan: ${feature.properties.aid_type}<br>
-                        Alamat: ${feature.properties.address || '-'}<br>
-                        Kapasitas: ${feature.properties.capacity_per_day} orang/hari<br>
-                        Kontak: ${feature.properties.contact_person || '-'}<br>
-                        Telp: ${feature.properties.contact_phone || '-'}
-                    `);
-                });
+                        const polys = [];
+                        if (geom.type === 'MultiPolygon') {
+                            geom.coordinates.forEach(poly => {
+                                const coords = poly[0].map(coord => [coord[1], coord[0]]);
+                                polys.push(coords);
+                            });
+                        } else if (geom.type === 'Polygon') {
+                            const coords = geom.coordinates[0].map(coord => [coord[1], coord[0]]);
+                            polys.push(coords);
+                        }
+
+                        polys.forEach(coords => {
+                            const polygon = L.polygon(coords, {
+                                color: '#facc15',
+                                fillColor: '#fde68a',
+                                fillOpacity: 0.15,
+                                weight: 2,
+                                dashArray: '4 2'
+                            }).addTo(layers.districtBoundaries);
+
+                            const p = feature.properties;
+                            polygon.bindPopup(`
+                                <strong>${p.nama_kecamatan}</strong><br>
+                                Penerima Bantuan: ${p.jumlah_penerima_bantuan ?? '-'}<br>
+                                Terdistribusi: ${p.bantuan_terdistribusi ?? '-'}<br>
+                                Persentase: ${p.persentase_distribusi ?? '-'}%
+                            `);
+                        });
+                    });
+                }
+
+                // Atur visibilitas layer batas kecamatan sesuai toggle
+                if (districtToggle && !districtToggle.checked) {
+                    map.removeLayer(layers.districtBoundaries);
+                } else {
+                    layers.districtBoundaries.addTo(map);
+                }
+
+                // Add aid disasters data (statistik per kecamatan — tanpa koordinat)
+                // Data ini ditampilkan sebagai info panel, bukan marker di peta
+                if (data.aid_disasters && data.aid_disasters.features.length > 0) {
+                    console.log('Data bantuan bencana:', data.aid_disasters.features.length, 'kecamatan');
+                }
 
                 // Fit map to bounds if there are features
                 if (data.disaster_zones.features.length > 0 || 
                     data.evacuation_routes.features.length > 0 ||
-                    data.evacuation_facilities.features.length > 0 ||
-                    data.aid_distribution_points.features.length > 0) {
+                    data.evacuation_facilities.features.length > 0) {
                     const allBounds = [];
                     Object.values(layers).forEach(layer => {
                         layer.eachLayer(l => {
@@ -270,6 +309,18 @@
     // Add event listeners to filters
     document.getElementById('disaster_type').addEventListener('change', loadMapData);
     document.getElementById('risk_level').addEventListener('change', loadMapData);
+
+    // Toggle batas kecamatan on/off
+    const districtToggle = document.getElementById('toggle_district_boundaries');
+    if (districtToggle) {
+        districtToggle.addEventListener('change', () => {
+            if (districtToggle.checked) {
+                layers.districtBoundaries.addTo(map);
+            } else {
+                map.removeLayer(layers.districtBoundaries);
+            }
+        });
+    }
 </script>
 @endpush
 
