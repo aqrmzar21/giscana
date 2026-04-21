@@ -80,19 +80,6 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <div>
-                        <label for="length_km" class="block text-sm font-medium text-gray-700">Panjang (km)</label>
-                        <div class="mt-1">
-                            <input type="number" step="0.01" name="length_km" id="length_km" value="{{ old('length_km') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('length_km') border-red-300 @enderror">
-                            @error('length_km')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
-
-                </div>
-
                 <div>
                     <label for="line_coordinates" class="block text-sm font-medium text-gray-700">Koordinat Garis (GeoJSON) <span class="text-red-500">*</span></label>
                     <div class="mt-1">

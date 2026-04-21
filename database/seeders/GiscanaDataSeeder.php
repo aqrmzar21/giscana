@@ -233,7 +233,6 @@ class GiscanaDataSeeder extends Seeder
                 [123.30154581878514,0.3187165777539036],
                 [123.30124950328184,0.3181495056982868]
             ],
-            'length_km' => 2.1,
             'route_type' => 'secondary',
             'is_accessible' => true,
             'is_active' => true,
@@ -265,7 +264,6 @@ class GiscanaDataSeeder extends Seeder
                 [123.2807269834953, 0.3202313630942797],
                 [123.2808477843464, 0.32043743191221097]
             ],
-            'length_km' => 3.2,
             'route_type' => 'primary',
             'is_accessible' => true,
             'is_active' => true,
@@ -300,7 +298,6 @@ class GiscanaDataSeeder extends Seeder
                 [123.25107873504884, 0.34933887366621263],
                 [123.25146119356252, 0.34940636509077194]
             ],
-            'length_km' => 1.8,
             'route_type' => 'emergency',
             'is_accessible' => true,
             'is_active' => true,

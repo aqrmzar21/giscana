@@ -19,7 +19,7 @@
             <p class="text-xs text-gray-500">Provinsi Gorontalo — filter dan legenda mengatur lapisan yang ditampilkan</p>
         </div>
         <div class="flex-1 min-w-0 space-y-3">
-            @include('map.partials.map-controls-inner', ['toolbarContext' => 'footer'])
+            @include('map.partials.map-controls-inner', ['toolbarContext' => 'footer', 'hideToolbarHeading' => true])
         </div>
     </div>
 </div>

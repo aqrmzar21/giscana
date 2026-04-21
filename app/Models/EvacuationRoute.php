@@ -16,7 +16,6 @@ class EvacuationRoute extends Model
         'description',
         'disaster_type',
         'line_coordinates',
-        'length_km',
         'route_type',
         'is_accessible',
         'is_active',
@@ -25,7 +24,6 @@ class EvacuationRoute extends Model
     protected $casts = [
         'line_coordinates' => 'array',
         'evacuation_facility_id' => 'integer',
-        'length_km' => 'decimal:2',
         'is_accessible' => 'boolean',
         'is_active' => 'boolean',
     ];
@@ -75,7 +73,6 @@ class EvacuationRoute extends Model
                 'nama_fasilitas' => $this->nama_fasilitas ?? $this->evacuationFacility?->name,
                 'disaster_type' => $this->disaster_type,
                 'route_type' => $this->route_type,
-                'length_km' => $this->length_km,
             ],
             'geometry' => [
                 'type' => 'LineString',
