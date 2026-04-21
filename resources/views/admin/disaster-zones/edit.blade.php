@@ -80,7 +80,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <!-- <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <label for="area_hectares" class="block text-sm font-medium text-gray-700">Luas (Hektar)</label>
                         <div class="mt-1">
@@ -90,8 +90,8 @@
                             @enderror
                         </div>
                     </div>
+                </div> -->
 
-                </div>
 
                 <div>
                     <label for="polygon_coordinates" class="block text-sm font-medium text-gray-700">Koordinat Polygon (GeoJSON) <span class="text-red-500">*</span></label>

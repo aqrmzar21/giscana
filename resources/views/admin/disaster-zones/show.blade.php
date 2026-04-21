@@ -74,10 +74,10 @@
                 <dt class="text-sm font-medium text-gray-500">Deskripsi</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $disasterZone->description ?? '-' }}</dd>
             </div>
-            <div>
+            <!-- <div>
                 <dt class="text-sm font-medium text-gray-500">Luas (Hektar)</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ number_format($disasterZone->area_hectares ?? 0, 2) }}</dd>
-            </div>
+            </div> -->
             <div>
                 <dt class="text-sm font-medium text-gray-500">Status</dt>
                 <dd class="mt-1 text-sm text-gray-900">
