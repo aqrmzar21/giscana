@@ -22,6 +22,17 @@ class MapController extends Controller
     }
 
     /**
+     * Peta di dalam layout admin (hanya pengguna terautentikasi).
+     */
+    public function dashboard(Request $request)
+    {
+        $disasterType = $request->get('disaster_type', 'all');
+        $riskLevel = $request->get('risk_level', 'all');
+
+        return view('map.dashboard', compact('disasterType', 'riskLevel'));
+    }
+
+    /**
      * Get all geospatial data for the map
      */
     public function getMapData(Request $request)
