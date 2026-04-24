@@ -94,11 +94,11 @@
 
 
                 <div>
-                    <label for="polygon_coordinates" class="block text-sm font-medium text-gray-700">Koordinat Polygon (GeoJSON) <span class="text-red-500">*</span></label>
+                    <label for="point_coordinates" class="block text-sm font-medium text-gray-700">Koordinat Polygon (GeoJSON) <span class="text-red-500">*</span></label>
                     <div class="mt-1">
-                        <textarea id="polygon_coordinates" name="polygon_coordinates" rows="5" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md font-mono text-xs @error('polygon_coordinates') border-red-300 @enderror">{{ old('polygon_coordinates', json_encode($disasterZone->polygon_coordinates, JSON_PRETTY_PRINT)) }}</textarea>
+                        <textarea id="point_coordinates" name="point_coordinates" rows="5" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md font-mono text-xs @error('point_coordinates') border-red-300 @enderror">{{ old('point_coordinates', json_encode($disasterZone->point_coordinates, JSON_PRETTY_PRINT)) }}</textarea>
                         <p class="mt-2 text-sm text-gray-500">Format: JSON array of coordinates [[[lng, lat], [lng, lat], ...]]</p>
-                        @error('polygon_coordinates')
+                        @error('point_coordinates')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>

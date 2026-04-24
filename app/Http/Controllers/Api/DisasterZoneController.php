@@ -55,7 +55,7 @@ class DisasterZoneController extends Controller
             'disaster_type' => 'required|in:longsor,banjir,other',
             'description' => 'nullable|string',
             'risk_level' => 'required|in:low,medium,high,critical',
-            'polygon_coordinates' => 'required|array',
+            'point_coordinates' => 'required|array',
             'area_hectares' => 'nullable|numeric|min:0',
             'affected_population' => 'nullable|integer|min:0',
         ]);
@@ -94,7 +94,7 @@ class DisasterZoneController extends Controller
             'disaster_type' => 'sometimes|in:longsor,banjir,other',
             'description' => 'nullable|string',
             'risk_level' => 'sometimes|in:low,medium,high,critical',
-            'polygon_coordinates' => 'sometimes|array',
+            'point_coordinates' => 'sometimes|array',
             'area_hectares' => 'nullable|numeric|min:0',
             'affected_population' => 'nullable|integer|min:0',
             'is_active' => 'sometimes|boolean',

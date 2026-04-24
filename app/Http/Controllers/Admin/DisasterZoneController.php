@@ -35,14 +35,14 @@ class DisasterZoneController extends Controller
             'disaster_type' => 'required|in:longsor,banjir,other',
             'description' => 'nullable|string',
             'risk_level' => 'required|in:low,medium,high,critical',
-            'polygon_coordinates' => 'required|json',
+            'point_coordinates' => 'json',
             'area_hectares' => 'nullable|numeric|min:0',
             'is_active' => 'boolean',
         ]);
-
-        $validated['polygon_coordinates'] = json_decode($validated['polygon_coordinates'], true);
+        $validated['point_coordinates'] = json_decode($validated['point_coordinates'], true);
         $validated['is_active'] = $request->has('is_active');
-
+        
+        // dd($validated);
         DisasterZone::create($validated);
 
         return redirect()->route('admin.disaster-zones.index')
@@ -75,12 +75,12 @@ class DisasterZoneController extends Controller
             'disaster_type' => 'required|in:longsor,banjir,other',
             'description' => 'nullable|string',
             'risk_level' => 'required|in:low,medium,high,critical',
-            'polygon_coordinates' => 'required|json',
+            'point_coordinates' => 'required|json',
             'area_hectares' => 'nullable|numeric|min:0',
             'is_active' => 'boolean',
         ]);
 
-        $validated['polygon_coordinates'] = json_decode($validated['polygon_coordinates'], true);
+        $validated['point_coordinates'] = json_decode($validated['point_coordinates'], true);
         $validated['is_active'] = $request->has('is_active');
 
         $disasterZone->update($validated);

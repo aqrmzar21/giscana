@@ -89,9 +89,9 @@
                 </dd>
             </div>
             <div class="sm:col-span-2">
-                <dt class="text-sm font-medium text-gray-500">Koordinat Polygon</dt>
+                <dt class="text-sm font-medium text-gray-500">Koordinat Point</dt>
                 <dd class="mt-1 text-sm text-gray-900">
-                    <pre class="bg-gray-50 p-4 rounded-md text-xs overflow-x-auto">{{ json_encode($disasterZone->polygon_coordinates, JSON_PRETTY_PRINT) }}</pre>
+                    <pre class="bg-gray-50 p-4 rounded-md text-xs overflow-x-auto">{{ json_encode($disasterZone->point_coordinates, JSON_PRETTY_PRINT) }}</pre>
                 </dd>
             </div>
             <div>
