@@ -14,9 +14,29 @@ class EvacuationFacilityController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $facilities = EvacuationFacility::with('aidDisaster')->latest()->paginate(15);
+        $query = EvacuationFacility::with('aidDisaster');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('address', 'like', "%{$search}%")
+                  ->orWhere('nama_kecamatan', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+        } elseif ($request->filled('start_date')) {
+            $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+        } elseif ($request->filled('end_date')) {
+            $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
+        }
+
+        $facilities = $query->latest()->paginate(15)->withQueryString();
+        
         return $this->partialView('admin.evacuation-facilities.index', compact('facilities'));
     }
 
