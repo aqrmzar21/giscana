@@ -7,9 +7,11 @@
 
     @include('map.partials.map-filters-fields')
 
+    @if(!isset($hideLegend) || !$hideLegend)
     <div class="legend mt-3 pt-3 border-t border-gray-100">
         @include('map.partials.map-legend-content', ['legendLayout' => 'inline'])
     </div>
+    @endif
 
     <div class="mt-3">
         @include('map.partials.map-district-checkbox')

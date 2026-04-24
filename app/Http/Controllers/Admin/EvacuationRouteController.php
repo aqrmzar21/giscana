@@ -35,7 +35,8 @@ class EvacuationRouteController extends Controller
             $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
         }
 
-        $routes = $query->latest()->paginate(15)->withQueryString();
+        $perPage = $request->get('per_page', 10);
+        $routes = $query->latest()->paginate($perPage)->withQueryString();
         
         return $this->partialView('admin.evacuation-routes.index', compact('routes'));
     }

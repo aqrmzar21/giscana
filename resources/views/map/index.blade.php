@@ -15,12 +15,13 @@
     <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div class="shrink-0 lg:pr-6">
             <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Kontrol peta</p>
-            <!-- <p class="text-sm font-medium text-gray-900">Kabupaten Bone Bolango</p> -->
-            <p class="text-xs text-gray-500">Provinsi Gorontalo — filter dan legenda mengatur lapisan yang ditampilkan</p>
-            <!-- <span class="px-2">@include('map.partials.map-legend-content')</span> -->
+            <p class="text-xs text-gray-500 mb-2">Provinsi Gorontalo — filter dan legenda mengatur lapisan yang ditampilkan</p>
+            <div class="mt-2">
+                @include('map.partials.map-legend-content')
+            </div>
         </div>
-        <div class="flex-1 min-w-0 space-y-3">
-            @include('map.partials.map-controls-inner', ['toolbarContext' => 'footer', 'hideToolbarHeading' => false])
+        <div class="flex-1 min-w-0 space-y-3 border-l border-gray-200 pl-4">
+            @include('map.partials.map-controls-inner', ['toolbarContext' => 'footer', 'hideToolbarHeading' => false, 'hideLegend' => true])
         </div>
     </div>
 </div>

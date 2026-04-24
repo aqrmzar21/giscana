@@ -22,6 +22,9 @@
         aidDistributionPoints: L.layerGroup().addTo(map)
     };
 
+    const villageBoundariesLayer = L.layerGroup();
+    let villageGeojsonLoaded = false;
+
     function invalidateMapSize() {
         map.invalidateSize({ animate: false });
     }
@@ -188,6 +191,52 @@
                 map.removeLayer(layers.districtBoundaries);
             }
         });
+    }
+
+    const villageToggle = document.getElementById('toggle_village_boundaries');
+    if (villageToggle) {
+        villageToggle.addEventListener('change', () => {
+            if (villageToggle.checked) {
+                villageBoundariesLayer.addTo(map);
+                if (!villageGeojsonLoaded) {
+                    villageGeojsonLoaded = true;
+                    const files = [
+                        '/geojson/Kecamatan Bone Raya-KEL_DESA.geojson',
+                        '/geojson/Kecamatan Bone-KEL_DESA.geojson',
+                        '/geojson/Kecamatan Bonepantai-KEL_DESA.geojson',
+                        '/geojson/Kecamatan Bulawa-KEL_DESA.geojson',
+                        '/geojson/Kecamatan Kabila Bone-KEL_DESA.geojson'
+                    ];
+                    files.forEach(file => {
+                        fetch(file)
+                            .then(res => res.json())
+                            .then(data => {
+                                L.geoJSON(data, {
+                                    style: {
+                                        color: '#000000',
+                                        weight: 1,
+                                        fillColor: '#60a5fa',
+                                        fillOpacity: 0.1,
+                                        dashArray: '3 3'
+                                    },
+                                    onEachFeature: function(feature, layer) {
+                                        if (feature.properties && feature.properties.NAMOBJ) {
+                                            layer.bindPopup(`<strong>Desa/Kelurahan: ${feature.properties.NAMOBJ}</strong>`);
+                                        }
+                                    }
+                                }).addTo(villageBoundariesLayer);
+                            })
+                            .catch(err => console.error('Error loading village boundaries:', err));
+                    });
+                }
+            } else {
+                map.removeLayer(villageBoundariesLayer);
+            }
+        });
+
+        if (villageToggle.checked) {
+            villageToggle.dispatchEvent(new Event('change'));
+        }
     }
 
     if (mapUiVariant === 'landing-fs') {
