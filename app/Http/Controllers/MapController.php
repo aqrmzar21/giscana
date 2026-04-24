@@ -65,23 +65,54 @@ class MapController extends Controller
         if ($riskLevel && $riskLevel !== 'all') {
             $zonesQuery->byRiskLevel($riskLevel);
         }
-        $zones = $zonesQuery->get()
-            ->filter(fn (DisasterZone $z) => $this->pointInBoundingBox($z->point_coordinates, $bbox))
-            ->values();
+        $zones = $zonesQuery->get();
 
         // Get evacuation routes (dengan relasi ke evacuation_facility untuk nama_fasilitas)
         $routesQuery = EvacuationRoute::with('evacuationFacility')->active()->accessible();
         if ($disasterType && $disasterType !== 'all') {
             $routesQuery->byDisasterType($disasterType);
         }
-        $routes = $routesQuery->get()
-            ->filter(fn (EvacuationRoute $r) => $this->lineOverlapsBoundingBox($r->line_coordinates, $bbox))
-            ->values();
+        $routes = $routesQuery->get();
 
         // Get evacuation facilities (dengan relasi ke aid_disaster untuk nama_kecamatan)
-        $facilities = EvacuationFacility::with('aidDisaster')->active()->accessible()->get()
-            ->filter(fn (EvacuationFacility $f) => $this->pointInBoundingBox($f->point_coordinates, $bbox))
-            ->values();
+        $facilities = EvacuationFacility::with('aidDisaster')->active()->accessible()->get();
+
+        $minLng = $bbox['min_lng'];
+        $maxLng = $bbox['max_lng'];
+        $minLat = $bbox['min_lat'];
+        $maxLat = $bbox['max_lat'];
+
+        $updateBounds = function($lng, $lat) use (&$minLng, &$maxLng, &$minLat, &$maxLat) {
+            $minLng = min($minLng, $lng);
+            $maxLng = max($maxLng, $lng);
+            $minLat = min($minLat, $lat);
+            $maxLat = max($maxLat, $lat);
+        };
+
+        foreach ($zones as $z) {
+            if (is_array($z->point_coordinates) && count($z->point_coordinates) >= 2) {
+                $updateBounds((float)$z->point_coordinates[0], (float)$z->point_coordinates[1]);
+            }
+        }
+        foreach ($facilities as $f) {
+            if (is_array($f->point_coordinates) && count($f->point_coordinates) >= 2) {
+                $updateBounds((float)$f->point_coordinates[0], (float)$f->point_coordinates[1]);
+            }
+        }
+        foreach ($routes as $r) {
+            if (is_array($r->line_coordinates)) {
+                foreach ($r->line_coordinates as $pt) {
+                    if (is_array($pt) && count($pt) >= 2) {
+                        $updateBounds((float)$pt[0], (float)$pt[1]);
+                    }
+                }
+            }
+        }
+
+        $bbox['min_lng'] = $minLng;
+        $bbox['max_lng'] = $maxLng;
+        $bbox['min_lat'] = $minLat;
+        $bbox['max_lat'] = $maxLat;
 
         // Get aid disasters data
         $aidDisasters = AidDisaster::active()->get();
@@ -179,8 +210,7 @@ class MapController extends Controller
         $zones = DisasterZone::where('name', 'like', "%{$query}%")
             ->orWhere('description', 'like', "%{$query}%")
             ->active()
-            ->get()
-            ->filter(fn (DisasterZone $z) => $this->pointInBoundingBox($z->point_coordinates, $bbox));
+            ->get();
 
         foreach ($zones as $zone) {
             $results->push([
@@ -197,8 +227,7 @@ class MapController extends Controller
         $facilities = EvacuationFacility::where('name', 'like', "%{$query}%")
             ->orWhere('address', 'like', "%{$query}%")
             ->active()
-            ->get()
-            ->filter(fn (EvacuationFacility $f) => $this->pointInBoundingBox($f->point_coordinates, $bbox));
+            ->get();
 
         foreach ($facilities as $facility) {
             $results->push([

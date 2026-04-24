@@ -13,9 +13,29 @@ class DisasterZoneController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $zones = DisasterZone::latest()->paginate(15);
+        $query = DisasterZone::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('disaster_type', 'like', "%{$search}%")
+                  ->orWhere('risk_level', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+        } elseif ($request->filled('start_date')) {
+            $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+        } elseif ($request->filled('end_date')) {
+            $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
+        }
+
+        $zones = $query->latest()->paginate(15)->withQueryString();
+        
         return $this->partialView('admin.disaster-zones.index', compact('zones'));
     }
 

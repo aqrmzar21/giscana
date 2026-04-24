@@ -1,5 +1,4 @@
 <x-guest-layout>
-    @yield('title', 'Admin - Giscana')
         <div class="max-w-md w-full space-y-8">
             <div class="text-center">
                 {{-- <div class="mx-auto h-16 w-16 bg-white rounded-full flex items-center justify-center mb-4">
