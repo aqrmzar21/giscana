@@ -3,18 +3,20 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\PartialRenderable;
 use App\Models\DisasterZone;
 use Illuminate\Http\Request;
 
 class DisasterZoneController extends Controller
 {
+    use PartialRenderable;
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         $zones = DisasterZone::latest()->paginate(15);
-        return view('admin.disaster-zones.index', compact('zones'));
+        return $this->partialView('admin.disaster-zones.index', compact('zones'));
     }
 
     /**
@@ -22,7 +24,7 @@ class DisasterZoneController extends Controller
      */
     public function create()
     {
-        return view('admin.disaster-zones.create');
+        return $this->partialView('admin.disaster-zones.create');
     }
 
     /**
@@ -54,7 +56,7 @@ class DisasterZoneController extends Controller
      */
     public function show(DisasterZone $disasterZone)
     {
-        return view('admin.disaster-zones.show', compact('disasterZone'));
+        return $this->partialView('admin.disaster-zones.show', compact('disasterZone'));
     }
 
     /**
@@ -62,7 +64,7 @@ class DisasterZoneController extends Controller
      */
     public function edit(DisasterZone $disasterZone)
     {
-        return view('admin.disaster-zones.edit', compact('disasterZone'));
+        return $this->partialView('admin.disaster-zones.edit', compact('disasterZone'));
     }
 
     /**

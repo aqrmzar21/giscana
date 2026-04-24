@@ -3,19 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\PartialRenderable;
 use App\Models\EvacuationRoute;
 use App\Models\EvacuationFacility;
 use Illuminate\Http\Request;
 
 class EvacuationRouteController extends Controller
 {
+    use PartialRenderable;
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         $routes = EvacuationRoute::with('evacuationFacility')->latest()->paginate(15);
-        return view('admin.evacuation-routes.index', compact('routes'));
+        return $this->partialView('admin.evacuation-routes.index', compact('routes'));
     }
 
     /**
@@ -24,7 +26,7 @@ class EvacuationRouteController extends Controller
     public function create()
     {
         $facilities = EvacuationFacility::active()->orderBy('name')->get();
-        return view('admin.evacuation-routes.create', compact('facilities'));
+        return $this->partialView('admin.evacuation-routes.create', compact('facilities'));
     }
 
     /**
@@ -62,7 +64,7 @@ class EvacuationRouteController extends Controller
      */
     public function show(EvacuationRoute $evacuationRoute)
     {
-        return view('admin.evacuation-routes.show', compact('evacuationRoute'));
+        return $this->partialView('admin.evacuation-routes.show', compact('evacuationRoute'));
     }
 
     /**
@@ -71,7 +73,7 @@ class EvacuationRouteController extends Controller
     public function edit(EvacuationRoute $evacuationRoute)
     {
         $facilities = EvacuationFacility::active()->orderBy('name')->get();
-        return view('admin.evacuation-routes.edit', compact('evacuationRoute', 'facilities'));
+        return $this->partialView('admin.evacuation-routes.edit', compact('evacuationRoute', 'facilities'));
     }
 
     /**

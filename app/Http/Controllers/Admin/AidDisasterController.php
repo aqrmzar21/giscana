@@ -3,18 +3,20 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\PartialRenderable;
 use App\Models\AidDisaster;
 use Illuminate\Http\Request;
 
 class AidDisasterController extends Controller
 {
+    use PartialRenderable;
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         $aidDisasters = AidDisaster::latest()->paginate(15);
-        return view('admin.aid-disasters.index', compact('aidDisasters'));
+        return $this->partialView('admin.aid-disasters.index', compact('aidDisasters'));
     }
 
     /**
@@ -22,7 +24,7 @@ class AidDisasterController extends Controller
      */
     public function create()
     {
-        return view('admin.aid-disasters.create');
+        return $this->partialView('admin.aid-disasters.create');
     }
 
     /**
@@ -50,7 +52,7 @@ class AidDisasterController extends Controller
      */
     public function show(AidDisaster $aidDisaster)
     {
-        return view('admin.aid-disasters.show', compact('aidDisaster'));
+        return $this->partialView('admin.aid-disasters.show', compact('aidDisaster'));
     }
 
     /**
@@ -58,7 +60,7 @@ class AidDisasterController extends Controller
      */
     public function edit(AidDisaster $aidDisaster)
     {
-        return view('admin.aid-disasters.edit', compact('aidDisaster'));
+        return $this->partialView('admin.aid-disasters.edit', compact('aidDisaster'));
     }
 
     /**

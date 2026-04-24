@@ -3,19 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\PartialRenderable;
 use App\Models\EvacuationFacility;
 use App\Models\AidDisaster;
 use Illuminate\Http\Request;
 
 class EvacuationFacilityController extends Controller
 {
+    use PartialRenderable;
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         $facilities = EvacuationFacility::with('aidDisaster')->latest()->paginate(15);
-        return view('admin.evacuation-facilities.index', compact('facilities'));
+        return $this->partialView('admin.evacuation-facilities.index', compact('facilities'));
     }
 
     /**
@@ -24,7 +26,7 @@ class EvacuationFacilityController extends Controller
     public function create()
     {
         $aidDisasters = AidDisaster::active()->orderBy('nama_kecamatan')->get();
-        return view('admin.evacuation-facilities.create', compact('aidDisasters'));
+        return $this->partialView('admin.evacuation-facilities.create', compact('aidDisasters'));
     }
 
     /**
@@ -69,7 +71,7 @@ class EvacuationFacilityController extends Controller
      */
     public function show(EvacuationFacility $evacuationFacility)
     {
-        return view('admin.evacuation-facilities.show', compact('evacuationFacility'));
+        return $this->partialView('admin.evacuation-facilities.show', compact('evacuationFacility'));
     }
 
     /**
@@ -78,7 +80,7 @@ class EvacuationFacilityController extends Controller
     public function edit(EvacuationFacility $evacuationFacility)
     {
         $aidDisasters = AidDisaster::active()->orderBy('nama_kecamatan')->get();
-        return view('admin.evacuation-facilities.edit', compact('evacuationFacility', 'aidDisasters'));
+        return $this->partialView('admin.evacuation-facilities.edit', compact('evacuationFacility', 'aidDisasters'));
     }
 
     /**

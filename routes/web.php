@@ -9,9 +9,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/admin', function () { return view('admin'); })->name('layouts.admin');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/dashboard/map', [MapController::class, 'dashboard'])->name('dashboard.map');
 });

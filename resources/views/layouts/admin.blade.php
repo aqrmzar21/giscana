@@ -1,3 +1,5 @@
+@php $__isPjax = request()->header('X-PJAX') === 'true'; @endphp
+@if(!$__isPjax)
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -16,12 +18,14 @@
     @stack('styles')
 </head>
 <body class="font-sans antialiased bg-gray-100">
+    <!-- PJAX Loading Bar -->
+    <div id="pjax-progress" style="position:fixed;top:0;left:0;width:0;height:3px;background:linear-gradient(90deg,#6366f1,#8b5cf6);z-index:9999;transition:width 0.3s ease,opacity 0.4s ease;opacity:0;pointer-events:none;"></div>
+
     <div class="min-h-screen flex">
         <!-- Sidebar -->
         <aside class="w-64 bg-white shadow-lg fixed h-screen overflow-y-auto">
             <div class="p-4">
                 <a href="{{ route('dashboard') }}" class="flex items-center space-x-2">
-                    <!-- <x-application-logo class="block h-8 w-auto fill-current text-gray-800" /> -->
                      <svg class="w-8 h-8 mr-2" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
                     </svg>
@@ -30,7 +34,7 @@
             </div>
             <nav class="mt-5 px-2">
                 <div class="space-y-1">
-                    <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('dashboard') || request()->routeIs('dashboard.map') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100' }}">
+                    <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('dashboard') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
@@ -140,9 +144,6 @@
                                 <a href="{{ route('admin.aid-disasters.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-disasters.index') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">
                                     Daftar Bantuan
                                 </a>
-                                <!-- <a href="{{ route('admin.aid-disasters.create') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-disasters.create') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                                    Tambah Data Baru
-                                </a> -->
                             </div>
                         </div>
                     </div>
@@ -158,7 +159,7 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between h-16">
                         <div class="flex items-center">
-                            <h2 class="text-xl font-semibold text-gray-800">@yield('page-title', 'Dashboard')</h2>
+                            <h2 id="page-title" class="text-xl font-semibold text-gray-800">@yield('page-title', 'Dashboard')</h2>
                         </div>
                         <div class="flex items-center">
                             <x-dropdown align="right" width="48">
@@ -172,13 +173,10 @@
                                         </div>
                                     </button>
                                 </x-slot>
-
                                 <x-slot name="content">
                                     <x-dropdown-link :href="route('profile.edit')">
                                         {{ __('Profile') }}
                                     </x-dropdown-link>
-
-                                    <!-- Authentication -->
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
                                         <x-dropdown-link :href="route('logout')"
@@ -208,7 +206,9 @@
             @endif
 
             <!-- Page Content -->
-            <main class="py-6">
+            <main id="page-content" class="py-6">
+@endif
+{{-- ═══ KONTEN UTAMA — dirender selalu (full page & PJAX) ═══ --}}
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     @if(session('success'))
                         <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
@@ -249,11 +249,27 @@
 
                     @yield('content')
                 </div>
+@if(!$__isPjax)
             </main>
         </div>
     </div>
 
+    @stack('styles')
+
+    {{-- Map scripts (Leaflet dll) harus di-stack sebelum closing body --}}
     @stack('scripts')
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </body>
 </html>
+@else
+{{-- ═══ PJAX metadata — hanya dikirim saat partial request ═══ --}}
+<script type="application/json" id="pjax-meta">
+@php
+    $__sections = \Illuminate\Support\Facades\View::getSections();
+    echo json_encode([
+        'title'     => strip_tags($__sections['title'] ?? config('app.name', 'Giscana')),
+        'pageTitle' => strip_tags($__sections['page-title'] ?? ''),
+    ]);
+@endphp
+</script>
+@endif

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Traits\PartialRenderable;
 use App\Models\DisasterZone;
 use App\Models\EvacuationRoute;
 use App\Models\EvacuationFacility;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 
 class MapController extends Controller
 {
+    use PartialRenderable;
     /** Batas administrasi GeoJSON: hanya fitur Kabupaten Bone Bolango (Gorontalo). */
     private const MAP_REGENCY_NAME = 'Bone Bolango';
 
@@ -29,7 +31,7 @@ class MapController extends Controller
         $disasterType = $request->get('disaster_type', 'all');
         $riskLevel = $request->get('risk_level', 'all');
 
-        return view('map.index', compact('disasterType', 'riskLevel'));
+        return $this->partialView('map.index', compact('disasterType', 'riskLevel'));
     }
 
     /**
@@ -40,7 +42,7 @@ class MapController extends Controller
         $disasterType = $request->get('disaster_type', 'all');
         $riskLevel = $request->get('risk_level', 'all');
 
-        return view('map.dashboard', compact('disasterType', 'riskLevel'));
+        return $this->partialView('map.dashboard', compact('disasterType', 'riskLevel'));
     }
 
     /**
