@@ -130,11 +130,26 @@
             </table>
         </div>
 
-        @if($zones->hasPages())
-        <div class="mt-4">
-            {{ $zones->links() }}
+        <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-700">Tampilkan</span>
+                <form action="{{ request()->url() }}" method="GET" class="inline-block">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+                    <select name="per_page" onchange="this.form.submit()" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-1 pl-3 pr-8">
+                        <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+                <span class="text-sm text-gray-700">data</span>
+            </div>
+            
+            <div class="w-full sm:w-auto">
+                {{ $zones->links() }}
+            </div>
         </div>
-        @endif
     </div>
 </div>
 @endsection
