@@ -221,7 +221,10 @@
                                     },
                                     onEachFeature: function(feature, layer) {
                                         if (feature.properties && feature.properties.NAMOBJ) {
-                                            layer.bindPopup(`<strong>Desa/Kelurahan: ${feature.properties.NAMOBJ}</strong>`);
+                                            layer.bindTooltip(`<strong>Desa/Kel: ${feature.properties.NAMOBJ}</strong>`, {
+                                                sticky: true,
+                                                className: 'bg-white rounded shadow-sm text-sm'
+                                            });
                                         }
                                     }
                                 }).addTo(villageBoundariesLayer);
