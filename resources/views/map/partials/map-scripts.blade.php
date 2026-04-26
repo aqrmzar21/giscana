@@ -100,10 +100,19 @@
                 data.disaster_zones.features.forEach(feature => {
                     if (!feature.geometry || !feature.geometry.coordinates) return;
                     const [lng, lat] = feature.geometry.coordinates;
+                    // Tentukan warna berdasarkan disaster_type
+                    let color = '#ef4444'; // default merah
+                    if (feature.properties.disaster_type === 'longsor') {
+                        color = '#ec4899'; // pink untuk longsor
+                    }
+
                     const marker = L.marker([lat, lng], {
                         icon: L.divIcon({
                             className: 'disaster-zone-marker',
-                            html: '<div style="background-color: #ef4444; width: 18px; height: 18px; border-radius: 50%; border: 2px solid white;"></div>',
+                            html: `<div style="background-color: ${color}; 
+                                            width: 18px; height: 18px; 
+                                            border-radius: 50%; 
+                                            border: 2px solid white;"></div>`,
                             iconSize: [18, 18]
                         })
                     }).addTo(layers.disasterZones);
