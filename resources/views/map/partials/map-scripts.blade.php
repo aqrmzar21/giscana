@@ -19,7 +19,7 @@
         evacuationRoutes: L.layerGroup().addTo(map),
         evacuationFacilities: L.layerGroup().addTo(map),
         districtBoundaries: L.layerGroup().addTo(map),
-        aidDistributionPoints: L.layerGroup().addTo(map)
+        // aidDistributionPoints: L.layerGroup().addTo(map)
     };
 
     const villageBoundariesLayer = L.layerGroup();
@@ -28,6 +28,37 @@
     function invalidateMapSize() {
         map.invalidateSize({ animate: false });
     }
+
+    // OpenStreetMap default
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+    });
+
+    // OpenTopoMap
+    const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenTopoMap contributors',
+        maxZoom: 17
+    });
+
+    // Esri World Imagery (satellite)
+    const esriSat = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles © Esri'
+    });
+
+    // Tambahkan salah satu ke map
+    osm.addTo(map);
+
+        // tombol icon switch peta
+        const baseMaps = {
+        "OpenStreetMap": osm,
+        "Topographic": topo,
+        "Satellite": esriSat
+    };
+
+    L.control.layers(baseMaps, layers).addTo(map);
+
 
     function loadMapData() {
         const disasterType = document.getElementById('disaster_type').value;
