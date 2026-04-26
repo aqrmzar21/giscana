@@ -1,3 +1,5 @@
+@php $__isPjax = request()->header('X-PJAX') === 'true'; @endphp
+@if(!$__isPjax)
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -17,6 +19,8 @@
     @stack('styles')
 </head>
 <body class="font-sans antialiased">
+    <!-- PJAX Loading Bar -->
+    <div id="pjax-progress" style="position:fixed;top:0;left:0;width:0;height:3px;background:linear-gradient(90deg,#3b82f6,#6366f1);z-index:9999;transition:width 0.3s ease,opacity 0.4s ease;opacity:0;pointer-events:none;"></div>
     <div class="min-h-screen bg-gray-50">
         <!-- Navigation -->
         <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -37,22 +41,15 @@
                             <a href="{{ route('home') }}" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                                 Beranda
                             </a>
-                            {{-- <a href="{{ route('map.index') }}" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <a href="{{ route('map.index') }}" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                                 Peta Interaktif
-                            </a> --}}
-                            <a href="#features" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-                                Fitur
-                            </a>
-                            <a href="#about" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-                                Tentang
                             </a>
                         </div>
                     </div>
-                    
+
                     <div class="flex items-center space-x-4">
                         @auth
                             <div class="flex items-center space-x-2">
-                                <!-- <span class="text-sm text-gray-700">Halo, {{ Auth::user()->name }}</span> -->
                                 <a href="{{ route('dashboard') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
                                     Dashboard
                                 </a>
@@ -74,8 +71,11 @@
         </nav>
 
         <!-- Main Content -->
-        <main>
+        <main id="page-content">
+@endif
+{{-- ═══ KONTEN UTAMA ═══ --}}
             @yield('content')
+@if(!$__isPjax)
         </main>
 
         <!-- Footer -->
@@ -116,3 +116,15 @@
     @stack('scripts')
 </body>
 </html>
+@else
+{{-- ═══ PJAX metadata ═══ --}}
+<script type="application/json" id="pjax-meta">
+@php
+    $__sections = \Illuminate\Support\Facades\View::getSections();
+    echo json_encode([
+        'title'     => strip_tags($__sections['title'] ?? config('app.name', 'Giscana')),
+        'pageTitle' => '',
+    ]);
+@endphp
+</script>
+@endif

@@ -37,17 +37,17 @@
         </div>
 
         {{-- Progress distribusi --}}
-        @if(!is_null($aidDisaster->persentase_distribusi))
-        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-            <p class="text-sm font-medium text-gray-700 mb-2">Progress Distribusi Bantuan</p>
-            <div class="flex items-center gap-3">
-                <div class="flex-1 bg-gray-200 rounded-full h-4">
-                    <div class="h-4 rounded-full transition-all duration-500 {{ $aidDisaster->persentase_distribusi >= 100 ? 'bg-green-500' : ($aidDisaster->persentase_distribusi >= 50 ? 'bg-yellow-500' : 'bg-red-500') }}"
-                         style="width: {{ min($aidDisaster->persentase_distribusi, 100) }}%"></div>
+        @if(!is_null($aidDisaster->distribution_percentage))
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <p class="text-sm font-medium text-gray-700 mb-2">Aid Distribution Progress</p>
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 bg-gray-200 rounded-full h-4">
+                        <div class="h-4 rounded-full transition-all duration-500 {{ $aidDisaster->distribution_percentage >= 100 ? 'bg-green-500' : ($aidDisaster->distribution_percentage >= 50 ? 'bg-yellow-500' : 'bg-red-500') }}"
+                            style="width: {{ min($aidDisaster->distribution_percentage, 100) }}%"></div>
+                    </div>
+                    <span class="text-sm font-bold text-gray-700 w-12 text-right">{{ $aidDisaster->distribution_percentage }}%</span>
                 </div>
-                <span class="text-sm font-bold text-gray-700 w-12 text-right">{{ $aidDisaster->persentase_distribusi }}%</span>
             </div>
-        </div>
         @endif
 
         <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
@@ -56,23 +56,23 @@
                 <dd class="mt-1 text-sm text-gray-900">{{ $aidDisaster->id }}</dd>
             </div>
             <div>
-                <dt class="text-sm font-medium text-gray-500">Nama Kecamatan</dt>
-                <dd class="mt-1 text-sm font-semibold text-gray-900">{{ $aidDisaster->nama_kecamatan }}</dd>
+                <dt class="text-sm font-medium text-gray-500">District Name</dt>
+                <dd class="mt-1 text-sm font-semibold text-gray-900">{{ $aidDisaster->district_name }}</dd>
             </div>
             <div>
-                <dt class="text-sm font-medium text-gray-500">Jumlah Penerima Bantuan</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{ number_format($aidDisaster->jumlah_penerima_bantuan ?? 0) }} orang</dd>
+                <dt class="text-sm font-medium text-gray-500">Total Recipients</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ number_format($aidDisaster->total_recipients ?? 0) }} people</dd>
             </div>
             <div>
-                <dt class="text-sm font-medium text-gray-500">Bantuan Terdistribusi</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{ number_format($aidDisaster->bantuan_terdistribusi ?? 0) }} orang</dd>
+                <dt class="text-sm font-medium text-gray-500">Distributed Aid</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ number_format($aidDisaster->distributed_aid ?? 0) }} people</dd>
             </div>
             <div>
-                <dt class="text-sm font-medium text-gray-500">Sisa Bantuan</dt>
+                <dt class="text-sm font-medium text-gray-500">Remaining Aid</dt>
                 <dd class="mt-1 text-sm text-gray-900">
-                    @if(!is_null($aidDisaster->sisa_bantuan))
-                        <span class="{{ $aidDisaster->sisa_bantuan > 0 ? 'text-orange-600 font-semibold' : 'text-green-600 font-semibold' }}">
-                            {{ number_format($aidDisaster->sisa_bantuan) }} orang
+                    @if(!is_null($aidDisaster->remaining_aid))
+                        <span class="{{ $aidDisaster->remaining_aid > 0 ? 'text-orange-600 font-semibold' : 'text-green-600 font-semibold' }}">
+                            {{ number_format($aidDisaster->remaining_aid) }} people
                         </span>
                     @else
                         -
@@ -83,24 +83,24 @@
                 <dt class="text-sm font-medium text-gray-500">Status</dt>
                 <dd class="mt-1 text-sm text-gray-900">
                     @if($aidDisaster->is_active)
-                        <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Aktif</span>
+                        <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Active</span>
                     @else
-                        <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Nonaktif</span>
+                        <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Inactive</span>
                     @endif
                 </dd>
             </div>
             <div>
-                <dt class="text-sm font-medium text-gray-500">Terakhir Sinkronisasi API</dt>
+                <dt class="text-sm font-medium text-gray-500">Last API Sync</dt>
                 <dd class="mt-1 text-sm text-gray-900">
-                    {{ $aidDisaster->last_synced_at ? $aidDisaster->last_synced_at->format('d/m/Y H:i:s') : 'Belum pernah sync' }}
+                    {{ $aidDisaster->last_synced_at ? $aidDisaster->last_synced_at->format('d/m/Y H:i:s') : 'Never synced' }}
                 </dd>
             </div>
             <div>
-                <dt class="text-sm font-medium text-gray-500">Dibuat</dt>
+                <dt class="text-sm font-medium text-gray-500">Created At</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $aidDisaster->created_at->format('d/m/Y H:i:s') }}</dd>
             </div>
             <div>
-                <dt class="text-sm font-medium text-gray-500">Diperbarui</dt>
+                <dt class="text-sm font-medium text-gray-500">Updated At</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $aidDisaster->updated_at->format('d/m/Y H:i:s') }}</dd>
             </div>
         </dl>

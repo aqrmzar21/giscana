@@ -37,10 +37,6 @@
 
         <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
             <div>
-                <dt class="text-sm font-medium text-gray-500">ID</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{ $disasterZone->id }}</dd>
-            </div>
-            <div>
                 <dt class="text-sm font-medium text-gray-500">Nama</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $disasterZone->name }}</dd>
             </div>
@@ -75,13 +71,13 @@
                 <dd class="mt-1 text-sm text-gray-900">{{ $disasterZone->description ?? '-' }}</dd>
             </div>
             <div>
+                <dt class="text-sm font-medium text-gray-500">Korban Terdampak</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ $disasterZone->affected_population ?? '-' }}</dd>
+            </div>
+            <!-- <div>
                 <dt class="text-sm font-medium text-gray-500">Luas (Hektar)</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ number_format($disasterZone->area_hectares ?? 0, 2) }}</dd>
-            </div>
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Populasi Terdampak</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{ number_format($disasterZone->affected_population ?? 0) }}</dd>
-            </div>
+            </div> -->
             <div>
                 <dt class="text-sm font-medium text-gray-500">Status</dt>
                 <dd class="mt-1 text-sm text-gray-900">
@@ -93,9 +89,9 @@
                 </dd>
             </div>
             <div class="sm:col-span-2">
-                <dt class="text-sm font-medium text-gray-500">Koordinat Polygon</dt>
+                <dt class="text-sm font-medium text-gray-500">Koordinat Point</dt>
                 <dd class="mt-1 text-sm text-gray-900">
-                    <pre class="bg-gray-50 p-4 rounded-md text-xs overflow-x-auto">{{ json_encode($disasterZone->polygon_coordinates, JSON_PRETTY_PRINT) }}</pre>
+                    <pre class="bg-gray-50 p-4 rounded-md text-xs overflow-x-auto">{{ json_encode($disasterZone->point_coordinates, JSON_PRETTY_PRINT) }}</pre>
                 </dd>
             </div>
             <div>

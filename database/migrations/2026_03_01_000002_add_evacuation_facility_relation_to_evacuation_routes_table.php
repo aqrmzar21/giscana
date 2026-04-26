@@ -20,6 +20,7 @@ return new class extends Migration
                 ->constrained('evacuation_facilities')
                 ->nullOnDelete();
             $table->string('nama_fasilitas')->nullable()->after('evacuation_facility_id');
+            $table->enum('disaster_type', ['longsor', 'banjir', 'other'])->nullable()->after('description');
         });
     }
 
@@ -30,7 +31,7 @@ return new class extends Migration
     {
         Schema::table('evacuation_routes', function (Blueprint $table) {
             $table->dropForeign(['evacuation_facility_id']);
-            $table->dropColumn(['evacuation_facility_id', 'nama_fasilitas']);
+            $table->dropColumn(['evacuation_facility_id', 'nama_fasilitas', 'disaster_type']);
         });
     }
 };

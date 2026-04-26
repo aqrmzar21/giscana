@@ -37,10 +37,6 @@
 
         <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
             <div>
-                <dt class="text-sm font-medium text-gray-500">ID</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{ $evacuationRoute->id }}</dd>
-            </div>
-            <div>
                 <dt class="text-sm font-medium text-gray-500">Nama</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $evacuationRoute->name }}</dd>
             </div>
@@ -75,14 +71,6 @@
             <div>
                 <dt class="text-sm font-medium text-gray-500">Deskripsi</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $evacuationRoute->description ?? '-' }}</dd>
-            </div>
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Panjang (km)</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{ number_format($evacuationRoute->length_km ?? 0, 2) }}</dd>
-            </div>
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Kapasitas per Jam</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{ number_format($evacuationRoute->capacity_per_hour ?? 0) }} orang</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-gray-500">Status</dt>

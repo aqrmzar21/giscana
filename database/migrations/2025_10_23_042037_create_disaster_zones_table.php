@@ -17,9 +17,9 @@ return new class extends Migration
             $table->enum('disaster_type', ['longsor', 'banjir', 'other']);
             $table->text('description')->nullable();
             $table->enum('risk_level', ['low', 'medium', 'high', 'critical']);
-            $table->json('polygon_coordinates'); // Store GeoJSON polygon coordinates
+            $table->json('point_coordinates'); // Store GeoJSON point coordinates
+            $table->integer('affected_population');
             $table->decimal('area_hectares', 10, 2)->nullable();
-            $table->integer('affected_population')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

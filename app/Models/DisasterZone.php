@@ -23,7 +23,6 @@ class DisasterZone extends Model
     protected $casts = [
         'point_coordinates' => 'array',
         'area_hectares' => 'decimal:2',
-        'affected_population' => 'integer',
         'is_active' => 'boolean',
     ];
 

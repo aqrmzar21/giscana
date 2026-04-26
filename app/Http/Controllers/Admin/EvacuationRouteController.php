@@ -3,19 +3,42 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\PartialRenderable;
 use App\Models\EvacuationRoute;
 use App\Models\EvacuationFacility;
 use Illuminate\Http\Request;
 
 class EvacuationRouteController extends Controller
 {
+    use PartialRenderable;
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $routes = EvacuationRoute::with('evacuationFacility')->latest()->paginate(15);
-        return view('admin.evacuation-routes.index', compact('routes'));
+        $query = EvacuationRoute::with('evacuationFacility');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('route_type', 'like', "%{$search}%")
+                  ->orWhere('nama_fasilitas', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+        } elseif ($request->filled('start_date')) {
+            $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+        } elseif ($request->filled('end_date')) {
+            $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
+        }
+
+        $perPage = $request->get('per_page', 10);
+        $routes = $query->latest()->paginate($perPage)->withQueryString();
+        
+        return $this->partialView('admin.evacuation-routes.index', compact('routes'));
     }
 
     /**
@@ -24,7 +47,7 @@ class EvacuationRouteController extends Controller
     public function create()
     {
         $facilities = EvacuationFacility::active()->orderBy('name')->get();
-        return view('admin.evacuation-routes.create', compact('facilities'));
+        return $this->partialView('admin.evacuation-routes.create', compact('facilities'));
     }
 
     /**
@@ -37,9 +60,7 @@ class EvacuationRouteController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'line_coordinates' => 'required|json',
-            'length_km' => 'nullable|numeric|min:0',
             'route_type' => 'required|in:primary,secondary,emergency',
-            'capacity_per_hour' => 'nullable|integer|min:0',
             'is_accessible' => 'boolean',
             'is_active' => 'boolean',
         ]);
@@ -64,7 +85,7 @@ class EvacuationRouteController extends Controller
      */
     public function show(EvacuationRoute $evacuationRoute)
     {
-        return view('admin.evacuation-routes.show', compact('evacuationRoute'));
+        return $this->partialView('admin.evacuation-routes.show', compact('evacuationRoute'));
     }
 
     /**
@@ -73,7 +94,7 @@ class EvacuationRouteController extends Controller
     public function edit(EvacuationRoute $evacuationRoute)
     {
         $facilities = EvacuationFacility::active()->orderBy('name')->get();
-        return view('admin.evacuation-routes.edit', compact('evacuationRoute', 'facilities'));
+        return $this->partialView('admin.evacuation-routes.edit', compact('evacuationRoute', 'facilities'));
     }
 
     /**
@@ -86,9 +107,7 @@ class EvacuationRouteController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'line_coordinates' => 'required|json',
-            'length_km' => 'nullable|numeric|min:0',
             'route_type' => 'required|in:primary,secondary,emergency',
-            'capacity_per_hour' => 'nullable|integer|min:0',
             'is_accessible' => 'boolean',
             'is_active' => 'boolean',
         ]);

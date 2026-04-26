@@ -17,17 +17,30 @@
 @section('content')
 <div class="bg-white shadow rounded-lg">
     <div class="px-4 py-5 sm:p-6">
-        <div class="sm:flex sm:items-center mb-4">
+        <div class="sm:flex sm:items-center justify-between mb-4">
             <div class="sm:flex-auto">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Daftar Rute Evakuasi</h3>
                 <p class="mt-2 text-sm text-gray-700">Daftar semua rute evakuasi yang terdaftar dalam sistem.</p>
             </div>
-            <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-                <a href="{{ route('admin.evacuation-routes.create') }}" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto">
+            <div class="mt-4 sm:mt-0 sm:ml-4 sm:flex-none flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                <form action="{{ route('admin.evacuation-routes.index') }}" method="GET" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                    <input type="date" name="start_date" value="{{ request('start_date') }}" class="block w-full sm:w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <input type="date" name="end_date" value="{{ request('end_date') }}" class="block w-full sm:w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari rute..." class="block w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <button type="submit" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        Filter
+                    </button>
+                    @if(request()->anyFilled(['search', 'start_date', 'end_date']))
+                        <a href="{{ route('admin.evacuation-routes.index') }}" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                            Reset
+                        </a>
+                    @endif
+                </form>
+                <a href="{{ route('admin.evacuation-routes.create') }}" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto whitespace-nowrap">
                     <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Tambah Rute Baru
+                    Tambah Data Baru
                 </a>
             </div>
         </div>
@@ -40,8 +53,6 @@
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nama</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nama Fasilitas</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tipe Rute</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Panjang (km)</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kapasitas/jam</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
                         <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
                             <span class="sr-only">Aksi</span>
@@ -63,8 +74,6 @@
                                 Darurat
                             @endif
                         </td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($route->length_km ?? 0, 2) }}</td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($route->capacity_per_hour ?? 0) }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($route->is_active)
                                 <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Aktif</span>
@@ -111,11 +120,26 @@
             </table>
         </div>
 
-        @if($routes->hasPages())
-        <div class="mt-4">
-            {{ $routes->links() }}
+        <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-700">Tampilkan</span>
+                <form action="{{ request()->url() }}" method="GET" class="inline-block">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+                    <select name="per_page" onchange="this.form.submit()" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-1 pl-3 pr-8">
+                        <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+                <span class="text-sm text-gray-700">data</span>
+            </div>
+            
+            <div class="w-full sm:w-auto">
+                {{ $routes->links() }}
+            </div>
         </div>
-        @endif
     </div>
 </div>
 @endsection

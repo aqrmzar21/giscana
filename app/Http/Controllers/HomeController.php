@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Traits\PartialRenderable;
 use Illuminate\Http\Request;
 use App\Models\DisasterZone;
 use App\Models\EvacuationRoute;
@@ -10,6 +11,7 @@ use App\Models\AidDisaster;
 
 class HomeController extends Controller
 {
+    use PartialRenderable;
     /**
      * Display the landing page
      */
@@ -29,6 +31,6 @@ class HomeController extends Controller
             ->take(3)
             ->get();
 
-        return view('home', compact('stats', 'recent_zones'));
+        return $this->partialView('home', compact('stats', 'recent_zones'));
     }
 }
