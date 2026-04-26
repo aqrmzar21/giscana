@@ -57,9 +57,7 @@
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tingkat Risiko</th>
                         <!-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Luas (ha)</th> -->
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                        <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                            <span class="sr-only">Aksi</span>
-                        </th>
+                        <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
@@ -89,9 +87,9 @@
                         </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($zone->is_active)
-                                <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Aktif</span>
+                                <span class="text-green-800">Aktif</span>
                             @else
-                                <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Tidak Aktif</span>
+                                <span class="text-gray-800">Tidak Aktif</span>
                             @endif
                         </td>
                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
