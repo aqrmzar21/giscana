@@ -72,7 +72,6 @@
                         <strong>${feature.properties.name}</strong><br>
                         Jenis: ${feature.properties.disaster_type}<br>
                         Risiko: ${feature.properties.risk_level}<br>
-                        Luas: ${feature.properties.area_hectares ?? '-'} ha<br>
                         Populasi Terdampak: ${feature.properties.affected_population ?? '-'}
                     `);
                 });
@@ -88,8 +87,6 @@
                     polyline.bindPopup(`
                         <strong>${feature.properties.name}</strong><br>
                         Jenis: ${feature.properties.route_type}<br>
-                        Panjang: ${feature.properties.length_km} km<br>
-                        Kapasitas: ${feature.properties.capacity_per_hour} orang/jam
                     `);
                 });
 
@@ -105,11 +102,7 @@
 
                     marker.bindPopup(`
                         <strong>${feature.properties.name}</strong><br>
-                        Tipe: ${feature.properties.facility_type}<br>
-                        Alamat: ${feature.properties.address || '-'}<br>
-                        Kapasitas: ${feature.properties.capacity} orang<br>
-                        ${feature.properties.has_medical_facility ? '✓ Fasilitas Medis' : ''}<br>
-                        ${feature.properties.has_food_storage ? '✓ Penyimpanan Makanan' : ''}
+                        Alamat: ${feature.properties.address || '-'}
                     `);
                 });
 
