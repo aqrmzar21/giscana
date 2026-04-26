@@ -60,26 +60,26 @@
                     @forelse($aidDisasters as $item)
                     <tr>
                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ $loop->iteration }}</td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-900">{{ $item->nama_kecamatan }}</td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($item->jumlah_penerima_bantuan ?? 0) }}</td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($item->bantuan_terdistribusi ?? 0) }}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-900">{{ $item->district_name }}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($item->total_recipients ?? 0) }}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($item->distributed_aid ?? 0) }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            @if(!is_null($item->sisa_bantuan))
-                                <span class="{{ $item->sisa_bantuan > 0 ? 'text-orange-600 font-semibold' : 'text-green-600' }}">
-                                    {{ number_format($item->sisa_bantuan) }}
+                            @if(!is_null($item->remaining_aid))
+                                <span class="{{ $item->remaining_aid > 0 ? 'text-orange-600 font-semibold' : 'text-green-600' }}">
+                                    {{ number_format($item->remaining_aid) }}
                                 </span>
                             @else
                                 -
                             @endif
                         </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            @if(!is_null($item->persentase_distribusi))
+                            @if(!is_null($item->distribution_percentage))
                                 <div class="flex items-center gap-2">
                                     <div class="w-20 bg-gray-200 rounded-full h-2">
-                                        <div class="h-2 rounded-full {{ $item->persentase_distribusi >= 100 ? 'bg-green-500' : ($item->persentase_distribusi >= 50 ? 'bg-yellow-500' : 'bg-red-500') }}"
-                                             style="width: {{ min($item->persentase_distribusi, 100) }}%"></div>
+                                        <div class="h-2 rounded-full {{ $item->distribution_percentage >= 100 ? 'bg-green-500' : ($item->distribution_percentage >= 50 ? 'bg-yellow-500' : 'bg-red-500') }}"
+                                            style="width: {{ min($item->distribution_percentage, 100) }}%"></div>
                                     </div>
-                                    <span>{{ $item->persentase_distribusi }}%</span>
+                                    <span>{{ $item->distribution_percentage }}%</span>
                                 </div>
                             @else
                                 -
@@ -87,9 +87,9 @@
                         </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($item->is_active)
-                                <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Aktif</span>
+                                <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Active</span>
                             @else
-                                <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Nonaktif</span>
+                                <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Inactive</span>
                             @endif
                         </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
@@ -98,23 +98,16 @@
                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                             <div class="flex items-center justify-end space-x-2">
                                 <a href="{{ route('admin.aid-disasters.show', $item) }}" class="text-indigo-600 hover:text-indigo-900" title="Detail">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
+                                    <!-- icon detail -->
                                 </a>
                                 <a href="{{ route('admin.aid-disasters.edit', $item) }}" class="text-yellow-600 hover:text-yellow-900" title="Edit">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
+                                    <!-- icon edit -->
                                 </a>
-                                <form action="{{ route('admin.aid-disasters.destroy', $item) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                                <form action="{{ route('admin.aid-disasters.destroy', $item) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this data?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900" title="Hapus">
-                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
+                                    <button type="submit" class="text-red-600 hover:text-red-900" title="Delete">
+                                        <!-- icon delete -->
                                     </button>
                                 </form>
                             </div>
@@ -123,11 +116,12 @@
                     @empty
                     <tr>
                         <td colspan="9" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 text-center sm:pl-6">
-                            Belum ada data bantuan bencana.
+                            No aid disaster data available.
                         </td>
                     </tr>
                     @endforelse
                 </tbody>
+
             </table>
         </div>
 

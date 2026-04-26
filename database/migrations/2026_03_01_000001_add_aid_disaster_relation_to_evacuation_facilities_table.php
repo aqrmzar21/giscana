@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      * Menambah relasi FK evacuation_facilities -> aid_disasters
-     * dan kolom nama_kecamatan (denormalized dari aid_disasters.nama_kecamatan).
+     * dan kolom district_name (denormalized dari aid_disasters.district_name).
      */
     public function up(): void
     {
@@ -19,7 +19,7 @@ return new class extends Migration
                 ->after('id')
                 ->constrained('aid_disasters')
                 ->nullOnDelete();
-            $table->string('nama_kecamatan')->nullable()->after('aid_disaster_id');
+            $table->string('district_name')->nullable()->after('aid_disaster_id');
         });
     }
 
@@ -30,7 +30,7 @@ return new class extends Migration
     {
         Schema::table('evacuation_facilities', function (Blueprint $table) {
             $table->dropForeign(['aid_disaster_id']);
-            $table->dropColumn(['aid_disaster_id', 'nama_kecamatan']);
+            $table->dropColumn(['aid_disaster_id', 'district_name']);
         });
     }
 };

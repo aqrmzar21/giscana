@@ -12,22 +12,22 @@ class AidDisaster extends Model
     protected $table = 'aid_disasters';
 
     protected $fillable = [
-        'nama_kecamatan',
-        'jumlah_penerima_bantuan',
-        'bantuan_terdistribusi',
+        'district_name',
+        'total_recipients',
+        'distributed_aid',
         'is_active',
         'last_synced_at',
     ];
 
     protected $casts = [
-        'jumlah_penerima_bantuan' => 'integer',
-        'bantuan_terdistribusi'   => 'integer',
-        'is_active'               => 'boolean',
-        'last_synced_at'          => 'datetime',
+        'total_recipients' => 'integer',
+        'distributed_aid'  => 'integer',
+        'is_active'        => 'boolean',
+        'last_synced_at'   => 'datetime',
     ];
 
     /**
-     * Relasi: satu kecamatan (aid_disaster) punya banyak fasilitas evakuasi.
+     * Relation: one aid_disaster has many evacuation facilities.
      */
     public function evacuationFacilities()
     {
@@ -35,7 +35,7 @@ class AidDisaster extends Model
     }
 
     /**
-     * Scope untuk data aktif
+     * Scope for active data.
      */
     public function scopeActive($query)
     {
@@ -43,24 +43,24 @@ class AidDisaster extends Model
     }
 
     /**
-     * Hitung persentase distribusi bantuan
+     * Calculate distribution percentage.
      */
-    public function getPersentaseDistribusiAttribute(): float|null
+    public function getDistributionPercentageAttribute(): float|null
     {
-        if (!$this->jumlah_penerima_bantuan || $this->jumlah_penerima_bantuan === 0) {
+        if (!$this->total_recipients || $this->total_recipients === 0) {
             return null;
         }
-        return round(($this->bantuan_terdistribusi / $this->jumlah_penerima_bantuan) * 100, 2);
+        return round(($this->distributed_aid / $this->total_recipients) * 100, 2);
     }
 
     /**
-     * Sisa bantuan yang belum terdistribusi
+     * Remaining aid not yet distributed.
      */
-    public function getSisaBantuanAttribute(): int|null
+    public function getRemainingAidAttribute(): int|null
     {
-        if (is_null($this->jumlah_penerima_bantuan) || is_null($this->bantuan_terdistribusi)) {
+        if (is_null($this->total_recipients) || is_null($this->distributed_aid)) {
             return null;
         }
-        return max(0, $this->jumlah_penerima_bantuan - $this->bantuan_terdistribusi);
+        return max(0, $this->total_recipients - $this->distributed_aid);
     }
 }

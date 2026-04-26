@@ -81,44 +81,50 @@ class GiscanaDataSeeder extends Seeder
 
         // 5 kecamatan inti (default) — data bantuan bencana per kecamatan
         AidDisaster::create([
-            'nama_kecamatan'          => 'Kecamatan Kabila Bone',
-            'jumlah_penerima_bantuan' => 350,
-            'bantuan_terdistribusi'   => 150,
-            'is_active'               => true,
-        ]);
-        AidDisaster::create([
-            'nama_kecamatan'          => 'Kecamatan Bone',
-            'jumlah_penerima_bantuan' => 100,
-            'bantuan_terdistribusi'   => 80,
-            'is_active'               => true,
-        ]);
-        AidDisaster::create([
-            'nama_kecamatan'          => 'Kecamatan Bone Pantai',
-            'jumlah_penerima_bantuan' => 700,
-            'bantuan_terdistribusi'   => 460,
-            'is_active'               => true,
-        ]);
-        AidDisaster::create([
-            'nama_kecamatan'          => 'Kecamatan Bone Raya',
-            'jumlah_penerima_bantuan' => 200,
-            'bantuan_terdistribusi'   => 130,
-            'is_active'               => true,
-        ]);
-        AidDisaster::create([
-            'nama_kecamatan'          => 'Kecamatan Bulawa',
-            'jumlah_penerima_bantuan' => 500,
-            'bantuan_terdistribusi'   => 280,
-            'is_active'               => true,
+            'district_name'     => 'Kecamatan Kabila Bone',
+            'total_recipients'  => 350,
+            'distributed_aid'   => 150,
+            'is_active'         => true,
         ]);
 
-        $kecamatanBone = AidDisaster::where('nama_kecamatan', 'Kecamatan Bone')->first();
-        $kecamatanKabilaBone = AidDisaster::where('nama_kecamatan', 'Kecamatan Kabila Bone')->first();
-        $kecamatanBulawa = AidDisaster::where('nama_kecamatan', 'Kecamatan Bulawa')->first();
+        AidDisaster::create([
+            'district_name'     => 'Kecamatan Bone',
+            'total_recipients'  => 100,
+            'distributed_aid'   => 80,
+            'is_active'         => true,
+        ]);
+
+        AidDisaster::create([
+            'district_name'     => 'Kecamatan Bone Pantai',
+            'total_recipients'  => 700,
+            'distributed_aid'   => 460,
+            'is_active'         => true,
+        ]);
+
+        AidDisaster::create([
+            'district_name'     => 'Kecamatan Bone Raya',
+            'total_recipients'  => 200,
+            'distributed_aid'   => 130,
+            'is_active'         => true,
+        ]);
+
+        AidDisaster::create([
+            'district_name'     => 'Kecamatan Bulawa',
+            'total_recipients'  => 500,
+            'distributed_aid'   => 280,
+            'is_active'         => true,
+        ]);
+
+        // Query examples
+        $kecamatanBone      = AidDisaster::where('district_name', 'Kecamatan Bone')->first();
+        $kecamatanKabilaBone= AidDisaster::where('district_name', 'Kecamatan Kabila Bone')->first();
+        $kecamatanBulawa    = AidDisaster::where('district_name', 'Kecamatan Bulawa')->first();
+
 
         // Sample evacuation facilities (terkait kecamatan via aid_disaster_id + nama_kecamatan)
         EvacuationFacility::create([
             'aid_disaster_id' => $kecamatanBone->id,
-            'nama_kecamatan' => $kecamatanBone->nama_kecamatan,
+            'district_name' => $kecamatanBone->district_name,
             'name' => 'SMK Negeri Bone 1',
             'description' => 'Primary evacuation center located in Bone village.',
             'point_coordinates' => [123.2180174509013, 0.3739372685927513],
@@ -134,7 +140,7 @@ class GiscanaDataSeeder extends Seeder
 
         EvacuationFacility::create([
             'aid_disaster_id' => $kecamatanKabilaBone->id,
-            'nama_kecamatan' => $kecamatanKabilaBone->nama_kecamatan,
+            'district_name' => $kecamatanKabilaBone->district_name,
             'name' => 'Masjid Oluhuta',
             'description' => 'Mosque serving as evacuation center with basic facilities.',
             'point_coordinates' => [123.16027286986488, 0.4298848194426226],
@@ -150,7 +156,7 @@ class GiscanaDataSeeder extends Seeder
         
         EvacuationFacility::create([
             'aid_disaster_id' => $kecamatanBone->id,
-            'nama_kecamatan' => $kecamatanBone->nama_kecamatan,
+            'district_name' => $kecamatanBone->district_name,
             'name' => 'Balai Desa Bone',
             'description' => 'Village hall equipped for emergency situations.',
             'point_coordinates' => [123.220285, 0.391023],
@@ -166,7 +172,7 @@ class GiscanaDataSeeder extends Seeder
         
         EvacuationFacility::create([
             'aid_disaster_id' => $kecamatanBulawa->id,
-            'nama_kecamatan' => $kecamatanBulawa->nama_kecamatan,
+            'district_name' => $kecamatanBulawa->district_name,
             'name' => 'Titik Kumpul',
             'description' => 'area null as evacuation center with basic facilities.',
             'point_coordinates' => [123.2514177981202, 0.3494345195302344],
@@ -182,7 +188,7 @@ class GiscanaDataSeeder extends Seeder
         
         EvacuationFacility::create([
             'aid_disaster_id' => $kecamatanBulawa->id,
-            'nama_kecamatan' => $kecamatanBulawa->nama_kecamatan,
+            'district_name' => $kecamatanBulawa->district_name,
             'name' => 'Gedung Pertemuan',
             'description' => 'Gedung pertemuan yang sering digunakan untuk kegiatan masyarakat',
             'point_coordinates' => [123.28091613555262,0.3204120222883091],
@@ -198,7 +204,7 @@ class GiscanaDataSeeder extends Seeder
         
         EvacuationFacility::create([
             'aid_disaster_id' => $kecamatanBulawa->id,
-            'nama_kecamatan' => $kecamatanBulawa->nama_kecamatan,
+            'district_name' => $kecamatanBulawa->district_name,
             'name' => 'Lapangan Pertemuan',
             'description' => 'lahan kososng tempat kumpul masyarakat dengan ketinggian yang cukup',
             'point_coordinates' => [123.30000155640084,0.3213922903642299],
