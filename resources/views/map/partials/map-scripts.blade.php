@@ -14,6 +14,13 @@
     let mapMaxBoundsApplied = false;
     let mapInitialExtentDone = false;
 
+    const villageBoundariesLayer = L.layerGroup();
+    let villageGeojsonLoaded = false;
+
+    function invalidateMapSize() {
+        map.invalidateSize({ animate: false });
+    }
+
     const layers = {
         disasterZones: L.layerGroup().addTo(map),
         evacuationRoutes: L.layerGroup().addTo(map),
@@ -21,13 +28,6 @@
         districtBoundaries: L.layerGroup().addTo(map),
         // aidDistributionPoints: L.layerGroup().addTo(map)
     };
-
-    const villageBoundariesLayer = L.layerGroup();
-    let villageGeojsonLoaded = false;
-
-    function invalidateMapSize() {
-        map.invalidateSize({ animate: false });
-    }
 
     // OpenStreetMap default
     const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -50,14 +50,23 @@
     // Tambahkan salah satu ke map
     osm.addTo(map);
 
-        // tombol icon switch peta
-        const baseMaps = {
-        "OpenStreetMap": osm,
-        "Topographic": topo,
-        "Satellite": esriSat
+   // Buat label dalam bahasa Indonesia
+    const overlayMaps = {
+        "Zona Bencana": layers.disasterZones,
+        "Rute Evakuasi": layers.evacuationRoutes,
+        "Fasilitas Evakuasi": layers.evacuationFacilities,
+        "Batas Kecamatan": layers.districtBoundaries
     };
 
-    L.control.layers(baseMaps, layers).addTo(map);
+    // Jika ada basemap lain, bisa ditambahkan di sini
+    const baseMaps = {
+        "Peta Jalan": osm,
+        "Topografi": topo,
+        "Satelit": esriSat
+    };
+
+    // Tambahkan kontrol ke peta
+    L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 
     function loadMapData() {

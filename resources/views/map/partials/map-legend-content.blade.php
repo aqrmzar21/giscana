@@ -16,7 +16,7 @@
         </div>
         <div class="legend-item">
             <div class="legend-color" style="background-color: #fde68a; border: 1px dashed #facc15;"></div>
-            <span class="text-gray-700">Batas Kecamatan</span>
+            <span class="text-gray-700">Batas Wilayah</span>
         </div>
     </div>
 </div>

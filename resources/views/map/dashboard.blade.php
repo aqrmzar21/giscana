@@ -20,6 +20,11 @@
 
 @section('content')
 <div class="bg-white shadow rounded-lg p-4 sm:p-6">
+    <p class="text-md">
+        Klik disini untuk
+        <button class="text-sm text-blue-500" onclick="location.reload()">Load peta </button>
+        jika peta tidak muncul
+    </p>
     @include('map.partials.interactive')
 </div>
 @endsection
