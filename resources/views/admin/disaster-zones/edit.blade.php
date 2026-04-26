@@ -91,6 +91,17 @@
                         </div>
                     </div>
                 </div> -->
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="affected_population" class="block text-sm font-medium text-gray-700">Terdampak (Korban)</label>
+                        <div class="mt-1">
+                            <input type="number" min="0" name="affected_population" id="affected_population" value="{{ old('affected_population', $disasterZone->affected_population) }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('affected_population') border-red-300 @enderror">
+                            @error('affected_population')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
 
 
                 <div>

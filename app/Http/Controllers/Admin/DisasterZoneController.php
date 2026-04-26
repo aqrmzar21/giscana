@@ -60,6 +60,7 @@ class DisasterZoneController extends Controller
             'risk_level' => 'required|in:low,medium,high,critical',
             'point_coordinates' => 'json',
             'area_hectares' => 'nullable|numeric|min:0',
+            'affected_population' => 'nullable|numeric|min:0',
             'is_active' => 'boolean',
         ]);
         $validated['point_coordinates'] = json_decode($validated['point_coordinates'], true);
@@ -100,6 +101,7 @@ class DisasterZoneController extends Controller
             'risk_level' => 'required|in:low,medium,high,critical',
             'point_coordinates' => 'required|json',
             'area_hectares' => 'nullable|numeric|min:0',
+            'affected_population' => 'nullable|numeric|min:0',
             'is_active' => 'boolean',
         ]);
 

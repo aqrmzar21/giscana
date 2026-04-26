@@ -53,8 +53,8 @@
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nama</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kecamatan</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Alamat</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kapasitas</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Fasilitas</th>
+                        <!-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kapasitas</th> -->
+                        <!-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Fasilitas</th> -->
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
                         <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
                             <span class="sr-only">Aksi</span>
@@ -68,19 +68,19 @@
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $facility->name }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $facility->nama_kecamatan ?? $facility->aidDisaster?->nama_kecamatan ?? '-' }}</td>
                         <td class="px-3 py-4 text-sm text-gray-500">{{ Str::limit($facility->address ?? '-', 30) }}</td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             <span class="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800">
                                 {{ number_format($facility->capacity ?? 0) }} orang
                             </span>
-                        </td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        </td> -->
+                        <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($facility->has_medical_facility)
                                 <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Medis</span>
                             @endif
                             @if($facility->has_food_storage)
                                 <span class="ml-1 inline-flex rounded-full bg-yellow-100 px-2 text-xs font-semibold leading-5 text-yellow-800">Makanan</span>
                             @endif
-                        </td>
+                        </td> -->
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($facility->is_active)
                                 <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Aktif</span>

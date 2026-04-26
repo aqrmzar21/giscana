@@ -16,6 +16,7 @@ class DisasterZone extends Model
         'risk_level',
         'point_coordinates',
         'area_hectares',
+        'affected_population',
         'is_active',
     ];
 
