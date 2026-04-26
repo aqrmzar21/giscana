@@ -23,7 +23,7 @@ class EvacuationFacilityController extends Controller
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('address', 'like', "%{$search}%")
-                  ->orWhere('nama_kecamatan', 'like', "%{$search}%");
+                  ->orWhere('district_name', 'like', "%{$search}%");
             });
         }
 
@@ -46,7 +46,7 @@ class EvacuationFacilityController extends Controller
      */
     public function create()
     {
-        $aidDisasters = AidDisaster::active()->orderBy('nama_kecamatan')->get();
+        $aidDisasters = AidDisaster::active()->orderBy('district_name')->get();
         return $this->partialView('admin.evacuation-facilities.create', compact('aidDisasters'));
     }
 
@@ -78,7 +78,7 @@ class EvacuationFacilityController extends Controller
 
         if (!empty($validated['aid_disaster_id'])) {
             $aid = AidDisaster::find($validated['aid_disaster_id']);
-            $validated['nama_kecamatan'] = $aid?->nama_kecamatan;
+            $validated['district_name'] = $aid?->district_name;
         }
 
         EvacuationFacility::create($validated);
@@ -100,7 +100,7 @@ class EvacuationFacilityController extends Controller
      */
     public function edit(EvacuationFacility $evacuationFacility)
     {
-        $aidDisasters = AidDisaster::active()->orderBy('nama_kecamatan')->get();
+        $aidDisasters = AidDisaster::active()->orderBy('district_name')->get();
         return $this->partialView('admin.evacuation-facilities.edit', compact('evacuationFacility', 'aidDisasters'));
     }
 
@@ -132,9 +132,9 @@ class EvacuationFacilityController extends Controller
 
         if (!empty($validated['aid_disaster_id'])) {
             $aid = AidDisaster::find($validated['aid_disaster_id']);
-            $validated['nama_kecamatan'] = $aid?->nama_kecamatan;
+            $validated['district_name'] = $aid?->district_name;
         } else {
-            $validated['nama_kecamatan'] = null;
+            $validated['district_name'] = null;
         }
 
         $evacuationFacility->update($validated);

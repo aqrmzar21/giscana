@@ -15,16 +15,16 @@ class AidDisasterController extends Controller
     public function index(): JsonResponse
     {
         $aidDisasters = AidDisaster::active()
-            ->orderBy('nama_kecamatan')
+            ->orderBy('district_name')
             ->get()
             ->map(function ($item) {
                 return [
                     'id'                       => $item->id,
-                    'nama_kecamatan'           => $item->nama_kecamatan,
-                    'jumlah_penerima_bantuan'  => $item->jumlah_penerima_bantuan,
-                    'bantuan_terdistribusi'    => $item->bantuan_terdistribusi,
-                    'sisa_bantuan'             => $item->sisa_bantuan,
-                    'persentase_distribusi'    => $item->persentase_distribusi,
+                    'district_name'           => $item->district_name,
+                    'total_recipients'  => $item->total_recipients,
+                    'distributed_aid'    => $item->distributed_aid,
+                    'remaining_aid'             => $item->remaining_aid,
+                    'distribution_percentage'    => $item->distribution_percentage,
                     'is_active'                => $item->is_active,
                     'last_synced_at'           => $item->last_synced_at,
                     'created_at'               => $item->created_at,
@@ -45,9 +45,9 @@ class AidDisasterController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'nama_kecamatan'           => 'required|string|max:255',
-            'jumlah_penerima_bantuan'  => 'nullable|integer|min:0',
-            'bantuan_terdistribusi'    => 'nullable|integer|min:0',
+            'district_name'           => 'required|string|max:255',
+            'total_recipients'  => 'nullable|integer|min:0',
+            'distributed_aid'    => 'nullable|integer|min:0',
             'is_active'                => 'boolean',
         ]);
 
@@ -68,8 +68,8 @@ class AidDisasterController extends Controller
         return response()->json([
             'success' => true,
             'data'    => array_merge($aidDisaster->toArray(), [
-                'sisa_bantuan'          => $aidDisaster->sisa_bantuan,
-                'persentase_distribusi' => $aidDisaster->persentase_distribusi,
+                'remaining_aid'          => $aidDisaster->remaining_aid,
+                'distribution_percentage' => $aidDisaster->distribution_percentage,
             ]),
         ]);
     }
@@ -80,9 +80,9 @@ class AidDisasterController extends Controller
     public function update(Request $request, AidDisaster $aidDisaster): JsonResponse
     {
         $validated = $request->validate([
-            'nama_kecamatan'           => 'sometimes|required|string|max:255',
-            'jumlah_penerima_bantuan'  => 'nullable|integer|min:0',
-            'bantuan_terdistribusi'    => 'nullable|integer|min:0',
+            'district_name'           => 'sometimes|required|string|max:255',
+            'total_recipients'  => 'nullable|integer|min:0',
+            'distributed_aid'    => 'nullable|integer|min:0',
             'is_active'                => 'boolean',
         ]);
 

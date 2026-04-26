@@ -182,10 +182,10 @@
 
                             const p = feature.properties;
                             polygon.bindPopup(`
-                                <strong>${p.nama_kecamatan}</strong><br>
-                                Penerima Bantuan: ${p.jumlah_penerima_bantuan ?? '-'}<br>
-                                Terdistribusi: ${p.bantuan_terdistribusi ?? '-'}<br>
-                                Persentase: ${p.persentase_distribusi ?? '-'}%
+                                <strong>${p.district_name}</strong><br>
+                                Penerima Bantuan: ${p.total_recipients ?? '-'}<br>
+                                Terdistribusi: ${p.distributed_aid ?? '-'}<br>
+                                Persentase: ${p.distribution_percentage ?? '-'}%
                             `);
                         });
                     });

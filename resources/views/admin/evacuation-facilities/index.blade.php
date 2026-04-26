@@ -66,7 +66,7 @@
                     <tr>
                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ $loop->iteration }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $facility->name }}</td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $facility->nama_kecamatan ?? $facility->aidDisaster?->nama_kecamatan ?? '-' }}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $facility->district_name ?? $facility->aidDisaster?->district_name ?? '-' }}</td>
                         <td class="px-3 py-4 text-sm text-gray-500">{{ Str::limit($facility->address ?? '-', 30) }}</td>
                         <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             <span class="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800">

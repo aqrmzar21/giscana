@@ -74,7 +74,7 @@ class MapController extends Controller
         }
         $routes = $routesQuery->get();
 
-        // Get evacuation facilities (dengan relasi ke aid_disaster untuk nama_kecamatan)
+        // Get evacuation facilities (dengan relasi ke aid_disaster untuk district_name)
         $facilities = EvacuationFacility::with('aidDisaster')->active()->accessible()->get();
 
         $minLng = $bbox['min_lng'];
@@ -124,7 +124,7 @@ class MapController extends Controller
         ];
 
         foreach ($aidDisasters as $item) {
-            $namaKec = $item->nama_kecamatan;
+            $namaKec = $item->district_name;
             $namaTrim = preg_replace('/^Kecamatan\\s+/i', '', $namaKec);
             $lookupName = $nameMap[$namaTrim] ?? $namaTrim;
 
@@ -138,10 +138,10 @@ class MapController extends Controller
                 'type' => 'Feature',
                 'properties' => [
                     'id'                      => $item->id,
-                    'nama_kecamatan'          => $item->nama_kecamatan,
-                    'jumlah_penerima_bantuan' => $item->jumlah_penerima_bantuan,
-                    'bantuan_terdistribusi'   => $item->bantuan_terdistribusi,
-                    'persentase_distribusi'   => $item->persentase_distribusi,
+                    'district_name'          => $item->district_name,
+                    'total_recipients' => $item->total_recipients,
+                    'distributed_aid'   => $item->distributed_aid,
+                    'distribution_percentage'   => $item->distribution_percentage,
                     'luas'                    => $src['properties']['SHAPE_Area'] ?? null,
                 ],
                 'geometry' => $src['geometry'] ?? null,
@@ -170,10 +170,10 @@ class MapController extends Controller
                     'type' => 'Feature',
                     'properties' => [
                         'id'                      => $item->id,
-                        'nama_kecamatan'          => $item->nama_kecamatan,
-                        'jumlah_penerima_bantuan' => $item->jumlah_penerima_bantuan,
-                        'bantuan_terdistribusi'   => $item->bantuan_terdistribusi,
-                        'persentase_distribusi'   => $item->persentase_distribusi,
+                        'district_name'          => $item->district_name,
+                        'total_recipients' => $item->total_recipients,
+                        'distributed_aid'   => $item->distributed_aid,
+                        'distribution_percentage'   => $item->distribution_percentage,
                     ],
                     'geometry' => null,
                 ]),
