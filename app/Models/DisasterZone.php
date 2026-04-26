@@ -63,6 +63,7 @@ class DisasterZone extends Model
                 'disaster_type' => $this->disaster_type,
                 'risk_level' => $this->risk_level,
                 'area_hectares' => $this->area_hectares,
+                'affected_population' => $this->affected_population,
             ],
             'geometry' => [
                 'type' => 'Point',

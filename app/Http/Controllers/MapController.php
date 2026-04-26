@@ -257,32 +257,23 @@ class MapController extends Controller
             return $memo;
         }
 
-        $geojsonPath = public_path('geojson/kawasan-pesisir.geojson');
         $byName = [];
         $minLng = INF;
         $maxLng = -INF;
         $minLat = INF;
         $maxLat = -INF;
 
-        if (file_exists($geojsonPath)) {
-            $geo = json_decode(file_get_contents($geojsonPath), true);
-            if (is_array($geo) && isset($geo['features']) && is_array($geo['features'])) {
-                $regency = self::MAP_REGENCY_NAME;
-                foreach ($geo['features'] as $feature) {
-                    $props = $feature['properties'] ?? [];
-                    if (($props['WADMKK'] ?? $props['WIADKK'] ?? '') !== $regency) {
-                        continue;
-                    }
-                    $geom = $feature['geometry'] ?? null;
-                    if (is_array($geom)) {
-                        $this->mergeGeometryIntoBounds($geom, $minLng, $maxLng, $minLat, $maxLat);
-                    }
-                    $name = $props['NAMOBJ'] ?? null;
-                    if ($name) {
-                        $byName[$name] = $feature;
-                    }
-                }
+        $districts = \App\Models\District::select('*', \Illuminate\Support\Facades\DB::raw('ST_AsGeoJSON(geom) as geom_json'))
+            ->where('regency', self::MAP_REGENCY_NAME)
+            ->get();
+
+        foreach ($districts as $district) {
+            $geojson = $district->toGeoJSON();
+            $geom = $geojson['geometry'] ?? null;
+            if (is_array($geom)) {
+                $this->mergeGeometryIntoBounds($geom, $minLng, $maxLng, $minLat, $maxLat);
             }
+            $byName[$district->name] = $geojson;
         }
 
         if ($minLng === INF) {

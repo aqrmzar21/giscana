@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->enum('risk_level', ['low', 'medium', 'high', 'critical']);
             $table->json('point_coordinates'); // Store GeoJSON point coordinates
+            $table->integer('affected_population');
             $table->decimal('area_hectares', 10, 2)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();

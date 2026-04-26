@@ -48,10 +48,10 @@ class GiscanaDataSeeder extends Seeder
             ['email' => 'staff@giscana.local'],
             [
                 'name' => 'BPBD Staff',
-                'password' => bcrypt('password'),
+                'staff123' => bcrypt('staff123'),
                 'role' => 'staff',
                 'phone' => '+6281234567891',
-                'organization' => 'BPBD Bone Bolango',
+                'organization' => 'BPBD Bone Pesisir',
                 'is_active' => true,
             ]
         );
@@ -65,6 +65,7 @@ class GiscanaDataSeeder extends Seeder
             // Titik representatif (lng, lat)
             'point_coordinates' => [123.20808535158405, 0.3783370772048755],
             'area_hectares' => 125.5,
+            'affected_population' => 1225,
             'is_active' => true,
         ]);
 
@@ -76,6 +77,7 @@ class GiscanaDataSeeder extends Seeder
             // Titik representatif (lng, lat)
             'point_coordinates' => [123.16263718062282, 0.42377850503008574],
             'area_hectares' => 85.2,
+            'affected_population' =>625,
             'is_active' => true,
         ]);
 
