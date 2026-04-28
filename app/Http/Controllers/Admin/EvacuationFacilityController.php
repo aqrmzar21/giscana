@@ -17,14 +17,10 @@ class EvacuationFacilityController extends Controller
     public function index(Request $request)
     {
         $query = EvacuationFacility::with('aidDisaster');
+        $districts = \App\Models\AidDisaster::select('district_name')->distinct()->whereNotNull('district_name')->orderBy('district_name')->get();
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('address', 'like', "%{$search}%")
-                  ->orWhere('district_name', 'like', "%{$search}%");
-            });
+        if ($request->filled('district_name')) {
+            $query->where('district_name', $request->district_name);
         }
 
         if ($request->filled('start_date') && $request->filled('end_date')) {
@@ -38,7 +34,7 @@ class EvacuationFacilityController extends Controller
         $perPage = $request->get('per_page', 10);
         $facilities = $query->latest()->paginate($perPage)->withQueryString();
         
-        return $this->partialView('admin.evacuation-facilities.index', compact('facilities'));
+        return $this->partialView('admin.evacuation-facilities.index', compact('facilities', 'districts'));
     }
 
     /**
