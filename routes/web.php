@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('disaster-zones', \App\Http\Controllers\Admin\DisasterZoneController::class);
     Route::resource('evacuation-routes', \App\Http\Controllers\Admin\EvacuationRouteController::class);
+    Route::get('evacuation-facilities/print', [\App\Http\Controllers\Admin\EvacuationFacilityController::class, 'print'])->name('evacuation-facilities.print');
     Route::resource('evacuation-facilities', \App\Http\Controllers\Admin\EvacuationFacilityController::class);
     Route::resource('aid-disasters', \App\Http\Controllers\Admin\AidDisasterController::class);
 });

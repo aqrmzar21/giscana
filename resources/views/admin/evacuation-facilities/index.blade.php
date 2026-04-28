@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <div class="sm:flex px-4 py-5 justify-center">
+        <div class="sm:flex px-4 py-5 justify-evenly">
             <form action="{{ route('admin.evacuation-facilities.index') }}" method="GET" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
             <select name="district_name" class="block w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                 <option value="">Semua Kecamatan</option>
@@ -49,9 +49,27 @@
                 <a href="{{ route('admin.evacuation-facilities.index') }}" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                     Reset
                 </a>
-                @endif
+            @endif
             </form>
+            {{-- Tombol Cetak PDF --}}
+            @php
+                $printUrl = route('admin.evacuation-facilities.print');
+                $printParams = [];
+                if(request('district_name')) $printParams['district_name'] = request('district_name');
+                if(request('start_date'))   $printParams['start_date']   = request('start_date');
+                if(request('end_date'))     $printParams['end_date']     = request('end_date');
+                if($printParams) $printUrl .= '?' . http_build_query($printParams);
+            @endphp
+            <a href="{{ $printUrl }}" target="_blank"
+               class=" ml-auto inline-flex items-center justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap">
+                <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                Cetak PDF{{ request('district_name') ? ' ('.request('district_name').')' : ' (Semua)' }}
+            </a>
         </div>
+        
         <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
             <table class="min-w-full divide-y divide-gray-300">
                 <thead class="bg-gray-50">

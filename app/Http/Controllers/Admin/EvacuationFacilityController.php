@@ -38,6 +38,40 @@ class EvacuationFacilityController extends Controller
     }
 
     /**
+     * Print PDF report of evacuation facilities.
+     */
+    public function print(Request $request)
+    {
+        $query = EvacuationFacility::with('aidDisaster');
+
+        if ($request->filled('district_name')) {
+            $query->where('district_name', $request->district_name);
+        }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+        } elseif ($request->filled('start_date')) {
+            $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+        } elseif ($request->filled('end_date')) {
+            $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
+        }
+
+        $facilities = $query->latest()->get();
+        $districtName = $request->filled('district_name') ? $request->district_name : 'Semua Kecamatan';
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.evacuation-facilities.print', compact('facilities', 'districtName'))
+            ->setPaper('a4', 'landscape');
+
+        $fileName = 'laporan-fasilitas-evakuasi';
+        if ($request->filled('district_name')) {
+            $fileName .= '-' . \Illuminate\Support\Str::slug($request->district_name);
+        }
+        $fileName .= '.pdf';
+
+        return $pdf->stream($fileName);
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
