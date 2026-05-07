@@ -14,6 +14,7 @@ class Village extends Model
         'code',
         'yard',
         'full_name',
+        'zone',
         'regency',
         'province',
     ];
@@ -38,6 +39,7 @@ class Village extends Model
                 'yard'          => $this->yard,
                 'full_name'     => $this->full_name,
                 'code'          => $this->code,
+                'zone'          => $this->zone,
                 'regency'       => $this->regency,
                 'province'      => $this->province,
                 'district_id'   => $this->district_id,

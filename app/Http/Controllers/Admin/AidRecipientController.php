@@ -41,7 +41,7 @@ class AidRecipientController extends Controller
 
     public function show(\App\Models\AidRecipient $aidRecipient)
     {
-        $aidRecipient->load(['district', 'village']);
+        $aidRecipient->load(['village']);
         return $this->partialView('admin.aid-recipients.show', compact('aidRecipient'));
     }
 

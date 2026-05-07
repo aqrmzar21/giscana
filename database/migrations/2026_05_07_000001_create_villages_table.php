@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('code', 30)->nullable();             // kode desa (kode_kd)
             $table->string('yard', 100);                        // nama desa (kel_desa)
             $table->string('full_name', 150)->nullable();       // nama lengkap (nama)
+            $table->string('zone', 100);                        // nama kec (kecamatan)
             $table->string('regency', 100)->nullable();         // kabupaten/kota (kab_kota)
             $table->string('province', 100)->nullable();        // provinsi
             $table->geometry('geom');                           // geometri wilayah desa

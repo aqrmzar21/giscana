@@ -94,6 +94,7 @@ class VillageSeeder extends Seeder
                     'code'          => $props['kode_kd']  ?? null,
                     'yard'          => $props['kel_desa'] ?? 'Unknown',
                     'full_name'     => $props['nama']     ?? null,
+                    'zone'          => $props['kecamatan'] ?? null,
                     'regency'       => $props['kab_kota'] ?? null,
                     'province'      => $props['provinsi'] ?? null,
                     'geom'          => DB::raw("ST_GeomFromGeoJSON('" . addslashes($geometryJson) . "', 2)"),

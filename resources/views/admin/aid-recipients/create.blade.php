@@ -24,7 +24,12 @@
         <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Form Tambah Data</h3>
         
         <form action="{{ route('admin.aid-recipients.store') }}" method="POST">
-            @include('admin.aid-recipients._form')
+             @method('PUT')
+            @include('admin.aid-recipients._form') 
+            
+
+<!-- @method('PUT')
+@include('admin.aid-recipients._script') -->
 
             <div class="pt-5 mt-5 border-t border-gray-200">
                 <div class="flex justify-end space-x-3">
