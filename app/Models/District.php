@@ -18,6 +18,14 @@ class District extends Model
     ];
 
     /**
+     * Get villages in this district.
+     */
+    public function villages()
+    {
+        return $this->hasMany(Village::class);
+    }
+
+    /**
      * Get GeoJSON representation
      */
     public function toGeoJSON()

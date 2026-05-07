@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             DistrictSeeder::class,
+            VillageSeeder::class,
             GiscanaDataSeeder::class,
         ]);
     }
