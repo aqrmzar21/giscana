@@ -12,7 +12,7 @@ class Village extends Model
     protected $fillable = [
         'district_id',
         'code',
-        'name',
+        'yard',
         'full_name',
         'regency',
         'province',
@@ -35,7 +35,7 @@ class Village extends Model
             'type'       => 'Feature',
             'properties' => [
                 'id'            => $this->id,
-                'name'          => $this->name,
+                'yard'          => $this->yard,
                 'full_name'     => $this->full_name,
                 'code'          => $this->code,
                 'regency'       => $this->regency,

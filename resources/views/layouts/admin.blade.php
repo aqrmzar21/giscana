@@ -141,8 +141,8 @@
                         </div>
 
                         <!-- Data Bantuan Bencana -->
-                        <div x-data="{ open: {{ request()->routeIs('admin.aid-disasters.*') ? 'true' : 'false' }} }">
-                            <button @click="open = !open" class="w-full flex items-center justify-between px-4 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.aid-disasters.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100' }}">
+                        <div x-data="{ open: {{ request()->routeIs('admin.aid-disasters.*') || request()->routeIs('admin.aid-recipients.*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open" class="w-full flex items-center justify-between px-4 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.aid-disasters.*') || request()->routeIs('admin.aid-recipients.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100' }}">
                                 <div class="flex items-center">
                                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -155,7 +155,10 @@
                             </button>
                             <div x-show="open" x-collapse class="ml-4 mt-1 space-y-1">
                                 <a href="{{ route('admin.aid-disasters.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-disasters.index') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                                    Daftar Bantuan
+                                    Rekap per Kecamatan
+                                </a>
+                                <a href="{{ route('admin.aid-recipients.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-recipients.index') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">
+                                    Data Penerima
                                 </a>
                             </div>
                         </div>

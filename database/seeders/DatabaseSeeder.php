@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             DistrictSeeder::class,
             VillageSeeder::class,
             GiscanaDataSeeder::class,
+            AidRecipientSeeder::class,
         ]);
     }
 }

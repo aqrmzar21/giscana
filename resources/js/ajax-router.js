@@ -291,8 +291,8 @@ const PJAX = (() => {
         // Halaman peta pakai Leaflet — perlu full init
         // Biarkan full reload saat masuk/keluar dari halaman peta
         const currentPath = window.location.pathname.toLowerCase();
-        const isTargetMap = path.startsWith('/map');
-        const isCurrentMap = currentPath.startsWith('/map');
+        const isTargetMap = path.startsWith('/map') || path.startsWith('/dashboard/map');
+        const isCurrentMap = currentPath.startsWith('/map') || currentPath.startsWith('/dashboard/map');
         if (isTargetMap !== isCurrentMap) return false;
 
         return true;

@@ -92,7 +92,7 @@ class VillageSeeder extends Seeder
                 DB::table('villages')->insert([
                     'district_id'   => $districtId,
                     'code'          => $props['kode_kd']  ?? null,
-                    'name'          => $props['kel_desa'] ?? 'Unknown',
+                    'yard'          => $props['kel_desa'] ?? 'Unknown',
                     'full_name'     => $props['nama']     ?? null,
                     'regency'       => $props['kab_kota'] ?? null,
                     'province'      => $props['provinsi'] ?? null,

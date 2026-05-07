@@ -110,10 +110,10 @@
 </div>
 
 <!-- Welcome Card + Pie Chart Row -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
 
     {{-- Welcome Card --}}
-    <div class="lg:col-span-1 bg-white shadow rounded-lg flex flex-col justify-center">
+    <div id="welcome-card" class="lg:col-span-1 bg-white shadow rounded-lg flex flex-col justify-center">
         <div class="px-4 py-6 sm:p-6 text-center">
             <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100 mb-4">
                 <svg class="h-8 w-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,8 +148,10 @@
         </div>
     </div>
 
+    
+
     {{-- Pie Chart Card --}}
-    <div class="lg:col-span-2 bg-white shadow rounded-lg">
+    <div class="lg:col-span-1 bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex items-center justify-between">
             <div>
                 <h3 class="text-base font-semibold text-gray-900">Distribusi Bantuan per Kecamatan</h3>
@@ -171,20 +173,19 @@
                 <p class="text-sm">Belum ada data distribusi bantuan.</p>
             </div>
         @else
-            <div class="p-5 flex flex-col sm:flex-row items-center gap-6">
+            <div class="p-5 flex flex-col sm:flex-row items-center gap-6 h-full">
                 {{-- Canvas --}}
-                <div class="flex-shrink-0 mx-auto" style="width:220px; height:220px;">
+                <div class="flex-shrink-0 mx-auto" style="width:200px; height:200px;">
                     <canvas id="aidPieChart"></canvas>
                 </div>
 
                 {{-- Legend + Detail --}}
                 <div class="flex-1 w-full overflow-x-auto">
-                    <table class="w-full text-sm min-w-[300px]">
+                    <table class="w-full text-sm min-w-[250px]">
                         <thead>
                             <tr class="text-xs text-gray-500 border-b border-gray-100">
                                 <th class="pb-2 text-left font-medium">Kecamatan</th>
                                 <th class="pb-2 text-right font-medium">Tersalur</th>
-                                <th class="pb-2 text-right font-medium">Penerima</th>
                                 <th class="pb-2 text-right font-medium">%</th>
                             </tr>
                         </thead>
@@ -203,7 +204,6 @@
                                     </div>
                                 </td>
                                 <td class="py-2 text-right text-gray-600">{{ number_format($aid->distributed_aid) }}</td>
-                                <td class="py-2 text-right text-gray-600">{{ number_format($aid->total_recipients) }}</td>
                                 <td class="py-2 text-right">
                                     <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold"
                                           style="background:{{ $colors[$i] ?? '#9ca3af' }}22; color:{{ $colors[$i] ?? '#9ca3af' }}">
@@ -217,6 +217,66 @@
                 </div>
             </div>
         @endif
+    </div>
+
+    <!-- Tampil disini aja Daftar Bantuan Kecamatan -->
+    <div class="lg:col-span-2 bg-white shadow rounded-lg mb-6">
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Daftar Bantuan Kecamatan</h3>
+                <p class="mt-1 text-sm text-gray-500">Ringkasan penyaluran bantuan di tiap kecamatan.</p>
+            </div>
+            <div>
+                <a href="{{ route('admin.aid-recipients.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    Data Penerima Bantuan
+                </a>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-300">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">NO</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kecamatan</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Progres</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+                @forelse($aidDisasters as $aid)
+                <tr>
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ $loop->iteration }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $aid->district_name }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        @php
+                            $percentage = $aid->total_recipients > 0 ? ($aid->distributed_aid / $aid->total_recipients) * 100 : 0;
+                        @endphp
+                        <div class="flex items-center">
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
+                            </div>
+                            <span>{{ round($percentage, 1) }}%</span>
+                        </div>
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        @if($aid->is_active)
+                        <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Aktif</span>
+                        @else
+                        <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Selesai</span>
+                        @endif
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="7" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 text-center sm:pl-6">
+                        Tidak ada data bantuan bencana.
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
     </div>
 </div>
 

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use App\Models\DisasterZone;
 use App\Models\EvacuationRoute;
 use App\Models\EvacuationFacility;
@@ -35,6 +36,7 @@ class GiscanaDataSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin@giscana.local'],
             [
+                'uuid' => (string) Str::uuid(),
                 'name' => 'BPBD Admin',
                 'password' => bcrypt('password'),
                 'role' => 'admin',
@@ -47,6 +49,7 @@ class GiscanaDataSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'staff@giscana.local'],
             [
+                'uuid' => (string) Str::uuid(),
                 'name' => 'BPBD Staff',
                 'password' => bcrypt('staff123'),
                 'role' => 'staff',
@@ -58,6 +61,7 @@ class GiscanaDataSeeder extends Seeder
 
         // Sample disaster zones for Bone Bolango Regency (sebagai titik lokasi, bukan poligon)
         DisasterZone::create([
+            'uuid' => (string) Str::uuid(),
             'name' => 'banjir Risk Zone - Bone River',
             'disaster_type' => 'banjir',
             'description' => 'High-risk banjir zone along the Bone River, prone to seasonal banjiring during rainy season.',
@@ -69,7 +73,8 @@ class GiscanaDataSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        DisasterZone::create([
+        DisasterZone::create([ 
+            'uuid' => (string) Str::uuid(),
             'name' => 'longsor Risk Zone - Hillside Area',
             'disaster_type' => 'longsor',
             'description' => 'Critical longsor risk area on steep hillsides, especially vulnerable during heavy rainfall.',
@@ -83,6 +88,7 @@ class GiscanaDataSeeder extends Seeder
 
         // 5 kecamatan inti (default) — data bantuan bencana per kecamatan
         AidDisaster::create([
+            'uuid' => (string) Str::uuid(),
             'district_name'     => 'Kecamatan Kabila Bone',
             'total_recipients'  => 350,
             'distributed_aid'   => 150,
@@ -90,6 +96,7 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         AidDisaster::create([
+            'uuid' => (string) Str::uuid(),
             'district_name'     => 'Kecamatan Bone',
             'total_recipients'  => 100,
             'distributed_aid'   => 80,
@@ -97,6 +104,7 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         AidDisaster::create([
+            'uuid' => (string) Str::uuid(),
             'district_name'     => 'Kecamatan Bone Pantai',
             'total_recipients'  => 700,
             'distributed_aid'   => 460,
@@ -104,6 +112,7 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         AidDisaster::create([
+            'uuid' => (string) Str::uuid(),
             'district_name'     => 'Kecamatan Bone Raya',
             'total_recipients'  => 200,
             'distributed_aid'   => 130,
@@ -111,6 +120,7 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         AidDisaster::create([
+            'uuid' => (string) Str::uuid(),
             'district_name'     => 'Kecamatan Bulawa',
             'total_recipients'  => 500,
             'distributed_aid'   => 280,
@@ -125,6 +135,7 @@ class GiscanaDataSeeder extends Seeder
 
         // Sample evacuation facilities (terkait kecamatan via aid_disaster_id + nama_kecamatan)
         EvacuationFacility::create([
+            'uuid' => (string) Str::uuid(),
             'aid_disaster_id' => $kecamatanBone->id,
             'district_name' => $kecamatanBone->district_name,
             'name' => 'SMK Negeri Bone 1',
@@ -141,6 +152,7 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         EvacuationFacility::create([
+            'uuid' => (string) Str::uuid(),
             'aid_disaster_id' => $kecamatanKabilaBone->id,
             'district_name' => $kecamatanKabilaBone->district_name,
             'name' => 'Masjid Oluhuta',
@@ -157,6 +169,7 @@ class GiscanaDataSeeder extends Seeder
         ]);
         
         EvacuationFacility::create([
+            'uuid' => (string) Str::uuid(),
             'aid_disaster_id' => $kecamatanBone->id,
             'district_name' => $kecamatanBone->district_name,
             'name' => 'Balai Desa Bone',
@@ -173,6 +186,7 @@ class GiscanaDataSeeder extends Seeder
         ]);
         
         EvacuationFacility::create([
+            'uuid' => (string) Str::uuid(),
             'aid_disaster_id' => $kecamatanBulawa->id,
             'district_name' => $kecamatanBulawa->district_name,
             'name' => 'Titik Kumpul',
@@ -189,6 +203,7 @@ class GiscanaDataSeeder extends Seeder
         ]);
         
         EvacuationFacility::create([
+            'uuid' => (string) Str::uuid(), 
             'aid_disaster_id' => $kecamatanBulawa->id,
             'district_name' => $kecamatanBulawa->district_name,
             'name' => 'Gedung Pertemuan',
@@ -205,6 +220,7 @@ class GiscanaDataSeeder extends Seeder
         ]);
         
         EvacuationFacility::create([
+            'uuid' => (string) Str::uuid(),
             'aid_disaster_id' => $kecamatanBulawa->id,
             'district_name' => $kecamatanBulawa->district_name,
             'name' => 'Lapangan Pertemuan',
@@ -227,6 +243,7 @@ class GiscanaDataSeeder extends Seeder
 
         // Sample evacuation routes (terkait fasilitas via evacuation_facility_id + nama_fasilitas dari evacuation_facilities.name)
         EvacuationRoute::create([
+            'uuid' => (string) Str::uuid(),
             'evacuation_facility_id' => $facilitySmk->id,
             'nama_fasilitas' => $facilitySmk->name,
             'name' => 'Secondary Route - Village Path',
@@ -247,11 +264,12 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         EvacuationRoute::create([
+            'uuid' => (string) Str::uuid(),
             'evacuation_facility_id' => $facilityGedung->id,
             'nama_fasilitas' => $facilityGedung->name,
             'name' => 'Primary Evacuation Route - Main Road',
             'description' => 'Main evacuation route connecting high-risk areas to evacuation centers.',
-            'disaster_type' => 'other',
+            'disaster_type' => 'banjir',
             'line_coordinates' => [
                 [123.28008744958447, 0.32173069129049736],
                 [123.28015140297714, 0.3216027865242239],
@@ -278,6 +296,7 @@ class GiscanaDataSeeder extends Seeder
         ]);
 
         EvacuationRoute::create([
+            'uuid' => (string) Str::uuid(),
             'evacuation_facility_id' => $facilityMasjid->id,
             'nama_fasilitas' => $facilityMasjid->name,
             'name' => 'Emergency Route - Hillside',

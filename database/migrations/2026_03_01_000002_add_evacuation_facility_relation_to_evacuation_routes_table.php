@@ -20,7 +20,7 @@ return new class extends Migration
                 ->constrained('evacuation_facilities')
                 ->nullOnDelete();
             $table->string('nama_fasilitas')->nullable()->after('evacuation_facility_id');
-            $table->enum('disaster_type', ['longsor', 'banjir', 'other'])->nullable()->after('description');
+            $table->enum('disaster_type', ['longsor', 'banjir'])->nullable()->after('description');
         });
     }
 
