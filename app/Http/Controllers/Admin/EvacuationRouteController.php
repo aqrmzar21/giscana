@@ -18,12 +18,17 @@ class EvacuationRouteController extends Controller
     {
         $query = EvacuationRoute::with('evacuationFacility');
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('route_type', 'like', "%{$search}%")
-                  ->orWhere('nama_fasilitas', 'like', "%{$search}%");
+        // Ambil daftar kecamatan unik dari tabel aid_disasters
+        $districts = \App\Models\AidDisaster::select('district_name')
+            ->distinct()
+            ->whereNotNull('district_name')
+            ->orderBy('district_name')
+            ->get();
+
+        if ($request->filled('district_name')) {
+            $districtName = $request->district_name;
+            $query->whereHas('evacuationFacility', function($q) use ($districtName) {
+                $q->where('district_name', $districtName);
             });
         }
 
@@ -38,7 +43,44 @@ class EvacuationRouteController extends Controller
         $perPage = $request->get('per_page', 10);
         $routes = $query->latest()->paginate($perPage)->withQueryString();
         
-        return $this->partialView('admin.evacuation-routes.index', compact('routes'));
+        return $this->partialView('admin.evacuation-routes.index', compact('routes', 'districts'));
+    }
+
+    /**
+     * Print PDF report of evacuation routes.
+     */
+    public function print(Request $request)
+    {
+        $query = EvacuationRoute::with('evacuationFacility');
+
+        if ($request->filled('district_name')) {
+            $districtName = $request->district_name;
+            $query->whereHas('evacuationFacility', function($q) use ($districtName) {
+                $q->where('district_name', $districtName);
+            });
+        }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+        } elseif ($request->filled('start_date')) {
+            $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+        } elseif ($request->filled('end_date')) {
+            $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
+        }
+
+        $routes = $query->latest()->get();
+        $districtName = $request->filled('district_name') ? $request->district_name : 'Semua Kecamatan';
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.evacuation-routes.print', compact('routes', 'districtName'))
+            ->setPaper('a4', 'landscape');
+
+        $fileName = 'laporan-rute-evakuasi';
+        if ($request->filled('district_name')) {
+            $fileName .= '-' . \Illuminate\Support\Str::slug($request->district_name);
+        }
+        $fileName .= '.pdf';
+
+        return $pdf->stream($fileName);
     }
 
     /**

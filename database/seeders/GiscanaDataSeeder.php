@@ -48,7 +48,7 @@ class GiscanaDataSeeder extends Seeder
             ['email' => 'staff@giscana.local'],
             [
                 'name' => 'BPBD Staff',
-                'staff123' => bcrypt('staff123'),
+                'password' => bcrypt('staff123'),
                 'role' => 'staff',
                 'phone' => '+6281234567891',
                 'organization' => 'BPBD Bone Pesisir',

@@ -4,7 +4,7 @@
     <div class="@if($legendLayout === 'inline') flex flex-wrap gap-x-4 gap-y-1 @endif">
         <div class="legend-item">
             <div class="legend-color" style="background-color: #ef4444;"></div>
-            <span class="text-gray-700">Titik Rawan</span>
+            <span class="text-gray-700">Zona Rawan</span>
         </div>
         <div class="legend-item">
             <div class="legend-color" style="background-color: #10b981;"></div>

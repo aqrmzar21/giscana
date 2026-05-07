@@ -74,10 +74,10 @@
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
-                        <label for="capacity" class="block text-sm font-medium text-gray-700">Kapasitas</label>
+                        <label for="contact_person" class="block text-sm font-medium text-gray-700">Kontak Person</label>
                         <div class="mt-1">
-                            <input type="number" name="capacity" id="capacity" value="{{ old('capacity') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('capacity') border-red-300 @enderror">
-                            @error('capacity')
+                            <input type="number" name="contact_person" id="contact_person" value="{{ old('contact_person') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('contact_person') border-red-300 @enderror">
+                            @error('contact_person')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
@@ -94,15 +94,15 @@
                     </div>
                 </div>
 
-                <div>
-                    <label for="contact_person" class="block text-sm font-medium text-gray-700">Kontak Person</label>
+                <!-- <div>
+                    <label for="capacity" class="block text-sm font-medium text-gray-700">Kapasitas</label>
                     <div class="mt-1">
-                        <input type="text" name="contact_person" id="contact_person" value="{{ old('contact_person') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('contact_person') border-red-300 @enderror">
-                        @error('contact_person')
+                        <input type="text" name="capacity" id="capacity" value="{{ old('capacity') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('capacity') border-red-300 @enderror">
+                        @error('capacity')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
-                </div>
+                </div> -->
 
                 <div>
                     <label for="point_coordinates" class="block text-sm font-medium text-gray-700">Koordinat Titik (GeoJSON) <span class="text-red-500">*</span></label>

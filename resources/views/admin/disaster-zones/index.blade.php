@@ -25,19 +25,6 @@
                 <p class="mt-2 text-sm text-gray-700">Daftar semua zona bencana yang terdaftar dalam sistem.</p>
             </div>
             <div class="mt-4 sm:mt-0 sm:ml-4 sm:flex-none flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                <form action="{{ route('admin.disaster-zones.index') }}" method="GET" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                    <input type="date" name="start_date" value="{{ request('start_date') }}" class="block w-full sm:w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    <input type="date" name="end_date" value="{{ request('end_date') }}" class="block w-full sm:w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari zona..." class="block w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    <button type="submit" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        Filter
-                    </button>
-                    @if(request()->anyFilled(['search', 'start_date', 'end_date']))
-                        <a href="{{ route('admin.disaster-zones.index') }}" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                            Reset
-                        </a>
-                    @endif
-                </form>
                 <a href="{{ route('admin.disaster-zones.create') }}" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto whitespace-nowrap">
                     <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -46,6 +33,29 @@
                 </a>
             </div>
         </div>
+        
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4 justify-evenly">
+            <form action="{{ route('admin.disaster-zones.index') }}" method="GET" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                <!-- ini buat rata kiri sendiri -->
+                <div class="flex items-center gap-2 flex-1">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari zona..." class="flex w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <button type="submit" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        Filter
+                    </button>
+                </div>
+                <!-- ini tetap berada center di tengah -->
+                <div class="flex items-center gap-2 justify-center">
+                    <input type="date" name="start_date" value="{{ request('start_date') }}" class="block w-full sm:w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <input type="date" name="end_date" value="{{ request('end_date') }}" class="block w-full sm:w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    @if(request()->anyFilled(['search', 'start_date', 'end_date']))
+                    <a href="{{ route('admin.disaster-zones.index') }}" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        Reset
+                    </a>
+                    @endif
+                </div>
+            </form>
+        </div>
+
 
         <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
             <table class="min-w-full divide-y divide-gray-300">
