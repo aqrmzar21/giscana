@@ -17,13 +17,26 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
-<body class="font-sans antialiased bg-gray-100">
+<body class="font-sans antialiased bg-gray-100" x-data="{ sidebarOpen: false }">
     <!-- PJAX Loading Bar -->
     <div id="pjax-progress" style="position:fixed;top:0;left:0;width:0;height:3px;background:linear-gradient(90deg,#6366f1,#8b5cf6);z-index:9999;transition:width 0.3s ease,opacity 0.4s ease;opacity:0;pointer-events:none;"></div>
 
     <div class="min-h-screen flex">
+        <!-- Mobile Sidebar Overlay -->
+        <div x-show="sidebarOpen" 
+             x-transition:enter="transition-opacity ease-linear duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-linear duration-300"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-gray-600 bg-opacity-75 z-20 md:hidden" 
+             @click="sidebarOpen = false"
+             style="display: none;"></div>
+
         <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-lg fixed h-screen overflow-y-auto">
+        <aside class="w-64 bg-white shadow-lg fixed h-screen overflow-y-auto z-30 transition-transform duration-300 ease-in-out transform md:translate-x-0"
+               :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
             <div class="p-4">
                 <a href="{{ route('dashboard') }}" class="flex items-center space-x-2">
                      <svg class="w-8 h-8 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -153,13 +166,20 @@
         </aside>
 
         <!-- Main Content -->
-        <div class="flex-1 ml-64">
+        <div class="flex-1 md:ml-64 w-full min-w-0 transition-all duration-300">
             <!-- Top Navigation -->
             <nav class="bg-white shadow-sm border-b border-gray-200">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between h-16">
                         <div class="flex items-center">
-                            <h2 id="page-title" class="text-xl font-semibold text-gray-800">@yield('page-title', 'Dashboard')</h2>
+                            <!-- Mobile Menu Button -->
+                            <button @click="sidebarOpen = true" class="md:hidden mr-4 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                                <span class="sr-only">Buka sidebar</span>
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            </button>
+                            <h2 id="page-title" class="text-xl font-semibold text-gray-800 truncate">@yield('page-title', 'Dashboard')</h2>
                         </div>
                         <div class="flex items-center">
                             <x-dropdown align="right" width="48">

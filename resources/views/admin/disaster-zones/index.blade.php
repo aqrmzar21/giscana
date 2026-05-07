@@ -57,7 +57,7 @@
         </div>
 
 
-        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+        <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
             <table class="min-w-full divide-y divide-gray-300">
                 <thead class="bg-gray-50">
                     <tr>
@@ -101,7 +101,7 @@
                             @if($zone->is_active)
                             <span class="inline-flex rounded-full bg-green-100 px-2 leading-3 text-sm text-green-800">Aktif</span>
                             @else
-                            <span class="inline-flex rounded-full bg-green-100 px-2 leading-3 text-sm text-gray-800">Tidak Aktif</span>
+                            <span class="inline-flex rounded-full bg-gray-100 px-2 leading-3 text-sm text-gray-800">Tidak Aktif</span>
                             @endif
                         </td>
                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">

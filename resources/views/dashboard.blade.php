@@ -173,13 +173,13 @@
         @else
             <div class="p-5 flex flex-col sm:flex-row items-center gap-6">
                 {{-- Canvas --}}
-                <div class="flex-shrink-0" style="width:220px; height:220px;">
+                <div class="flex-shrink-0 mx-auto" style="width:220px; height:220px;">
                     <canvas id="aidPieChart"></canvas>
                 </div>
 
                 {{-- Legend + Detail --}}
-                <div class="flex-1 w-full">
-                    <table class="w-full text-sm">
+                <div class="flex-1 w-full overflow-x-auto">
+                    <table class="w-full text-sm min-w-[300px]">
                         <thead>
                             <tr class="text-xs text-gray-500 border-b border-gray-100">
                                 <th class="pb-2 text-left font-medium">Kecamatan</th>
