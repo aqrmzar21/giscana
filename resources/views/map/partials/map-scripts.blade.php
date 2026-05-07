@@ -103,7 +103,8 @@
                     // Tentukan warna berdasarkan disaster_type
                     let color = '#ef4444'; // default merah
                     if (feature.properties.disaster_type === 'longsor') {
-                        color = '#ec4899'; // pink untuk longsor
+                        color = '#ef4444'; // merah untuk longsor
+                        // color = '#ec4899'; // pink untuk longsor
                     }
 
                     const marker = L.marker([lat, lng], {

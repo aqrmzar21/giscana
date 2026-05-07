@@ -196,7 +196,6 @@
                     <th style="width:22%;">Nama Fasilitas</th>
                     <th style="width:14%;">Kecamatan</th>
                     <th style="width:25%;">Alamat</th>
-                    <th style="width:10%;">Kapasitas</th>
                     <th style="width:12%;">Kontak</th>
                     <th style="width:13%;">Status</th>
                 </tr>
@@ -208,7 +207,6 @@
                     <td>{{ $facility->name ?? '-' }}</td>
                     <td>{{ $facility->district_name ?? $facility->aidDisaster?->district_name ?? '-' }}</td>
                     <td>{{ $facility->address ?? '-' }}</td>
-                    <td>{{ $facility->capacity ? number_format($facility->capacity) . ' org' : '-' }}</td>
                     <td>
                         @if($facility->contact_person)
                             {{ $facility->contact_person }}
