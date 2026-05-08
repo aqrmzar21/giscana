@@ -52,7 +52,7 @@
                     <div class="mt-1 sm:mt-0 sm:col-span-2">
                         <select id="aid_type" name="aid_type" required class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
                             <option value="">Pilih Jenis Bantuan</option>
-                            @foreach(['Sembako', 'Uang Tunai', 'Material Bangunan', 'Pakaian Layak Pakai', 'Obat-obatan'] as $type)
+                            @foreach(['Sembako', 'Material Bangunan', 'Pakaian Layak Pakai', 'Obat-obatan'] as $type)
                                 <option value="{{ $type }}" {{ old('aid_type', $aidRecipient->aid_type ?? '') == $type ? 'selected' : '' }}>{{ $type }}</option>
                             @endforeach
                         </select>
@@ -74,22 +74,7 @@
                     </div>
                 </div>
 
-                <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                    <label for="aid_disaster_id" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">Bencana (Kecamatan)</label>
-                    <div class="mt-1 sm:mt-0 sm:col-span-2">
-                        <select id="aid_disaster_id" name="aid_disaster_id" required class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
-                            <option value="">Pilih Bencana</option>
-                            @foreach($aidDisasters as $disaster)
-                                <option value="{{ $disaster->id }}" {{ old('aid_disaster_id') == $disaster->id ? 'selected' : '' }}>
-                                    {{ $disaster->district_name }} - {{ $disaster->name ?? '' }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('aid_disaster_id')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
+
                 
                 <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
                     <label for="village_id" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">Desa/Kelurahan <span class="text-red-500">*</span></label>
@@ -143,8 +128,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const districtSelect = document.getElementById('zone');
+    const districtSelect = document.getElementById('district_id');
     const villageSelect = document.getElementById('village_id');
+    if (!districtSelect || !villageSelect) {
+        return;
+    }
+
     const villageOptions = Array.from(villageSelect.querySelectorAll('option[data-district-id]'));
 
     function filterVillages() {
