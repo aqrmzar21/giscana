@@ -80,33 +80,32 @@
                 </div>
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <div>
+                    <!-- <div>
                         <label for="area_hectares" class="block text-sm font-medium text-gray-700">Luas (Hektar)</label>
                         <div class="mt-1">
                             <input type="number" step="0.01" name="area_hectares" id="area_hectares" value="{{ old('area_hectares') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('area_hectares') border-red-300 @enderror">
                             @error('area_hectares')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
-                    </div>
-
+                    </div> -->
                     <div>
-                        <label for="affected_population" class="block text-sm font-medium text-gray-700">Populasi Terdampak</label>
+                        <label for="affected_population" class="block text-sm font-medium text-gray-700">Terdampak (Korban)</label>
                         <div class="mt-1">
-                            <input type="number" name="affected_population" id="affected_population" value="{{ old('affected_population') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('affected_population') border-red-300 @enderror">
-                            @error('affected_population')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
+                        <input type="number" name="affected_population" id="affected_population" value="{{ old('affected_population') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('affected_population') border-red-300 @enderror">
+                        @error('affected_population')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <label for="polygon_coordinates" class="block text-sm font-medium text-gray-700">Koordinat Polygon (GeoJSON) <span class="text-red-500">*</span></label>
+                    <label for="point_coordinates" class="block text-sm font-medium text-gray-700">Koordinat Point (GeoJSON) <span class="text-red-500">*</span></label>
                     <div class="mt-1">
-                        <textarea id="polygon_coordinates" name="polygon_coordinates" rows="5" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md font-mono text-xs @error('polygon_coordinates') border-red-300 @enderror">{{ old('polygon_coordinates') }}</textarea>
+                        <textarea id="point_coordinates" name="point_coordinates" rows="5" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md font-mono text-xs @error('point_coordinates') border-red-300 @enderror">{{ old('point_coordinates') }}</textarea>
                         <p class="mt-2 text-sm text-gray-500">Format: JSON array of coordinates [[[lng, lat], [lng, lat], ...]]</p>
-                        @error('polygon_coordinates')
+                        @error('point_coordinates')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>

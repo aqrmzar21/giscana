@@ -10,7 +10,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('map.index') }}" class="nav-link {{ request()->routeIs('map.*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.map') }}" class="nav-link {{ request()->routeIs('dashboard.map') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-map-marked-alt"></i>
                     <p>Peta Interaktif</p>
                 </a>

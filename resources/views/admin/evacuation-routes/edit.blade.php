@@ -65,7 +65,10 @@
                     </div>
                 </div>
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> f9d22c5180283f088f98e8f158ddcef8b88ced5c
                 <div>
                     <label for="line_coordinates" class="block text-sm font-medium text-gray-700">Koordinat Garis (GeoJSON) <span class="text-red-500">*</span></label>
                     <div class="mt-1">

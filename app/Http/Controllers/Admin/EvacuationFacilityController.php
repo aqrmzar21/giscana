@@ -3,19 +3,72 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\PartialRenderable;
 use App\Models\EvacuationFacility;
 use App\Models\AidDisaster;
 use Illuminate\Http\Request;
 
 class EvacuationFacilityController extends Controller
 {
+    use PartialRenderable;
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $facilities = EvacuationFacility::with('aidDisaster')->latest()->paginate(15);
-        return view('admin.evacuation-facilities.index', compact('facilities'));
+        $query = EvacuationFacility::with('aidDisaster');
+        $districts = \App\Models\AidDisaster::select('district_name')->distinct()->whereNotNull('district_name')->orderBy('district_name')->get();
+
+        if ($request->filled('district_name')) {
+            $query->where('district_name', $request->district_name);
+        }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+        } elseif ($request->filled('start_date')) {
+            $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+        } elseif ($request->filled('end_date')) {
+            $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
+        }
+
+        $perPage = $request->get('per_page', 10);
+        $facilities = $query->latest()->paginate($perPage)->withQueryString();
+        
+        return $this->partialView('admin.evacuation-facilities.index', compact('facilities', 'districts'));
+    }
+
+    /**
+     * Print PDF report of evacuation facilities.
+     */
+    public function print(Request $request)
+    {
+        $query = EvacuationFacility::with('aidDisaster');
+
+        if ($request->filled('district_name')) {
+            $query->where('district_name', $request->district_name);
+        }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+        } elseif ($request->filled('start_date')) {
+            $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+        } elseif ($request->filled('end_date')) {
+            $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
+        }
+
+        $facilities = $query->latest()->get();
+        $districtName = $request->filled('district_name') ? $request->district_name : 'Semua Kecamatan';
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.evacuation-facilities.print', compact('facilities', 'districtName'))
+            ->setPaper('a4', 'landscape');
+
+        $fileName = 'laporan-fasilitas-evakuasi';
+        if ($request->filled('district_name')) {
+            $fileName .= '-' . \Illuminate\Support\Str::slug($request->district_name);
+        }
+        $fileName .= '.pdf';
+
+        return $pdf->stream($fileName);
     }
 
     /**
@@ -23,8 +76,8 @@ class EvacuationFacilityController extends Controller
      */
     public function create()
     {
-        $aidDisasters = AidDisaster::active()->orderBy('nama_kecamatan')->get();
-        return view('admin.evacuation-facilities.create', compact('aidDisasters'));
+        $aidDisasters = AidDisaster::active()->orderBy('district_name')->get();
+        return $this->partialView('admin.evacuation-facilities.create', compact('aidDisasters'));
     }
 
     /**
@@ -55,7 +108,7 @@ class EvacuationFacilityController extends Controller
 
         if (!empty($validated['aid_disaster_id'])) {
             $aid = AidDisaster::find($validated['aid_disaster_id']);
-            $validated['nama_kecamatan'] = $aid?->nama_kecamatan;
+            $validated['district_name'] = $aid?->district_name;
         }
 
         EvacuationFacility::create($validated);
@@ -69,7 +122,7 @@ class EvacuationFacilityController extends Controller
      */
     public function show(EvacuationFacility $evacuationFacility)
     {
-        return view('admin.evacuation-facilities.show', compact('evacuationFacility'));
+        return $this->partialView('admin.evacuation-facilities.show', compact('evacuationFacility'));
     }
 
     /**
@@ -77,8 +130,8 @@ class EvacuationFacilityController extends Controller
      */
     public function edit(EvacuationFacility $evacuationFacility)
     {
-        $aidDisasters = AidDisaster::active()->orderBy('nama_kecamatan')->get();
-        return view('admin.evacuation-facilities.edit', compact('evacuationFacility', 'aidDisasters'));
+        $aidDisasters = AidDisaster::active()->orderBy('district_name')->get();
+        return $this->partialView('admin.evacuation-facilities.edit', compact('evacuationFacility', 'aidDisasters'));
     }
 
     /**
@@ -109,9 +162,9 @@ class EvacuationFacilityController extends Controller
 
         if (!empty($validated['aid_disaster_id'])) {
             $aid = AidDisaster::find($validated['aid_disaster_id']);
-            $validated['nama_kecamatan'] = $aid?->nama_kecamatan;
+            $validated['district_name'] = $aid?->district_name;
         } else {
-            $validated['nama_kecamatan'] = null;
+            $validated['district_name'] = null;
         }
 
         $evacuationFacility->update($validated);

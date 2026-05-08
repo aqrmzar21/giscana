@@ -46,7 +46,7 @@
             </div>
             <div>
                 <dt class="text-sm font-medium text-gray-500">Kecamatan</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{ $evacuationFacility->nama_kecamatan ?? $evacuationFacility->aidDisaster?->nama_kecamatan ?? '-' }}</dd>
+                <dd class="mt-1 text-sm text-gray-900">{{ $evacuationFacility->district_name ?? $evacuationFacility->aidDisaster?->district_name ?? '-' }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-gray-500">Tipe Fasilitas</dt>

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\HasUuid;
 
 class EvacuationRoute extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
 
     protected $fillable = [
         'name',
@@ -21,7 +22,11 @@ class EvacuationRoute extends Model
 
     protected $casts = [
         'line_coordinates' => 'array',
+<<<<<<< HEAD
         'length_km' => 'decimal:2',
+=======
+        'evacuation_facility_id' => 'integer',
+>>>>>>> f9d22c5180283f088f98e8f158ddcef8b88ced5c
         'is_accessible' => 'boolean',
         'is_active' => 'boolean',
     ];
@@ -62,8 +67,6 @@ class EvacuationRoute extends Model
                 'name' => $this->name,
                 'disaster_type' => $this->disaster_type,
                 'route_type' => $this->route_type,
-                'length_km' => $this->length_km,
-                'capacity_per_hour' => $this->capacity_per_hour,
             ],
             'geometry' => [
                 'type' => 'LineString',

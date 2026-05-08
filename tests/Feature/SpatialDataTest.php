@@ -116,20 +116,20 @@ class SpatialDataTest extends TestCase
     public function test_aid_disaster_crud(): void
     {
         $aidDisaster = AidDisaster::create([
-            'nama_kecamatan'          => 'Kecamatan Bone',
-            'jumlah_penerima_bantuan' => 500,
-            'bantuan_terdistribusi'   => 300,
+            'district_name'          => 'Kecamatan Bone',
+            'total_recipients' => 500,
+            'distributed_aid'   => 300,
             'is_active'               => true,
         ]);
 
         $this->assertDatabaseHas('aid_disasters', [
-            'nama_kecamatan' => 'Kecamatan Bone',
+            'district_name' => 'Kecamatan Bone',
             'is_active'      => true,
         ]);
 
         // Test computed attributes
-        $this->assertEquals(200, $aidDisaster->sisa_bantuan);
-        $this->assertEquals(60, $aidDisaster->persentase_distribusi);
+        $this->assertEquals(200, $aidDisaster->remaining_aid);
+        $this->assertEquals(60, $aidDisaster->distribution_percentage);
     }
 
     /**

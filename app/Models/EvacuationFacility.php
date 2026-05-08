@@ -4,14 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\HasUuid;
 
 class EvacuationFacility extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
 
     protected $fillable = [
         'aid_disaster_id',
-        'nama_kecamatan',
+        'district_name',
         'name',
         'description',
         'point_coordinates',
@@ -93,7 +94,7 @@ class EvacuationFacility extends Model
             'properties' => [
                 'id' => $this->id,
                 'name' => $this->name,
-                'nama_kecamatan' => $this->nama_kecamatan ?? $this->aidDisaster?->nama_kecamatan,
+                'district_name' => $this->district_name ?? $this->aidDisaster?->district_name,
                 'capacity' => $this->capacity,
                 'address' => $this->address,
                 'contact_person' => $this->contact_person,

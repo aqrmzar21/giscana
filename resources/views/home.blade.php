@@ -171,10 +171,10 @@
 <!-- About Section -->
 <section id="about" class="py-16 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {{-- <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"> --}}
+        <!-- <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"> -->
         <div class="grid grid-cols-1 gap-12 items-center">
-            <div>
-                <h2 class="text-3xl font-bold text-gray-900 mb-6">Tentang Giscana</h2>
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">Tentang Giscana</h2>
                 <p class="text-lg text-gray-600 mb-6">
                     Giscana adalah sistem informasi geografis berbasis web yang dirancang khusus untuk mendukung 
                     kesiapsiagaan dan penanggulangan bencana alam di Kawasan Pesisir Bone, Kabupaten Bone Bolango, 
@@ -185,19 +185,19 @@
                     paling sering terjadi di Kabupaten Bone Bolango.
                 </p>
                 <div class="space-y-4">
-                    <div class="flex items-center">
+                    <div class="flex items-center justify-center">
                         <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                         </svg>
                         <span class="text-gray-700">Teknologi GIS modern dengan Leaflet.js</span>
                     </div>
-                    <div class="flex items-center">
+                    <div class="flex items-center justify-center">
                         <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                         </svg>
                         <span class="text-gray-700">Data real-time dan akurat</span>
                     </div>
-                    <div class="flex items-center">
+                    <div class="flex items-center justify-center">
                         <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                         </svg>
@@ -205,6 +205,9 @@
                     </div>
                 </div>
             </div>
+            </div>
+
+
             {{-- <div class="bg-white p-8 rounded-lg shadow-lg">
                 <h3 class="text-xl font-semibold mb-4">Teknologi yang Digunakan</h3>
                 <div class="grid grid-cols-2 gap-4">

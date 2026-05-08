@@ -1,79 +1,16 @@
-@extends('layouts.landing')
+@extends('layouts.landing-map')
 
 @section('title', 'Peta Interaktif - Giscana')
 
-@push('styles')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<style>
-    #map {
-        height: 600px;
-        width: 100%;
-        z-index: 1;
-    }
-    .map-controls {
-        position: absolute;
-        /* top: 10px;
-        right: 10px; */
-        top: 180px;
-        bottom: 10px;
-        left: 10px;
-        z-index: 1000;
-        background: white;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        min-width: 250px;
-    }
-    .map-container {
-        position: relative;
-        margin: 20px 0;
-    }
-    .filter-group {
-        margin-bottom: 15px;
-    }
-    .filter-group label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 600;
-        font-size: 14px;
-        color: #374151;
-    }
-    .filter-group select {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #d1d5db;
-        border-radius: 4px;
-        font-size: 14px;
-    }
-    .legend {
-        background: white;
-        padding: 10px;
-        border-radius: 4px;
-        margin-top: 10px;
-        font-size: 12px;
-    }
-    .legend-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 5px;
-    }
-    .legend-color {
-        width: 20px;
-        height: 20px;
-        margin-right: 8px;
-        border-radius: 3px;
-    }
-</style>
-@endpush
+@include('map.partials.map-styles', ['mapUiVariant' => 'landing-fs'])
 
 @section('content')
-<!-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"> -->
-<div class="max-f mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-blue-600">
-    <div class="mb-6 text-center text-white">
-        <!-- <h1 class="text-3xl font-bold  mb-2">Peta Interaktif</h1> -->
-        <!-- <p class="text-sm">Visualisasi zona risiko bencana, rute evakuasi, fasilitas evakuasi, dan titik distribusi bantuan</p> -->
-    </div>
+<div class="map-landing-fs" id="map-landing-wrapper">
+    <div id="map"></div>
+</div>
+@endsection
 
+<<<<<<< HEAD
     <div class="map-container">
         <div class="map-controls">
             <h3 class="text-lg font-semibold mb-4">Filter Peta</h3>
@@ -128,14 +65,26 @@
                     <div class="w-5 h-5 mr-2 flex items-center justify-center"></div>
                     <span>Data Bantuan Bencana</span>
                 </div> -->
+=======
+@section('map-toolbar')
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div class="shrink-0 lg:pr-6">
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Kontrol peta</p>
+            <p class="text-xs text-gray-500 mb-2">Provinsi Gorontalo — filter dan legenda mengatur lapisan yang ditampilkan</p>
+            <div class="mt-2">
+                @include('map.partials.map-legend-content')
+>>>>>>> f9d22c5180283f088f98e8f158ddcef8b88ced5c
             </div>
         </div>
-
-        <div id="map"></div>
+        <div class="flex-1 min-w-0 space-y-3 border-l border-gray-200 pl-4">
+            @include('map.partials.map-controls-inner', ['toolbarContext' => 'footer', 'hideToolbarHeading' => false, 'hideLegend' => true])
+        </div>
     </div>
 </div>
 @endsection
 
+<<<<<<< HEAD
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -330,3 +279,6 @@
 </script>
 @endpush
 
+=======
+@include('map.partials.map-scripts', ['mapUiVariant' => 'landing-fs'])
+>>>>>>> f9d22c5180283f088f98e8f158ddcef8b88ced5c

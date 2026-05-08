@@ -109,9 +109,9 @@ Giscana is a comprehensive disaster management system that focuses on natural di
 
 #### aid_disasters
 - `id` (Primary Key)
-- `nama_kecamatan` (string)
-- `jumlah_penerima_bantuan` (integer)
-- `bantuan_terdistribusi` (integer)
+- `district_name` (string)
+- `total_recipients` (integer)
+- `distributed_aid` (integer)
 - `is_active` (boolean)
 - `last_synced_at` (timestamp)
 - `timestamps`

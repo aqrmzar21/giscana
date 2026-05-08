@@ -4,26 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\HasUuid;
 
 class DisasterZone extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
 
     protected $fillable = [
         'name',
         'disaster_type',
         'description',
         'risk_level',
-        'polygon_coordinates',
+        'point_coordinates',
         'area_hectares',
         'affected_population',
         'is_active',
     ];
 
     protected $casts = [
-        'polygon_coordinates' => 'array',
+        'point_coordinates' => 'array',
         'area_hectares' => 'decimal:2',
-        'affected_population' => 'integer',
         'is_active' => 'boolean',
     ];
 
@@ -71,9 +71,16 @@ class DisasterZone extends Model
                 'area_hectares' => $this->area_hectares,
                 'affected_population' => $this->affected_population,
             ],
+<<<<<<< HEAD
             'geometry' => $isPoint
                 ? ['type' => 'Point', 'coordinates' => $coords]
                 : ['type' => 'Polygon', 'coordinates' => $coords],
+=======
+            'geometry' => [
+                'type' => 'Point',
+                'coordinates' => $this->point_coordinates,
+            ],
+>>>>>>> f9d22c5180283f088f98e8f158ddcef8b88ced5c
         ];
     }
 }

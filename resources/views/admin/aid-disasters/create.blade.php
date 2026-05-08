@@ -38,15 +38,15 @@
             <div class="space-y-6">
 
                 <div>
-                    <label for="nama_kecamatan" class="block text-sm font-medium text-gray-700">
-                        Nama Kecamatan <span class="text-red-500">*</span>
+                    <label for="district_name" class="block text-sm font-medium text-gray-700">
+                        District Name <span class="text-red-500">*</span>
                     </label>
                     <div class="mt-1">
-                        <input type="text" name="nama_kecamatan" id="nama_kecamatan"
-                               value="{{ old('nama_kecamatan') }}" required
-                               placeholder="Contoh: Kecamatan Sukajadi"
-                               class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('nama_kecamatan') border-red-300 @enderror">
-                        @error('nama_kecamatan')
+                        <input type="text" name="district_name" id="district_name"
+                            value="{{ old('district_name') }}" required
+                            placeholder="Example: Sukajadi District"
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('district_name') border-red-300 @enderror">
+                        @error('district_name')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -54,30 +54,30 @@
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
-                        <label for="jumlah_penerima_bantuan" class="block text-sm font-medium text-gray-700">
-                            Jumlah Penerima Bantuan
+                        <label for="total_recipients" class="block text-sm font-medium text-gray-700">
+                            Total Recipients
                         </label>
                         <div class="mt-1">
-                            <input type="number" name="jumlah_penerima_bantuan" id="jumlah_penerima_bantuan"
-                                   value="{{ old('jumlah_penerima_bantuan') }}" min="0"
-                                   placeholder="0"
-                                   class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('jumlah_penerima_bantuan') border-red-300 @enderror">
-                            @error('jumlah_penerima_bantuan')
+                            <input type="number" name="total_recipients" id="total_recipients"
+                                value="{{ old('total_recipients') }}" min="0"
+                                placeholder="0"
+                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('total_recipients') border-red-300 @enderror">
+                            @error('total_recipients')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
                     <div>
-                        <label for="bantuan_terdistribusi" class="block text-sm font-medium text-gray-700">
-                            Bantuan Terdistribusi
+                        <label for="distributed_aid" class="block text-sm font-medium text-gray-700">
+                            Distributed Aid
                         </label>
                         <div class="mt-1">
-                            <input type="number" name="bantuan_terdistribusi" id="bantuan_terdistribusi"
-                                   value="{{ old('bantuan_terdistribusi') }}" min="0"
-                                   placeholder="0"
-                                   class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('bantuan_terdistribusi') border-red-300 @enderror">
-                            @error('bantuan_terdistribusi')
+                            <input type="number" name="distributed_aid" id="distributed_aid"
+                                value="{{ old('distributed_aid') }}" min="0"
+                                placeholder="0"
+                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('distributed_aid') border-red-300 @enderror">
+                            @error('distributed_aid')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
@@ -86,9 +86,9 @@
 
                 <div class="flex items-center">
                     <input id="is_active" name="is_active" type="checkbox" value="1"
-                           {{ old('is_active', true) ? 'checked' : '' }}
-                           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                    <label for="is_active" class="ml-2 block text-sm text-gray-900">Aktif</label>
+                        {{ old('is_active', true) ? 'checked' : '' }}
+                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <label for="is_active" class="ml-2 block text-sm text-gray-900">Active</label>
                 </div>
 
             </div>

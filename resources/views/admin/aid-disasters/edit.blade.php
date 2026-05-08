@@ -37,14 +37,15 @@
 
         {{-- Info terakhir disync --}}
         @if($aidDisaster->last_synced_at)
-        <div class="mb-4 rounded-md bg-blue-50 p-3 flex items-center gap-2">
-            <svg class="h-4 w-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            <p class="text-sm text-blue-700">
-                Data terakhir disinkronisasi dari API: <strong>{{ $aidDisaster->last_synced_at->format('d/m/Y H:i:s') }}</strong>
-            </p>
-        </div>
+            <div class="mb-4 rounded-md bg-blue-50 p-3 flex items-center gap-2">
+                <svg class="h-4 w-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <p class="text-sm text-blue-700">
+                    Last synced from API: <strong>{{ $aidDisaster->last_synced_at->format('d/m/Y H:i:s') }}</strong>
+                </p>
+            </div>
         @endif
 
         <form action="{{ route('admin.aid-disasters.update', $aidDisaster) }}" method="POST">
@@ -53,14 +54,14 @@
             <div class="space-y-6">
 
                 <div>
-                    <label for="nama_kecamatan" class="block text-sm font-medium text-gray-700">
-                        Nama Kecamatan <span class="text-red-500">*</span>
+                    <label for="district_name" class="block text-sm font-medium text-gray-700">
+                        District Name <span class="text-red-500">*</span>
                     </label>
                     <div class="mt-1">
-                        <input type="text" name="nama_kecamatan" id="nama_kecamatan"
-                               value="{{ old('nama_kecamatan', $aidDisaster->nama_kecamatan) }}" required
-                               class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('nama_kecamatan') border-red-300 @enderror">
-                        @error('nama_kecamatan')
+                        <input type="text" name="district_name" id="district_name"
+                            value="{{ old('district_name', $aidDisaster->district_name) }}" required
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('district_name') border-red-300 @enderror">
+                        @error('district_name')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -68,33 +69,36 @@
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
-                        <label for="jumlah_penerima_bantuan" class="block text-sm font-medium text-gray-700">
-                            Jumlah Penerima Bantuan
+                        <label for="total_recipients" class="block text-sm font-medium text-gray-700">
+                            Total Recipients
                         </label>
                         <div class="mt-1">
-                            <input type="number" name="jumlah_penerima_bantuan" id="jumlah_penerima_bantuan"
-                                   value="{{ old('jumlah_penerima_bantuan', $aidDisaster->jumlah_penerima_bantuan) }}" min="0"
-                                   class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('jumlah_penerima_bantuan') border-red-300 @enderror">
-                            @error('jumlah_penerima_bantuan')
+                            <input type="number" name="total_recipients" id="total_recipients"
+                                value="{{ old('total_recipients', $aidDisaster->total_recipients) }}" min="0"
+                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('total_recipients') border-red-300 @enderror">
+                            @error('total_recipients')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
                     <div>
-                        <label for="bantuan_terdistribusi" class="block text-sm font-medium text-gray-700">
-                            Bantuan Terdistribusi
+                        <label for="distributed_aid" class="block text-sm font-medium text-gray-700">
+                            Distributed Aid
                         </label>
                         <div class="mt-1">
-                            <input type="number" name="bantuan_terdistribusi" id="bantuan_terdistribusi"
-                                   value="{{ old('bantuan_terdistribusi', $aidDisaster->bantuan_terdistribusi) }}" min="0"
-                                   class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('bantuan_terdistribusi') border-red-300 @enderror">
-                            @error('bantuan_terdistribusi')
+                            <input type="number" name="distributed_aid" id="distributed_aid"
+                                value="{{ old('distributed_aid', $aidDisaster->distributed_aid) }}" min="0"
+                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('distributed_aid') border-red-300 @enderror">
+                            @error('distributed_aid')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
                 </div>
+            </div>
+        </form>
+
 
                 <div class="flex items-center">
                     <input id="is_active" name="is_active" type="checkbox" value="1"
