@@ -29,7 +29,6 @@ class AidRecipientController extends Controller
             'aid_type' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'recipient_name' => 'required|string|max:255',
-            'district_id' => 'required|exists:districts,id',
             'village_id' => 'required|exists:villages,id',
             'description' => 'nullable|string',
         ]);
@@ -58,7 +57,6 @@ class AidRecipientController extends Controller
             'aid_type' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'recipient_name' => 'required|string|max:255',
-            'district_id' => 'required|exists:districts,id',
             'village_id' => 'required|exists:villages,id',
             'description' => 'nullable|string',
         ]);
