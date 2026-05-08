@@ -91,7 +91,6 @@ class GiscanaDataSeeder extends Seeder
             'uuid' => (string) Str::uuid(),
             'district_name'     => 'Kabila Bone',
             'total_recipients'  => 350,
-            'distributed_aid'   => 150,
             'is_active'         => true,
         ]);
 
@@ -99,7 +98,6 @@ class GiscanaDataSeeder extends Seeder
             'uuid' => (string) Str::uuid(),
             'district_name'     => 'Bone',
             'total_recipients'  => 100,
-            'distributed_aid'   => 80,
             'is_active'         => true,
         ]);
 
@@ -107,7 +105,6 @@ class GiscanaDataSeeder extends Seeder
             'uuid' => (string) Str::uuid(),
             'district_name'     => 'Bonepantai',
             'total_recipients'  => 700,
-            'distributed_aid'   => 460,
             'is_active'         => true,
         ]);
 
@@ -115,7 +112,6 @@ class GiscanaDataSeeder extends Seeder
             'uuid' => (string) Str::uuid(),
             'district_name'     => 'Bone Raya',
             'total_recipients'  => 200,
-            'distributed_aid'   => 130,
             'is_active'         => true,
         ]);
 
@@ -123,7 +119,6 @@ class GiscanaDataSeeder extends Seeder
             'uuid' => (string) Str::uuid(),
             'district_name'     => 'Bulawa',
             'total_recipients'  => 500,
-            'distributed_aid'   => 280,
             'is_active'         => true,
         ]);
 

@@ -18,8 +18,8 @@ class AidRecipientController extends Controller
 
     public function create()
     {
-        $aidDisasters = \App\Models\AidDisaster::all();
-        return $this->partialView('admin.aid-recipients.create', compact('aidDisasters'));
+        $districts = \App\Models\District::with('villages')->get();
+        return $this->partialView('admin.aid-recipients.create', compact('districts'));
     }
 
     public function store(Request $request)
@@ -30,9 +30,15 @@ class AidRecipientController extends Controller
             'amount' => 'required|numeric|min:0',
             'recipient_name' => 'required|string|max:255',
             'village_id' => 'required|exists:villages,id',
-            'aid_disaster_id' => 'required|exists:aid_disasters,id',
             'description' => 'nullable|string',
         ]);
+
+        $village = \App\Models\Village::with('district')->find($validated['village_id']);
+        if ($village && $village->district) {
+            $aidDisaster = \App\Models\AidDisaster::where('district_name', $village->district->name)->first();
+            $validated['aid_disaster_id'] = $aidDisaster ? $aidDisaster->id : null;
+            $validated['name'] = $village->district->name;
+        }
 
         \App\Models\AidRecipient::create($validated);
 
@@ -47,8 +53,8 @@ class AidRecipientController extends Controller
 
     public function edit(\App\Models\AidRecipient $aidRecipient)
     {
-        $aidDisasters = \App\Models\AidDisaster::all();
-        return $this->partialView('admin.aid-recipients.edit', compact('aidRecipient', 'aidDisasters'));
+        $districts = \App\Models\District::with('villages')->get();
+        return $this->partialView('admin.aid-recipients.edit', compact('aidRecipient', 'districts'));
     }
 
     public function update(Request $request, \App\Models\AidRecipient $aidRecipient)
@@ -59,9 +65,15 @@ class AidRecipientController extends Controller
             'amount' => 'required|numeric|min:0',
             'recipient_name' => 'required|string|max:255',
             'village_id' => 'required|exists:villages,id',
-            'aid_disaster_id' => 'required|exists:aid_disasters,id',
             'description' => 'nullable|string',
         ]);
+
+        $village = \App\Models\Village::with('district')->find($validated['village_id']);
+        if ($village && $village->district) {
+            $aidDisaster = \App\Models\AidDisaster::where('district_name', $village->district->name)->first();
+            $validated['aid_disaster_id'] = $aidDisaster ? $aidDisaster->id : null;
+            $validated['name'] = $village->district->name;
+        }
 
         $aidRecipient->update($validated);
 
