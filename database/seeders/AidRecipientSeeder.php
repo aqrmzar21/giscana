@@ -23,7 +23,7 @@ class AidRecipientSeeder extends Seeder
         }
 
         $faker = \Faker\Factory::create('id_ID');
-        $aidTypes = ['Sembako', 'Uang Tunai', 'Material Bangunan', 'Pakaian Layak Pakai', 'Obat-obatan'];
+        $aidTypes = ['Sembako', 'Material Bangunan', 'Pakaian Layak Pakai', 'Obat-obatan'];
 
         foreach (range(1, 30) as $i) {
             $village = $villages->random();
@@ -32,7 +32,7 @@ class AidRecipientSeeder extends Seeder
                 'uuid' => (string) \Illuminate\Support\Str::uuid(),
                 'date' => $faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d'),
                 'aid_type' => $faker->randomElement($aidTypes),
-                'amount' => $faker->numberBetween(1, 350),
+                'amount' => $faker->numberBetween(1, 50),
                 'recipient_name' => $faker->name,
                 'village_id' => $village->id,
                 'name' => $village->district->name,

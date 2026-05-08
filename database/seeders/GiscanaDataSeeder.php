@@ -89,7 +89,7 @@ class GiscanaDataSeeder extends Seeder
         // 5 kecamatan inti (default) — data bantuan bencana per kecamatan
         AidDisaster::create([
             'uuid' => (string) Str::uuid(),
-            'district_name'     => 'Kecamatan Kabila Bone',
+            'district_name'     => 'Kabila Bone',
             'total_recipients'  => 350,
             'distributed_aid'   => 150,
             'is_active'         => true,
@@ -97,7 +97,7 @@ class GiscanaDataSeeder extends Seeder
 
         AidDisaster::create([
             'uuid' => (string) Str::uuid(),
-            'district_name'     => 'Kecamatan Bone',
+            'district_name'     => 'Bone',
             'total_recipients'  => 100,
             'distributed_aid'   => 80,
             'is_active'         => true,
@@ -105,7 +105,7 @@ class GiscanaDataSeeder extends Seeder
 
         AidDisaster::create([
             'uuid' => (string) Str::uuid(),
-            'district_name'     => 'Kecamatan Bone Pantai',
+            'district_name'     => 'Bonepantai',
             'total_recipients'  => 700,
             'distributed_aid'   => 460,
             'is_active'         => true,
@@ -113,7 +113,7 @@ class GiscanaDataSeeder extends Seeder
 
         AidDisaster::create([
             'uuid' => (string) Str::uuid(),
-            'district_name'     => 'Kecamatan Bone Raya',
+            'district_name'     => 'Bone Raya',
             'total_recipients'  => 200,
             'distributed_aid'   => 130,
             'is_active'         => true,
@@ -121,16 +121,16 @@ class GiscanaDataSeeder extends Seeder
 
         AidDisaster::create([
             'uuid' => (string) Str::uuid(),
-            'district_name'     => 'Kecamatan Bulawa',
+            'district_name'     => 'Bulawa',
             'total_recipients'  => 500,
             'distributed_aid'   => 280,
             'is_active'         => true,
         ]);
 
         // Query examples
-        $kecamatanBone      = AidDisaster::where('district_name', 'Kecamatan Bone')->first();
-        $kecamatanKabilaBone= AidDisaster::where('district_name', 'Kecamatan Kabila Bone')->first();
-        $kecamatanBulawa    = AidDisaster::where('district_name', 'Kecamatan Bulawa')->first();
+        $kecamatanBone      = AidDisaster::where('district_name', 'Bone')->first();
+        $kecamatanKabilaBone= AidDisaster::where('district_name', 'Kabila Bone')->first();
+        $kecamatanBulawa    = AidDisaster::where('district_name', 'Bulawa')->first();
 
 
         // Sample evacuation facilities (terkait kecamatan via aid_disaster_id + nama_kecamatan)

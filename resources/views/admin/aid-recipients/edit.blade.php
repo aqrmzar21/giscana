@@ -74,6 +74,56 @@
                     </div>
                 </div>
 
+                <!-- Disaster selection -->
+                <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                    <label for="aid_disaster_id" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">Bencana (Kecamatan)</label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <select id="aid_disaster_id" name="aid_disaster_id" required class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
+                            <option value="">Pilih Bencana</option>
+                            @foreach($aidDisasters as $disaster)
+                                <option value="{{ $disaster->id }}" {{ old('aid_disaster_id', $aidRecipient->aid_disaster_id ?? '') == $disaster->id ? 'selected' : '' }}>
+                                    {{ $disaster->district_name }} - {{ $disaster->name ?? '' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('aid_disaster_id')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+                <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                    <label for="district_id" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">Kecamatan</label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        @php
+                            $selectedVillageId = old('village_id', $aidRecipient->village_id ?? '');
+                            $selectedDistrictId = old('district_id', '');
+
+                            if (!$selectedDistrictId && $selectedVillageId) {
+                                foreach ($districts as $district) {
+                                    if ($district->villages->contains('id', (int) $selectedVillageId)) {
+                                        $selectedDistrictId = (string) $district->id;
+                                        break;
+                                    }
+                                }
+                            }
+                        @endphp
+
+                        <select id="district_id" name="district_id" required class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
+                            <option value="">Pilih Kecamatan</option>
+                            @foreach($districts as $district)
+                                <option value="{{ $district->id }}" {{ (string) $selectedDistrictId === (string) $district->id ? 'selected' : '' }}>
+                                    {{ $district->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('district_id')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+                    </div>
+                </div>
+
                 <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
                     <label for="district_id" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">Kecamatan <span class="text-red-500">*</span></label>
                     <div class="mt-1 sm:mt-0 sm:col-span-2">

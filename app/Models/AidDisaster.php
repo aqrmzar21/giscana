@@ -36,6 +36,23 @@ class AidDisaster extends Model
     }
 
     /**
+     * Relation: one aid_disaster has many aid recipients.
+     */
+    public function aidRecipients()
+    {
+        return $this->hasMany(AidRecipient::class, 'aid_disaster_id');
+    }
+
+    /**
+     * Recalculate distributed aid based on aid recipients.
+     */
+    public function recalculateDistributedAid()
+    {
+        $this->distributed_aid = $this->aidRecipients()->sum('amount');
+        $this->save();
+    }
+
+    /**
      * Scope for active data.
      */
     public function scopeActive($query)
