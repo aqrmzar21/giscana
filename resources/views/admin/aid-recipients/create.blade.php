@@ -185,6 +185,4 @@ document.addEventListener('DOMContentLoaded', function () {
     filterVillages();
 });
 </script>
-
-
 @endsection

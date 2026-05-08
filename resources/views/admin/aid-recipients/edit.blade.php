@@ -77,17 +77,30 @@
                 <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
                     <label for="district_id" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">Kecamatan <span class="text-red-500">*</span></label>
                     <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        @php
+                            $selectedVillageId = old('village_id', $aidRecipient->village_id ?? '');
+                            $selectedDistrictId = old('district_id', '');
+
+                            if (!$selectedDistrictId && $selectedVillageId) {
+                                foreach ($districts as $district) {
+                                    if ($district->villages->contains('id', (int) $selectedVillageId)) {
+                                        $selectedDistrictId = (string) $district->id;
+                                        break;
+                                    }
+                                }
+                            }
+                        @endphp
+
                         <select id="district_id" name="district_id" required class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
                             <option value="">Pilih Kecamatan</option>
-                            @foreach($districts as $district)                        
-                                @foreach($district->villages->unique('zone') as $village)
-                                    <!-- <option value="{{ $district->id }}" {{ old('district_id', $aidRecipient->district_id ?? '') == $district->id ? 'selected' : '' }}>{{ $district->zone }}</option> -->
-                                    <option value="{{ $village->id }}" {{ old('village_id', $aidRecipient->village_id ?? '') == $village->id ? 'selected' : '' }}>{{ $village->zone }}</option>
-                                @endforeach                        
+                            @foreach($districts as $district)
+                                <option value="{{ $district->id }}" {{ (string) $selectedDistrictId === (string) $district->id ? 'selected' : '' }}>
+                                    {{ $district->name }}
+                                </option>
                             @endforeach
                         </select>
                         @error('district_id')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
@@ -99,7 +112,13 @@
                             <option value="">Pilih Desa/Kelurahan</option>
                             @foreach($districts as $district)
                                 @foreach($district->villages as $village)
-                                    <option value="{{ $village->id }}" {{ old('village_id', $aidRecipient->village_id ?? '') == $village->id ? 'selected' : '' }}>{{ $village->yard }}</option>
+                                    <option
+                                        value="{{ $village->id }}"
+                                        data-district-id="{{ $district->id }}"
+                                        {{ (string) $selectedVillageId === (string) $village->id ? 'selected' : '' }}
+                                    >
+                                        {{ $village->yard }}
+                                    </option>
                                 @endforeach
                             @endforeach
                         </select>
@@ -134,4 +153,35 @@
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const districtSelect = document.getElementById('district_id');
+    const villageSelect = document.getElementById('village_id');
+    const villageOptions = Array.from(villageSelect.querySelectorAll('option[data-district-id]'));
+
+    function filterVillages() {
+        const selectedDistrictId = districtSelect.value;
+        const selectedVillageOption = villageSelect.options[villageSelect.selectedIndex];
+
+        villageOptions.forEach(option => {
+            const matchesDistrict = selectedDistrictId && option.dataset.districtId === selectedDistrictId;
+            option.hidden = !matchesDistrict;
+            option.disabled = !matchesDistrict;
+        });
+
+        const selectedVillageMatchesDistrict =
+            selectedVillageOption &&
+            selectedVillageOption.dataset &&
+            selectedVillageOption.dataset.districtId === selectedDistrictId;
+
+        if (!selectedVillageMatchesDistrict) {
+            villageSelect.value = '';
+        }
+    }
+
+    districtSelect.addEventListener('change', filterVillages);
+    filterVillages();
+});
+</script>
 @endsection
