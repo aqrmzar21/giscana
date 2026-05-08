@@ -16,9 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->json('line_coordinates'); // Store GeoJSON linestring coordinates
-            $table->decimal('length_km', 8, 2)->nullable();
             $table->enum('route_type', ['primary', 'secondary', 'emergency']);
-            $table->integer('capacity_per_hour')->nullable();
             $table->boolean('is_accessible')->default(true);
             $table->boolean('is_active')->default(true);
             $table->timestamps();

@@ -8,11 +8,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/admin', function () { return view('admin'); })->name('layouts.admin');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
-// Map routes
+    Route::get('/dashboard/map', [MapController::class, 'dashboard'])->name('dashboard.map');
+});
+
+// Map routes (halaman publik + endpoint data untuk keduanya)
 Route::get('/map', [MapController::class, 'index'])->name('map.index');
 Route::get('/map/data', [MapController::class, 'getMapData'])->name('map.data');
 Route::get('/map/search', [MapController::class, 'search'])->name('map.search');
@@ -26,9 +28,11 @@ Route::middleware('auth')->group(function () {
 // Admin routes - hanya untuk admin
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('disaster-zones', \App\Http\Controllers\Admin\DisasterZoneController::class);
+    Route::get('evacuation-routes/print', [\App\Http\Controllers\Admin\EvacuationRouteController::class, 'print'])->name('evacuation-routes.print');
     Route::resource('evacuation-routes', \App\Http\Controllers\Admin\EvacuationRouteController::class);
+    Route::get('evacuation-facilities/print', [\App\Http\Controllers\Admin\EvacuationFacilityController::class, 'print'])->name('evacuation-facilities.print');
     Route::resource('evacuation-facilities', \App\Http\Controllers\Admin\EvacuationFacilityController::class);
-    Route::resource('aid-distribution-points', \App\Http\Controllers\Admin\AidDistributionPointController::class);
+    Route::resource('aid-disasters', \App\Http\Controllers\Admin\AidDisasterController::class);
 });
 
 require __DIR__.'/auth.php';

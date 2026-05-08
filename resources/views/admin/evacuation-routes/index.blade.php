@@ -17,30 +17,83 @@
 @section('content')
 <div class="bg-white shadow rounded-lg">
     <div class="px-4 py-5 sm:p-6">
-        <div class="sm:flex sm:items-center mb-4">
+
+        {{-- ── HEADER ROW ──────────────────────────────────────────────── --}}
+        <div class="sm:flex sm:items-center justify-between mb-4">
             <div class="sm:flex-auto">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Daftar Rute Evakuasi</h3>
                 <p class="mt-2 text-sm text-gray-700">Daftar semua rute evakuasi yang terdaftar dalam sistem.</p>
             </div>
-            <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-                <a href="{{ route('admin.evacuation-routes.create') }}" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto">
+            <div class="mt-4 sm:mt-0 sm:ml-4 sm:flex-none">
+                <a href="{{ route('admin.evacuation-routes.create') }}"
+                   class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto whitespace-nowrap">
                     <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Tambah Rute Baru
+                    Tambah Data Baru
                 </a>
             </div>
         </div>
 
+        {{-- ── FILTER + CETAK ROW ──────────────────────────────────────── --}}
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
+
+            {{-- Form Filter Kecamatan --}}
+            <form action="{{ route('admin.evacuation-routes.index') }}" method="GET"
+                  class="flex flex-col sm:flex-row gap-2">
+                <select name="district_name"
+                        class="block w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <option value="">Semua Kecamatan</option>
+                    @foreach($districts as $district)
+                        <option value="{{ $district->district_name }}"
+                            {{ request('district_name') == $district->district_name ? 'selected' : '' }}>
+                            {{ $district->district_name }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <button type="submit"
+                        class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Filter
+                </button>
+
+                @if(request()->anyFilled(['district_name', 'start_date', 'end_date']))
+                    <a href="{{ route('admin.evacuation-routes.index') }}"
+                       class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        Reset
+                    </a>
+                @endif
+            </form>
+
+            {{-- Tombol Cetak PDF --}}
+            @php
+                $printUrl    = route('admin.evacuation-routes.print');
+                $printParams = [];
+                if (request('district_name')) $printParams['district_name'] = request('district_name');
+                if (request('start_date'))    $printParams['start_date']    = request('start_date');
+                if (request('end_date'))      $printParams['end_date']      = request('end_date');
+                if ($printParams)             $printUrl .= '?' . http_build_query($printParams);
+            @endphp
+            <a href="{{ $printUrl }}" target="_blank"
+               class="inline-flex items-center justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap sm:ml-auto">
+                <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                Cetak PDF{{ request('district_name') ? ' (' . request('district_name') . ')' : ' (Semua)' }}
+            </a>
+        </div>
+
+        {{-- ── TABLE ───────────────────────────────────────────────────── --}}
         <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
             <table class="min-w-full divide-y divide-gray-300">
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">NO</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nama</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nama Rute</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nama Fasilitas</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kecamatan</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tipe Rute</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Panjang (km)</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kapasitas/jam</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
                         <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
                             <span class="sr-only">Aksi</span>
@@ -50,19 +103,19 @@
                 <tbody class="divide-y divide-gray-200 bg-white">
                     @forelse($routes as $route)
                     <tr>
-                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ $route->id }}</td>
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ $loop->iteration }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $route->name }}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $route->nama_fasilitas ?? $route->evacuationFacility?->name ?? '-' }}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $route->evacuationFacility?->district_name ?? '-' }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($route->route_type === 'primary')
-                                Utama
+                                <span class="inline-flex rounded-full bg-indigo-100 px-2 text-xs font-semibold leading-5 text-indigo-800">Utama</span>
                             @elseif($route->route_type === 'secondary')
-                                Sekunder
+                                <span class="inline-flex rounded-full bg-yellow-100 px-2 text-xs font-semibold leading-5 text-yellow-800">Sekunder</span>
                             @else
-                                Darurat
+                                <span class="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800">Darurat</span>
                             @endif
                         </td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($route->length_km ?? 0, 2) }}</td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($route->capacity_per_hour ?? 0) }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($route->is_active)
                                 <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Aktif</span>
@@ -86,7 +139,8 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </a>
-                                <form action="{{ route('admin.evacuation-routes.destroy', $route) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus rute ini?');">
+                                <form action="{{ route('admin.evacuation-routes.destroy', $route) }}" method="POST" class="inline"
+                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus rute ini?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900">
@@ -100,7 +154,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 text-center sm:pl-6">
+                        <td colspan="7" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 text-center sm:pl-6">
                             Tidak ada data rute evakuasi.
                         </td>
                     </tr>
@@ -109,11 +163,29 @@
             </table>
         </div>
 
-        @if($routes->hasPages())
-        <div class="mt-4">
-            {{ $routes->links() }}
+        {{-- ── PAGINATION ───────────────────────────────────────────────── --}}
+        <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-700">Tampilkan</span>
+                <form action="{{ request()->url() }}" method="GET" class="inline-block">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+                    <select name="per_page" onchange="this.form.submit()"
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-1 pl-3 pr-8">
+                        <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+                <span class="text-sm text-gray-700">data</span>
+            </div>
+
+            <div class="w-full sm:w-auto">
+                {{ $routes->links() }}
+            </div>
         </div>
-        @endif
+
     </div>
 </div>
 @endsection

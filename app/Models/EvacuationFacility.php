@@ -4,12 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\HasUuid;
 
 class EvacuationFacility extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
 
     protected $fillable = [
+        'aid_disaster_id',
+        'district_name',
         'name',
         'description',
         'point_coordinates',
@@ -25,12 +28,29 @@ class EvacuationFacility extends Model
 
     protected $casts = [
         'point_coordinates' => 'array',
+        'aid_disaster_id' => 'integer',
         'capacity' => 'integer',
         'has_medical_facility' => 'boolean',
         'has_food_storage' => 'boolean',
         'is_accessible' => 'boolean',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Relasi: fasilitas evakuasi berada di satu kecamatan (aid_disaster).
+     */
+    public function aidDisaster()
+    {
+        return $this->belongsTo(AidDisaster::class, 'aid_disaster_id');
+    }
+
+    /**
+     * Relasi: satu fasilitas evakuasi punya banyak rute evakuasi.
+     */
+    public function evacuationRoutes()
+    {
+        return $this->hasMany(EvacuationRoute::class, 'evacuation_facility_id');
+    }
 
     /**
      * Scope for active facilities
@@ -74,6 +94,7 @@ class EvacuationFacility extends Model
             'properties' => [
                 'id' => $this->id,
                 'name' => $this->name,
+                'district_name' => $this->district_name ?? $this->aidDisaster?->district_name,
                 'capacity' => $this->capacity,
                 'address' => $this->address,
                 'contact_person' => $this->contact_person,
