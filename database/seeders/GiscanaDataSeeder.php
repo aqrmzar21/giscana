@@ -11,6 +11,7 @@ use App\Models\EvacuationRoute;
 use App\Models\EvacuationFacility;
 use App\Models\AidDisaster;
 use App\Models\User;
+use App\Models\District;
 
 class GiscanaDataSeeder extends Seeder
 {
@@ -59,10 +60,14 @@ class GiscanaDataSeeder extends Seeder
             ]
         );
 
+        $districtBonepantai = District::where('name', 'like', '%Bonepantai%')->first();
+        $districtKabilaBone = District::where('name', 'like', '%Kabila Bone%')->first();
+
         // Sample disaster zones for Bone Bolango Regency (sebagai titik lokasi, bukan poligon)
         DisasterZone::create([
             'uuid' => (string) Str::uuid(),
-            'name' => 'banjir Risk Zone - Bone River',
+            'location_name' => 'Bonepantai',
+            'district_id' => $districtBonepantai ? $districtBonepantai->id : null,
             'disaster_type' => 'banjir',
             'description' => 'High-risk banjir zone along the Bone River, prone to seasonal banjiring during rainy season.',
             'risk_level' => 'high',
@@ -75,7 +80,8 @@ class GiscanaDataSeeder extends Seeder
 
         DisasterZone::create([ 
             'uuid' => (string) Str::uuid(),
-            'name' => 'longsor Risk Zone - Hillside Area',
+            'location_name' => 'Kabila Bone',
+            'district_id' => $districtKabilaBone ? $districtKabilaBone->id : null,
             'disaster_type' => 'longsor',
             'description' => 'Critical longsor risk area on steep hillsides, especially vulnerable during heavy rainfall.',
             'risk_level' => 'critical',

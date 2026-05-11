@@ -37,8 +37,12 @@
 
         <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
             <div>
-                <dt class="text-sm font-medium text-gray-500">Nama</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{ $disasterZone->name }}</dd>
+                <dt class="text-sm font-medium text-gray-500">Lokasi Kejadian</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ $disasterZone->location_name }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Kecamatan</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ $disasterZone->district ? $disasterZone->district->name : '-' }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-gray-500">Jenis Bencana</dt>

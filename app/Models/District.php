@@ -26,6 +26,14 @@ class District extends Model
     }
 
     /**
+     * Get disaster zones in this district.
+     */
+    public function disasterZones()
+    {
+        return $this->hasMany(DisasterZone::class);
+    }
+
+    /**
      * Get GeoJSON representation
      */
     public function toGeoJSON()

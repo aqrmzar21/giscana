@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\PartialRenderable;
 use App\Models\DisasterZone;
+use App\Models\District;
 use Illuminate\Http\Request;
 
 class DisasterZoneController extends Controller
@@ -20,9 +21,12 @@ class DisasterZoneController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
+                $q->where('location_name', 'like', "%{$search}%")
                   ->orWhere('disaster_type', 'like', "%{$search}%")
-                  ->orWhere('risk_level', 'like', "%{$search}%");
+                  ->orWhere('risk_level', 'like', "%{$search}%")
+                  ->orWhereHas('district', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
             });
         }
 
@@ -35,7 +39,7 @@ class DisasterZoneController extends Controller
         }
 
         $perPage = $request->get('per_page', 10);
-        $zones = $query->latest()->paginate($perPage)->withQueryString();
+        $zones = $query->with('district')->latest()->paginate($perPage)->withQueryString();
         
         return $this->partialView('admin.disaster-zones.index', compact('zones'));
     }
@@ -45,7 +49,8 @@ class DisasterZoneController extends Controller
      */
     public function create()
     {
-        return $this->partialView('admin.disaster-zones.create');
+        $districts = District::orderBy('name')->get();
+        return $this->partialView('admin.disaster-zones.create', compact('districts'));
     }
 
     /**
@@ -54,7 +59,8 @@ class DisasterZoneController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'location_name' => 'required|string|max:255',
+            'district_id' => 'required|exists:districts,id',
             'disaster_type' => 'required|in:longsor,banjir,other',
             'description' => 'nullable|string',
             'risk_level' => 'required|in:low,medium,high,critical',
@@ -86,7 +92,8 @@ class DisasterZoneController extends Controller
      */
     public function edit(DisasterZone $disasterZone)
     {
-        return $this->partialView('admin.disaster-zones.edit', compact('disasterZone'));
+        $districts = District::orderBy('name')->get();
+        return $this->partialView('admin.disaster-zones.edit', compact('disasterZone', 'districts'));
     }
 
     /**
@@ -95,7 +102,8 @@ class DisasterZoneController extends Controller
     public function update(Request $request, DisasterZone $disasterZone)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'location_name' => 'required|string|max:255',
+            'district_id' => 'required|exists:districts,id',
             'disaster_type' => 'required|in:longsor,banjir,other',
             'description' => 'nullable|string',
             'risk_level' => 'required|in:low,medium,high,critical',
