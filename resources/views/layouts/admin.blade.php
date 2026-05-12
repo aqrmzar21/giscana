@@ -86,7 +86,7 @@
                             </button>
                             <div x-show="open" x-collapse class="ml-4 mt-1 space-y-1">
                                 <a href="{{ route('admin.disaster-zones.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.disaster-zones.index') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                                    Daftar Titik Bencana
+                                    Daftar Titik Rawan
                                 </a>
                                 <a href="{{ route('admin.disaster-zones.create') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.disaster-zones.create') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">
                                     Tambah Titik Bencana

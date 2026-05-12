@@ -11,7 +11,7 @@ class DisasterZone extends Model
     use HasFactory, HasUuid;
 
     protected $fillable = [
-        'location_name',
+        'name',
         'district_id',
         'disaster_type',
         'description',
@@ -69,7 +69,7 @@ class DisasterZone extends Model
             'type' => 'Feature',
             'properties' => [
                 'id' => $this->id,
-                'location_name' => $this->location_name,
+                'name' => $this->name,
                 'district_id' => $this->district_id,
                 'disaster_type' => $this->disaster_type,
                 'risk_level' => $this->risk_level,

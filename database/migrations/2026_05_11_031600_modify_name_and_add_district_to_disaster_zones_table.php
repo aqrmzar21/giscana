@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('disaster_zones', function (Blueprint $table) {
-            $table->renameColumn('name', 'location_name');
+            $table->renameColumn('name', 'name');
             $table->foreignId('district_id')->nullable()->constrained('districts')->nullOnDelete();
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
         Schema::table('disaster_zones', function (Blueprint $table) {
             $table->dropForeign(['district_id']);
             $table->dropColumn('district_id');
-            $table->renameColumn('location_name', 'name');
+            $table->renameColumn('name', 'name');
         });
     }
 };

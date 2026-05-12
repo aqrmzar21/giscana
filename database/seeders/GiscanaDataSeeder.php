@@ -66,7 +66,8 @@ class GiscanaDataSeeder extends Seeder
         // Sample disaster zones for Bone Bolango Regency (sebagai titik lokasi, bukan poligon)
         DisasterZone::create([
             'uuid' => (string) Str::uuid(),
-            'location_name' => 'Bonepantai',
+            // 'name' => 'Bonepantai',
+            'name' => 'banjir Risk Zone - Bone River',
             'district_id' => $districtBonepantai ? $districtBonepantai->id : null,
             'disaster_type' => 'banjir',
             'description' => 'High-risk banjir zone along the Bone River, prone to seasonal banjiring during rainy season.',
@@ -80,7 +81,8 @@ class GiscanaDataSeeder extends Seeder
 
         DisasterZone::create([ 
             'uuid' => (string) Str::uuid(),
-            'location_name' => 'Kabila Bone',
+            // 'name' => 'Kabila Bone',
+            'name' => 'longsor Risk Zone - Hillside Area',
             'district_id' => $districtKabilaBone ? $districtKabilaBone->id : null,
             'disaster_type' => 'longsor',
             'description' => 'Critical longsor risk area on steep hillsides, especially vulnerable during heavy rainfall.',

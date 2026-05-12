@@ -85,7 +85,7 @@
                                 <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Lainnya</span>
                             @endif
                         </td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $zone->location_name }}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $zone->name }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $zone->district ? $zone->district->name : '-' }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($zone->risk_level === 'low')

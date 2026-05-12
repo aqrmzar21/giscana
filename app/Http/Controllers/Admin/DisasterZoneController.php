@@ -21,7 +21,7 @@ class DisasterZoneController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('location_name', 'like', "%{$search}%")
+                $q->where('name', 'like', "%{$search}%")
                   ->orWhere('disaster_type', 'like', "%{$search}%")
                   ->orWhere('risk_level', 'like', "%{$search}%")
                   ->orWhereHas('district', function($q) use ($search) {
@@ -59,7 +59,7 @@ class DisasterZoneController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'location_name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'district_id' => 'required|exists:districts,id',
             'disaster_type' => 'required|in:longsor,banjir,other',
             'description' => 'nullable|string',
@@ -102,7 +102,7 @@ class DisasterZoneController extends Controller
     public function update(Request $request, DisasterZone $disasterZone)
     {
         $validated = $request->validate([
-            'location_name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'district_id' => 'required|exists:districts,id',
             'disaster_type' => 'required|in:longsor,banjir,other',
             'description' => 'nullable|string',

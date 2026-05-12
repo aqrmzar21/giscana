@@ -29,10 +29,10 @@
             <div class="space-y-6">
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
-                        <label for="location_name" class="block text-sm font-medium text-gray-700">Lokasi Kejadian <span class="text-red-500">*</span></label>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Lokasi Kejadian <span class="text-red-500">*</span></label>
                         <div class="mt-1">
-                            <input type="text" name="location_name" id="location_name" value="{{ old('location_name', $disasterZone->location_name) }}" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('location_name') border-red-300 @enderror">
-                            @error('location_name')
+                            <input type="text" name="name" id="name" value="{{ old('name', $disasterZone->name) }}" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('name') border-red-300 @enderror">
+                            @error('name')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>

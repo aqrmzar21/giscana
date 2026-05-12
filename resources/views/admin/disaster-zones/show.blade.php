@@ -38,7 +38,7 @@
         <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
             <div>
                 <dt class="text-sm font-medium text-gray-500">Lokasi Kejadian</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{ $disasterZone->location_name }}</dd>
+                <dd class="mt-1 text-sm text-gray-900">{{ $disasterZone->name }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-gray-500">Kecamatan</dt>
