@@ -12,8 +12,56 @@ class AidRecipientController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', 10);
-        $aidRecipients = \App\Models\AidRecipient::with(['village'])->latest('date')->paginate($perPage)->withQueryString();
+        $query = \App\Models\AidRecipient::with(['village'])->latest('date');
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('recipient_name', 'like', "%{$search}%")
+                  ->orWhere('aid_type', 'like', "%{$search}%")
+                  ->orWhereHas('village', function ($vq) use ($search) {
+                      $vq->where('yard', 'like', "%{$search}%")
+                         ->orWhere('full_name', 'like', "%{$search}%");
+                  });
+            });
+        }
+        if ($startDate = $request->input('start_date')) {
+            $query->whereDate('date', '>=', $startDate);
+        }
+        if ($endDate = $request->input('end_date')) {
+            $query->whereDate('date', '<=', $endDate);
+        }
+
+        $aidRecipients = $query->paginate($perPage)->withQueryString();
         return $this->partialView('admin.aid-recipients.index', compact('aidRecipients'));
+    }
+
+    public function print(Request $request)
+    {
+        $query = \App\Models\AidRecipient::with(['village'])->latest('date');
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('recipient_name', 'like', "%{$search}%")
+                  ->orWhere('aid_type', 'like', "%{$search}%")
+                  ->orWhereHas('village', function ($vq) use ($search) {
+                      $vq->where('yard', 'like', "%{$search}%")
+                         ->orWhere('full_name', 'like', "%{$search}%");
+                  });
+            });
+        }
+        if ($startDate = $request->input('start_date')) {
+            $query->whereDate('date', '>=', $startDate);
+        }
+        if ($endDate = $request->input('end_date')) {
+            $query->whereDate('date', '<=', $endDate);
+        }
+
+        $aidRecipients = $query->get();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.aid-recipients.pdf', compact('aidRecipients'))
+               ->setPaper('a4', 'landscape');
+
+        return $pdf->stream('Laporan-Penerima-Bantuan-' . date('Y-m-d') . '.pdf');
     }
 
     public function create()

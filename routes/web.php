@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('evacuation-facilities/print', [\App\Http\Controllers\Admin\EvacuationFacilityController::class, 'print'])->name('evacuation-facilities.print');
     Route::resource('evacuation-facilities', \App\Http\Controllers\Admin\EvacuationFacilityController::class);
     Route::resource('aid-disasters', \App\Http\Controllers\Admin\AidDisasterController::class);
+    Route::get('aid-recipients/print', [\App\Http\Controllers\Admin\AidRecipientController::class, 'print'])->name('aid-recipients.print');
     Route::resource('aid-recipients', \App\Http\Controllers\Admin\AidRecipientController::class);
 });
 
