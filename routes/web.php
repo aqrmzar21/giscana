@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
 
 // Admin routes - hanya untuk admin
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('disaster-zones/print', [\App\Http\Controllers\Admin\DisasterZoneController::class, 'print'])->name('disaster-zones.print');
     Route::resource('disaster-zones', \App\Http\Controllers\Admin\DisasterZoneController::class);
     Route::get('evacuation-routes/print', [\App\Http\Controllers\Admin\EvacuationRouteController::class, 'print'])->name('evacuation-routes.print');
     Route::resource('evacuation-routes', \App\Http\Controllers\Admin\EvacuationRouteController::class);

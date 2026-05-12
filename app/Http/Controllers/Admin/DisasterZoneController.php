@@ -45,6 +45,47 @@ class DisasterZoneController extends Controller
     }
 
     /**
+     * Print PDF report of disaster zones.
+     */
+    public function print(Request $request)
+    {
+        $query = DisasterZone::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('disaster_type', 'like', "%{$search}%")
+                  ->orWhere('risk_level', 'like', "%{$search}%")
+                  ->orWhereHas('district', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+        } elseif ($request->filled('start_date')) {
+            $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+        } elseif ($request->filled('end_date')) {
+            $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
+        }
+
+        $zones = $query->with('district')->latest()->get();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.disaster-zones.pdf', compact('zones'))
+            ->setPaper('a4', 'landscape');
+
+        $fileName = 'laporan-zona-bencana';
+        if ($request->filled('search')) {
+            $fileName .= '-' . \Illuminate\Support\Str::slug($request->search);
+        }
+        $fileName .= '.pdf';
+
+        return $pdf->stream($fileName);
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
