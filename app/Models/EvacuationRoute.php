@@ -22,11 +22,7 @@ class EvacuationRoute extends Model
 
     protected $casts = [
         'line_coordinates' => 'array',
-<<<<<<< HEAD
-        'length_km' => 'decimal:2',
-=======
         'evacuation_facility_id' => 'integer',
->>>>>>> f9d22c5180283f088f98e8f158ddcef8b88ced5c
         'is_accessible' => 'boolean',
         'is_active' => 'boolean',
     ];
