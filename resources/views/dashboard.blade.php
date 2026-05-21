@@ -172,9 +172,9 @@
             </div>
             
         </div>
-        <div class="px-2 py-2">
-            <table class="min-w-full divide-y divide-gray-300 rounded-lg mb-6">
-                <thead class="bg-gray-50">
+        <div class="px-2 py-2 rounded-lg">
+            <table class="min-w-full divide-y divide-gray-300 rounded-lg">
+                <thead class="bg-gray-10">
                     <tr>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kecamatan</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Progres</th>
@@ -189,7 +189,7 @@
                                 $percentage = $aid->total_recipients > 0 ? ($aid->distributed_aid / $aid->total_recipients) * 100 : 0;
                             @endphp
                             <div class="flex items-center">
-                                <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
+                                <div class="w-full bg-gray-200 rounded-full h-2.5 mr-9">
                                     <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
                                 </div>
                                 <span>{{ round($percentage, 1) }}%</span>
