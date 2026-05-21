@@ -114,7 +114,7 @@
             <div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Selamat Datang!</h3>
                 <p class="text-gray-500 text-sm mb-4">
-                    Halo <strong class="text-gray-800">{{ Auth::user()->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
+                    Halo <strong class="text-indigo-800">{{ Auth::user()->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
                 </p>
             </div>
             <div>

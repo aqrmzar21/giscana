@@ -158,7 +158,7 @@
                                     Distribusi Bantuan
                                 </a>
                                 <a href="{{ route('admin.aid-recipients.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-recipients.index') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                                    Data Penerima
+                                    Penerima Bantuan
                                 </a>
                             </div>
                         </div>
