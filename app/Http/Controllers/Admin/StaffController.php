@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Controller;
 use App\Http\Traits\PartialRenderable;
 use App\Models\User;
 use Illuminate\Http\Request;

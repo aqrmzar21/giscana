@@ -36,12 +36,10 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::resource('aid-disasters', \App\Http\Controllers\Admin\AidDisasterController::class);
     Route::get('aid-recipients/print', [\App\Http\Controllers\Admin\AidRecipientController::class, 'print'])->name('aid-recipients.print');
     Route::resource('aid-recipients', \App\Http\Controllers\Admin\AidRecipientController::class);
-    Route::resource('staff', \App\Http\Controllers\Admin\StaffController::class);
-
     // Staff Management - Hanya untuk admin
-    // Route::middleware(['role:admin'])->group(function () {
-    // Route::resource('staff', \App\Http\Controllers\Admin\StaffController::class);
-    // });
+    Route::middleware(['role:admin'])->group(function () {
+        Route::resource('staff', \App\Http\Controllers\Admin\StaffController::class);
+    });
 });
 
 require __DIR__.'/auth.php';
