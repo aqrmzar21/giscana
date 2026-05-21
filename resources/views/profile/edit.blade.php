@@ -30,11 +30,13 @@
         </div>
     </div>
 
+    @unless(auth()->user()->hasRole('admin'))
     <!-- Delete Account -->
     <div class="bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
             @include('profile.partials.delete-user-form')
         </div>
     </div>
+    @endunless
 </div>
 @endsection

@@ -129,6 +129,7 @@ class EvacuationRouteController extends Controller
      */
     public function edit(EvacuationRoute $evacuationRoute)
     {
+        abort_if(!auth()->user()->can('update data'), 403);
         $facilities = EvacuationFacility::active()->orderBy('name')->get();
         return $this->partialView('admin.evacuation-routes.edit', compact('evacuationRoute', 'facilities'));
     }
@@ -138,6 +139,7 @@ class EvacuationRouteController extends Controller
      */
     public function update(Request $request, EvacuationRoute $evacuationRoute)
     {
+        abort_if(!auth()->user()->can('update data'), 403);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -162,6 +164,7 @@ class EvacuationRouteController extends Controller
      */
     public function destroy(EvacuationRoute $evacuationRoute)
     {
+        abort_if(!auth()->user()->can('delete data'), 403);
         $evacuationRoute->delete();
 
         return redirect()->route('admin.evacuation-routes.index')
