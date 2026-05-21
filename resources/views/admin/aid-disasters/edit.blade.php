@@ -48,26 +48,31 @@
             </div>
         @endif
 
-            <form action="{{ route('admin.aid-disasters.update', $aidDisaster) }}" method="POST">
+        <div class="space-y-6">
+        <form action="{{ route('admin.aid-disasters.update', $aidDisaster) }}" method="POST">
                 @csrf
                 @method('PUT')
-                <div class="space-y-6">
 
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <label for="district_name" class="block text-sm font-medium text-gray-700">
                             Nama Kecamatan <span class="text-red-500">*</span>
                         </label>
                         <div class="mt-1">
-                            <input type="text" name="district_name" id="district_name"
-                                value="{{ old('district_name', $aidDisaster->district_name) }}" required
+                            <select name="district_name" id="district_name" required
                                 class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('district_name') border-red-300 @enderror">
+                                @foreach($districts as $district)
+                                    <option value="{{ $district->name }}" {{ old('district_name', $aidDisaster->district_name) == $district->name ? 'selected' : '' }}>
+                                        {{ $district->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                             @error('district_name')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div>
                             <label for="total_recipients" class="block text-sm font-medium text-gray-700">
                                 Jumlah Penerima Bantuan
@@ -96,26 +101,26 @@
                             </div>
                         </div> -->
                     </div>
+                    <div class="flex items-center p-2">
+                        <input id="is_active" name="is_active" type="checkbox" value="1"
+                        {{ old('is_active', $aidDisaster->is_active) ? 'checked' : '' }}
+                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                        <label for="is_active" class="ml-2 block text-sm text-gray-900">Aktif</label>
+                    </div>
                 </div>
-                <div class="flex items-center">
-                    <input id="is_active" name="is_active" type="checkbox" value="1"
-                           {{ old('is_active', $aidDisaster->is_active) ? 'checked' : '' }}
-                           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                    <label for="is_active" class="ml-2 block text-sm text-gray-900">Aktif</label>
-                </div>
-            </div>
-
-            <div class="mt-6 flex items-center justify-end space-x-3">
-                <a href="{{ route('admin.aid-disasters.index') }}"
-                   class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                
+                <div class="mt-6 flex items-center justify-end space-x-3">
+                    <a href="{{ route('admin.aid-disasters.index') }}"
+                    class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     Batal
                 </a>
                 <button type="submit"
-                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Update
-                </button>
-            </div>
-
+                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Update
+            </button>
+        </div>
+        
+    </div>
         </form>
     </div>
 </div>

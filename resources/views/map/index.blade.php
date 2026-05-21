@@ -9,78 +9,12 @@
     <div id="map"></div>
 </div>
 @endsection
-
-<<<<<<< HEAD
-    <div class="map-container">
-        <div class="map-controls">
-            <h3 class="text-lg font-semibold mb-4">Filter Peta</h3>
-            
-            <div class="filter-group">
-                <label for="disaster_type">Jenis Bencana</label>
-                <select id="disaster_type" name="disaster_type">
-                    <option value="all" {{ $disasterType === 'all' ? 'selected' : '' }}>Semua Jenis</option>
-                    <option value="longsor" {{ $disasterType === 'longsor' ? 'selected' : '' }}>Longsor</option>
-                    <option value="banjir" {{ $disasterType === 'banjir' ? 'selected' : '' }}>Banjir</option>
-                    <!-- <option value="other" {{ $disasterType === 'other' ? 'selected' : '' }}>Lainnya</option> -->
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="risk_level">Tingkat Risiko</label>
-                <select id="risk_level" name="risk_level">
-                    <option value="all" {{ $riskLevel === 'all' ? 'selected' : '' }}>Semua Tingkat</option>
-                    <option value="low" {{ $riskLevel === 'low' ? 'selected' : '' }}>Rendah</option>
-                    <option value="medium" {{ $riskLevel === 'medium' ? 'selected' : '' }}>Sedang</option>
-                    <option value="high" {{ $riskLevel === 'high' ? 'selected' : '' }}>Tinggi</option>
-                    <option value="very_high" {{ $riskLevel === 'very_high' ? 'selected' : '' }}>Sangat Tinggi</option>
-                </select>
-            </div>
-
-            <div class="legend">
-                <div class="font-semibold mb-2">Legenda</div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #ef4444;"></div>
-                    <span>Titik Rawan</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #10b981;"></div>
-                    <span>Titik Kumpul</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #3b82f6;"></div>
-                    <span>Rute Evakuasi</span>
-                </div>
-                
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #fde68a; border: 1px dashed #facc15;"></div>
-                    <span>Batas Kecamatan</span>
-                </div>
-                <div class="mt-3">
-                    <label class="inline-flex items-center text-xs text-gray-700">
-                        <input type="checkbox" id="toggle_district_boundaries" class="mr-2" checked>
-                        Tampilkan Batas Kecamatan
-                    </label>
-                </div>
-                <!-- <div class="legend-item">
-                    <div class="w-5 h-5 mr-2 flex items-center justify-center"></div>
-                    <span>Data Bantuan Bencana</span>
-                </div> -->
-=======
 @section('map-toolbar')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
     <div class="flex flex-col lg:grid lg:grid-cols-12 lg:gap-x-0 lg:items-start">
         <!-- Text: Mobile Bottom (order 3), Desktop Top-Left -->
         <div class="order-3 lg:order-none lg:col-span-4 lg:col-start-1 lg:row-start-1 lg:pr-6 border-t border-gray-200 pt-5 mt-5 lg:border-t-0 lg:pt-0 lg:mt-0">
             <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Kontrol peta</p>
-<<<<<<< HEAD
-            <p class="text-xs text-gray-500 mb-2">Provinsi Gorontalo — filter dan legenda mengatur lapisan yang ditampilkan</p>
-            <div class="mt-2">
-                @include('map.partials.map-legend-content')
->>>>>>> f9d22c5180283f088f98e8f158ddcef8b88ced5c
-            </div>
-=======
-            <p class="text-xs text-gray-500 mb-0">Provinsi Gorontalo — filter dan legenda mengatur lapisan yang ditampilkan</p>
->>>>>>> bos
         </div>
 
         <!-- Legend: Mobile Top (order 1), Desktop Bottom-Left -->
@@ -96,7 +30,6 @@
 </div>
 @endsection
 
-<<<<<<< HEAD
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -291,6 +224,4 @@
 </script>
 @endpush
 
-=======
 @include('map.partials.map-scripts', ['mapUiVariant' => 'landing-fs'])
->>>>>>> f9d22c5180283f088f98e8f158ddcef8b88ced5c

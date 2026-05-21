@@ -46,7 +46,8 @@ class AidDisasterController extends Controller
 
     public function edit(AidDisaster $aidDisaster)
     {
-        return $this->partialView('admin.aid-disasters.edit', compact('aidDisaster'));
+        $districts = \App\Models\District::orderBy('name')->get();
+        return $this->partialView('admin.aid-disasters.edit', compact('aidDisaster', 'districts'));
     }
 
     public function update(Request $request, AidDisaster $aidDisaster)
