@@ -64,6 +64,17 @@
                     </div>
                 </div>
 
+                <div>
+                    <label for="line_coordinates" class="block text-sm font-medium text-gray-700">Koordinat Garis (GeoJSON) <span class="text-red-500">*</span></label>
+                    <div class="mt-1">
+                        <textarea id="line_coordinates" name="line_coordinates" rows="5" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md font-mono text-xs @error('line_coordinates') border-red-300 @enderror">{{ old('line_coordinates') }}</textarea>
+                        <p class="mt-2 text-sm text-gray-500">Format: JSON array of coordinates [[lng, lat], [lng, lat], ...]</p>
+                        @error('line_coordinates')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
                 <div class="space-y-3">
                     <div class="flex items-center">
                         <input id="is_accessible" name="is_accessible" type="checkbox" value="1" {{ old('is_accessible', true) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
