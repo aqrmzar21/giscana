@@ -34,8 +34,8 @@
             </div>
         </div>
         
-        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4 justify-evenly">
-            <form action="{{ route('admin.disaster-zones.index') }}" method="GET" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4 justify-between">
+            <form action="{{ route('admin.disaster-zones.index') }}" method="GET" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
                 <!-- ini buat rata kiri sendiri -->
                 <div class="flex items-center gap-2 flex-1">
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari zona..." class="flex w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
@@ -46,6 +46,7 @@
                 <!-- ini tetap berada center di tengah -->
                 <div class="flex items-center gap-2 justify-center">
                     <input type="date" name="start_date" value="{{ request('start_date') }}" class="block w-full sm:w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <span class="text-sm text-gray-500">s/d</span>
                     <input type="date" name="end_date" value="{{ request('end_date') }}" class="block w-full sm:w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                     @if(request()->anyFilled(['search', 'start_date', 'end_date']))
                     <a href="{{ route('admin.disaster-zones.index') }}" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
@@ -54,16 +55,35 @@
                     @endif
                 </div>
             </form>
+
+            {{-- Tombol Cetak PDF --}}
+            @php
+                $printUrl    = route('admin.disaster-zones.print');
+                $printParams = [];
+                if (request('search'))     $printParams['search']     = request('search');
+                if (request('start_date')) $printParams['start_date'] = request('start_date');
+                if (request('end_date'))   $printParams['end_date']   = request('end_date');
+                if ($printParams)          $printUrl .= '?' . http_build_query($printParams);
+            @endphp
+            <a href="{{ $printUrl }}" target="_blank"
+               class="inline-flex items-center justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap sm:ml-auto">
+                <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                Cetak PDF{{ request('search') || request('start_date') || request('end_date') ? ' (Filter)' : ' (Semua)' }}
+            </a>
         </div>
 
 
-        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+        <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
             <table class="min-w-full divide-y divide-gray-300">
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">NO</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Jenis Bencana</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Lokasi</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Lokasi Kejadian</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kecamatan</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tingkat Risiko</th>
                         <!-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Luas (ha)</th> -->
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Terdampak</th>
@@ -85,6 +105,7 @@
                             @endif
                         </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $zone->name }}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $zone->district ? $zone->district->name : '-' }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($zone->risk_level === 'low')
                             <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Rendah</span>
@@ -101,7 +122,7 @@
                             @if($zone->is_active)
                             <span class="inline-flex rounded-full bg-green-100 px-2 leading-3 text-sm text-green-800">Aktif</span>
                             @else
-                            <span class="inline-flex rounded-full bg-green-100 px-2 leading-3 text-sm text-gray-800">Tidak Aktif</span>
+                            <span class="inline-flex rounded-full bg-gray-100 px-2 leading-3 text-sm text-gray-800">Tidak Aktif</span>
                             @endif
                         </td>
                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
@@ -131,7 +152,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 text-center sm:pl-6">
+                        <td colspan="9" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 text-center sm:pl-6">
                             Tidak ada data zona bencana.
                         </td>
                     </tr>

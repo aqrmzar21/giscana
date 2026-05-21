@@ -70,10 +70,10 @@
                 <dt class="text-sm font-medium text-gray-500">Alamat</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $evacuationFacility->address ?? '-' }}</dd>
             </div>
-            <div>
+            <!-- <div>
                 <dt class="text-sm font-medium text-gray-500">Kapasitas</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ number_format($evacuationFacility->capacity ?? 0) }} orang</dd>
-            </div>
+            </div> -->
             <div>
                 <dt class="text-sm font-medium text-gray-500">Kontak Person</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $evacuationFacility->contact_person ?? '-' }}</dd>

@@ -12,6 +12,7 @@ class DisasterZone extends Model
 
     protected $fillable = [
         'name',
+        'district_id',
         'disaster_type',
         'description',
         'risk_level',
@@ -26,6 +27,14 @@ class DisasterZone extends Model
         'area_hectares' => 'decimal:2',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Get the district that owns the disaster zone.
+     */
+    public function district()
+    {
+        return $this->belongsTo(District::class);
+    }
 
     /**
      * Scope for active disaster zones
@@ -66,6 +75,7 @@ class DisasterZone extends Model
             'properties' => [
                 'id' => $this->id,
                 'name' => $this->name,
+                'district_id' => $this->district_id,
                 'disaster_type' => $this->disaster_type,
                 'risk_level' => $this->risk_level,
                 'area_hectares' => $this->area_hectares,

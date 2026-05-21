@@ -17,13 +17,26 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
-<body class="font-sans antialiased bg-gray-100">
+<body class="font-sans antialiased bg-gray-100" x-data="{ sidebarOpen: false }">
     <!-- PJAX Loading Bar -->
     <div id="pjax-progress" style="position:fixed;top:0;left:0;width:0;height:3px;background:linear-gradient(90deg,#6366f1,#8b5cf6);z-index:9999;transition:width 0.3s ease,opacity 0.4s ease;opacity:0;pointer-events:none;"></div>
 
     <div class="min-h-screen flex">
+        <!-- Mobile Sidebar Overlay -->
+        <div x-show="sidebarOpen" 
+             x-transition:enter="transition-opacity ease-linear duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-linear duration-300"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-gray-600 bg-opacity-75 z-20 md:hidden" 
+             @click="sidebarOpen = false"
+             style="display: none;"></div>
+
         <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-lg fixed h-screen overflow-y-auto">
+        <aside class="w-64 bg-white shadow-lg fixed h-screen overflow-y-auto z-30 transition-transform duration-300 ease-in-out transform md:translate-x-0"
+               :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
             <div class="p-4">
                 <a href="{{ route('dashboard') }}" class="flex items-center space-x-2">
                      <svg class="w-8 h-8 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -65,7 +78,7 @@
                                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                     </svg>
-                                    Zona Bencana
+                                    Titik Bencana
                                 </div>
                                 <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-90': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -73,10 +86,10 @@
                             </button>
                             <div x-show="open" x-collapse class="ml-4 mt-1 space-y-1">
                                 <a href="{{ route('admin.disaster-zones.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.disaster-zones.index') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                                    Daftar Zona
+                                    Daftar Titik Rawan
                                 </a>
                                 <a href="{{ route('admin.disaster-zones.create') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.disaster-zones.create') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                                    Tambah Zona Baru
+                                    Tambah Titik Bencana
                                 </a>
                             </div>
                         </div>
@@ -128,8 +141,8 @@
                         </div>
 
                         <!-- Data Bantuan Bencana -->
-                        <div x-data="{ open: {{ request()->routeIs('admin.aid-disasters.*') ? 'true' : 'false' }} }">
-                            <button @click="open = !open" class="w-full flex items-center justify-between px-4 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.aid-disasters.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100' }}">
+                        <div x-data="{ open: {{ request()->routeIs('admin.aid-disasters.*') || request()->routeIs('admin.aid-recipients.*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open" class="w-full flex items-center justify-between px-4 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.aid-disasters.*') || request()->routeIs('admin.aid-recipients.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100' }}">
                                 <div class="flex items-center">
                                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -142,7 +155,10 @@
                             </button>
                             <div x-show="open" x-collapse class="ml-4 mt-1 space-y-1">
                                 <a href="{{ route('admin.aid-disasters.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-disasters.index') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                                    Daftar Bantuan
+                                    Distribusi Bantuan
+                                </a>
+                                <a href="{{ route('admin.aid-recipients.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-recipients.index') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">
+                                    Data Penerima
                                 </a>
                             </div>
                         </div>
@@ -153,13 +169,20 @@
         </aside>
 
         <!-- Main Content -->
-        <div class="flex-1 ml-64">
+        <div class="flex-1 md:ml-64 w-full min-w-0 transition-all duration-300">
             <!-- Top Navigation -->
             <nav class="bg-white shadow-sm border-b border-gray-200">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between h-16">
                         <div class="flex items-center">
-                            <h2 id="page-title" class="text-xl font-semibold text-gray-800">@yield('page-title', 'Dashboard')</h2>
+                            <!-- Mobile Menu Button -->
+                            <button @click="sidebarOpen = true" class="md:hidden mr-4 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                                <span class="sr-only">Buka sidebar</span>
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            </button>
+                            <h2 id="page-title" class="text-xl font-semibold text-gray-800 truncate">@yield('page-title', 'Dashboard')</h2>
                         </div>
                         <div class="flex items-center">
                             <x-dropdown align="right" width="48">

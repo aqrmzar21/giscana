@@ -13,7 +13,10 @@ class DistrictSeeder extends Seeder
      */
     public function run(): void
     {
-        District::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('villages')->truncate();
+        DB::table('districts')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $geojsonPath = public_path('geojson/kawasan-pesisir.geojson');
         

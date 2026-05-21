@@ -24,6 +24,9 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return $this->partialView('dashboard', compact('aidByDistrict'));
+        // Semua data bantuan kecamatan untuk tabel
+        $aidDisasters = AidDisaster::orderBy('district_name')->get();
+
+        return $this->partialView('dashboard', compact('aidByDistrict', 'aidDisasters'));
     }
 }

@@ -16,6 +16,7 @@
 
     const villageBoundariesLayer = L.layerGroup();
     let villageGeojsonLoaded = false;
+    let villageAidsData = {};
 
     function invalidateMapSize() {
         map.invalidateSize({ animate: false });
@@ -83,6 +84,7 @@
         fetch(url)
             .then(response => response.json())
             .then(data => {
+                villageAidsData = data.village_aids || {};
                 if (data.map_extent) {
                     const sw = data.map_extent.southwest;
                     const ne = data.map_extent.northeast;
@@ -188,6 +190,12 @@
                                 Terdistribusi: ${p.distributed_aid ?? '-'}<br>
                                 Persentase: ${p.distribution_percentage ?? '-'}%
                             `);
+
+                            const vToggle = document.getElementById('toggle_village_boundaries');
+                            if (vToggle && vToggle.checked) {
+                                polygon._storedPopup = polygon.getPopup();
+                                polygon.unbindPopup();
+                            }
                         });
                     });
                 }
@@ -241,6 +249,15 @@
         villageToggle.addEventListener('change', () => {
             if (villageToggle.checked) {
                 villageBoundariesLayer.addTo(map);
+
+                // Sembunyikan popup kecamatan
+                layers.districtBoundaries.eachLayer(layer => {
+                    if (layer.getPopup()) {
+                        layer._storedPopup = layer.getPopup();
+                        layer.unbindPopup();
+                    }
+                });
+
                 if (!villageGeojsonLoaded) {
                     villageGeojsonLoaded = true;
                     const files = [
@@ -263,11 +280,26 @@
                                         dashArray: '3 3'
                                     },
                                     onEachFeature: function(feature, layer) {
-                                        if (feature.properties && feature.properties.NAMOBJ) {
-                                            layer.bindTooltip(`<strong>Desa/Kel: ${feature.properties.NAMOBJ}</strong>`, {
-                                                sticky: true,
-                                                className: 'bg-white rounded shadow-sm text-sm'
-                                            });
+                                        if (feature.properties) {
+                                            const name = feature.properties.nama || feature.properties.kel_desa || feature.properties.NAMOBJ || 'Tidak diketahui';
+                                            const key = name.toLowerCase().replace(/desa |kelurahan /g, '').trim();
+                                            const aidInfo = villageAidsData[key];
+                                            
+                                            let aidHtml = '-';
+                                            if (aidInfo && aidInfo.total_amount > 0) {
+                                                const types = aidInfo.aid_types && aidInfo.aid_types.length > 0 ? aidInfo.aid_types.join(', ') : '-';
+                                                // Format ke Rupiah
+                                                // const formattedAmount = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(aidInfo.total_amount);
+                                                aidHtml = `
+                                                    Jenis Bantuan: ${types}<br>
+                                                    Total Disalurkan: ${aidInfo.total_amount}
+                                                `;
+                                            }
+                                            
+                                            layer.bindPopup(`
+                                                <strong>${name}</strong><br>
+                                                ${aidHtml}
+                                            `);
                                         }
                                     }
                                 }).addTo(villageBoundariesLayer);
@@ -277,6 +309,13 @@
                 }
             } else {
                 map.removeLayer(villageBoundariesLayer);
+
+                // Tampilkan kembali popup kecamatan
+                layers.districtBoundaries.eachLayer(layer => {
+                    if (layer._storedPopup && !layer.getPopup()) {
+                        layer.bindPopup(layer._storedPopup);
+                    }
+                });
             }
         });
 

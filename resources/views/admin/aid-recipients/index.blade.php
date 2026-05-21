@@ -1,0 +1,174 @@
+@extends('layouts.admin')
+
+@section('title', 'Data Penerima Bantuan - Admin')
+
+@section('page-title', 'Manajemen Penerima Bantuan')
+
+@section('breadcrumb')
+<li class="inline-flex items-center">
+    <a href="{{ route('dashboard') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-indigo-600">Dashboard</a>
+    <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+</li>
+<li class="inline-flex items-center">
+    <span class="text-sm font-medium text-gray-500">Penerima Bantuan</span>
+</li>
+@endsection
+
+@section('content')
+<div class="bg-white shadow rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+        <div class="sm:flex sm:items-center justify-between mb-4">
+            <div class="sm:flex-auto">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Data Penerima Bantuan</h3>
+                <p class="mt-2 text-sm text-gray-700">Daftar lengkap masyarakat yang telah menerima bantuan.</p>
+            </div>
+            <div class="mt-4 sm:mt-0 sm:ml-4 sm:flex-none flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                <a href="{{ route('admin.aid-recipients.create') }}" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto whitespace-nowrap">
+                    <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Tambah Data Baru
+                </a>
+            </div>
+        </div>
+
+        {{-- ── FILTER + CETAK ROW ──────────────────────────────────────── --}}
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
+            <form action="{{ route('admin.aid-recipients.index') }}" method="GET" class="flex flex-col sm:flex-row gap-2">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari penerima atau desa..." class="block w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                
+                <div class="flex items-center space-x-2">
+                    <input type="date" name="start_date" value="{{ request('start_date') }}" class="block w-full sm:w-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <span class="text-sm text-gray-500">s/d</span>
+                    <input type="date" name="end_date" value="{{ request('end_date') }}" class="block w-full sm:w-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                </div>
+
+                <button type="submit" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Filter
+                </button>
+
+                @if(request()->anyFilled(['search', 'start_date', 'end_date']))
+                    <a href="{{ route('admin.aid-recipients.index') }}" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        Reset
+                    </a>
+                @endif
+            </form>
+
+            {{-- Tombol Cetak PDF --}}
+            @php
+                $printUrl    = route('admin.aid-recipients.print');
+                $printParams = [];
+                if (request('search'))     $printParams['search']     = request('search');
+                if (request('start_date')) $printParams['start_date'] = request('start_date');
+                if (request('end_date'))   $printParams['end_date']   = request('end_date');
+                if ($printParams)          $printUrl .= '?' . http_build_query($printParams);
+            @endphp
+            <a href="{{ $printUrl }}" target="_blank"
+               class="inline-flex items-center justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap sm:ml-auto">
+                <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                Cetak PDF{{ request('search') || request('start_date') || request('end_date') ? ' (Filter)' : ' (Semua)' }}
+            </a>
+        </div>
+
+        <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+            <table class="min-w-full divide-y divide-gray-300">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">NO</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tanggal</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Penerima</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Jenis Bantuan</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Jumlah</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Desa/Kel</th>
+                        <!-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kecamatan</th> -->
+                        <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                            <span class="sr-only">Aksi</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    @forelse($aidRecipients as $recipient)
+                    <tr>
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                            {{ $loop->iteration + ($aidRecipients->currentPage() - 1) * $aidRecipients->perPage() }}
+                        </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {{ $recipient->date->format('d/m/Y') }}
+                        </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-900">
+                            {{ $recipient->recipient_name }}
+                        </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">
+                                {{ $recipient->aid_type }}
+                            </span>
+                        </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {{ number_format($recipient->amount, 0, ',', '.') }}
+                        </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {{ $recipient->village->yard ?? '-' }}
+                        </td>
+                        <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $recipient->district->name ?? '-' }}</td> -->
+                        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                            <div class="flex items-center justify-end space-x-2">
+                                <a href="{{ route('admin.aid-recipients.show', $recipient) }}" class="text-indigo-600 hover:text-indigo-900">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </a>
+                                <a href="{{ route('admin.aid-recipients.edit', $recipient) }}" class="text-yellow-600 hover:text-yellow-900">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </a>
+                                <form action="{{ route('admin.aid-recipients.destroy', $recipient) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data penerima ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:text-red-900">
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 text-center sm:pl-6">
+                            Tidak ada data penerima bantuan.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-700">Tampilkan</span>
+                <form action="{{ request()->url() }}" method="GET" class="inline-block">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+                    <select name="per_page" onchange="this.form.submit()" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-1 pl-3 pr-8">
+                        <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+                <span class="text-sm text-gray-700">data</span>
+            </div>
+            
+            <div class="w-full sm:w-auto">
+                {{ $aidRecipients->links() }}
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
