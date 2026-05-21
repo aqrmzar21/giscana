@@ -28,6 +28,14 @@ class EvacuationRoute extends Model
     ];
 
     /**
+     * Get the evacuation facility associated with the route.
+     */
+    public function evacuationFacility()
+    {
+        return $this->belongsTo(EvacuationFacility::class);
+    }
+
+    /**
      * Scope for active routes
      */
     public function scopeActive($query)

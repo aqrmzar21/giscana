@@ -90,13 +90,9 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">NO</th>
-<<<<<<< HEAD
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nama</th>
-=======
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nama Rute</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nama Fasilitas</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kecamatan</th>
->>>>>>> f9d22c5180283f088f98e8f158ddcef8b88ced5c
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tipe Rute</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
                         <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -109,11 +105,8 @@
                     <tr>
                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ $loop->iteration }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $route->name }}</td>
-<<<<<<< HEAD
-=======
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $route->nama_fasilitas ?? $route->evacuationFacility?->name ?? '-' }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $route->evacuationFacility?->district_name ?? '-' }}</td>
->>>>>>> f9d22c5180283f088f98e8f158ddcef8b88ced5c
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($route->route_type === 'primary')
                                 <span class="inline-flex rounded-full bg-indigo-100 px-2 text-xs font-semibold leading-5 text-indigo-800">Utama</span>

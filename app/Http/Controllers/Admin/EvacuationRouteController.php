@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\PartialRenderable;
+use App\Models\EvacuationFacility;
 use App\Models\EvacuationRoute;
 use Illuminate\Http\Request;
 
@@ -15,10 +16,6 @@ class EvacuationRouteController extends Controller
      */
     public function index(Request $request)
     {
-<<<<<<< HEAD
-        $routes = EvacuationRoute::latest()->paginate(15);
-        return view('admin.evacuation-routes.index', compact('routes'));
-=======
         $query = EvacuationRoute::with('evacuationFacility');
 
         // Ambil daftar kecamatan unik dari tabel aid_disasters
@@ -84,7 +81,6 @@ class EvacuationRouteController extends Controller
         $fileName .= '.pdf';
 
         return $pdf->stream($fileName);
->>>>>>> f9d22c5180283f088f98e8f158ddcef8b88ced5c
     }
 
     /**
@@ -92,12 +88,8 @@ class EvacuationRouteController extends Controller
      */
     public function create()
     {
-<<<<<<< HEAD
-        return view('admin.evacuation-routes.create');
-=======
         $facilities = EvacuationFacility::active()->orderBy('name')->get();
         return $this->partialView('admin.evacuation-routes.create', compact('facilities'));
->>>>>>> f9d22c5180283f088f98e8f158ddcef8b88ced5c
     }
 
     /**
@@ -137,12 +129,8 @@ class EvacuationRouteController extends Controller
      */
     public function edit(EvacuationRoute $evacuationRoute)
     {
-<<<<<<< HEAD
-        return view('admin.evacuation-routes.edit', compact('evacuationRoute'));
-=======
         $facilities = EvacuationFacility::active()->orderBy('name')->get();
         return $this->partialView('admin.evacuation-routes.edit', compact('evacuationRoute', 'facilities'));
->>>>>>> f9d22c5180283f088f98e8f158ddcef8b88ced5c
     }
 
     /**
