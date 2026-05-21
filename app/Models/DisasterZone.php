@@ -81,16 +81,13 @@ class DisasterZone extends Model
                 'area_hectares' => $this->area_hectares,
                 'affected_population' => $this->affected_population,
             ],
-<<<<<<< HEAD
             'geometry' => $isPoint
                 ? ['type' => 'Point', 'coordinates' => $coords]
                 : ['type' => 'Polygon', 'coordinates' => $coords],
-=======
             'geometry' => [
                 'type' => 'Point',
                 'coordinates' => $this->point_coordinates,
             ],
->>>>>>> f9d22c5180283f088f98e8f158ddcef8b88ced5c
         ];
     }
 }
