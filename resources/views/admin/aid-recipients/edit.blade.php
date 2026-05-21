@@ -1,8 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', 'Ubah Data Penerima Bantuan - Admin')
+@section('title', 'Edit Penerima Bantuan - Admin')
 
-@section('page-title', 'Ubah Data Penerima Bantuan')
+@section('page-title', 'Edit Penerima Bantuan')
 
 @section('breadcrumb')
 <li class="inline-flex items-center">
@@ -14,14 +14,14 @@
     <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
 </li>
 <li class="inline-flex items-center">
-    <span class="text-sm font-medium text-gray-500">Ubah Data</span>
+    <span class="text-sm font-medium text-gray-500">Edit</span>
 </li>
 @endsection
 
 @section('content')
 <div class="bg-white shadow rounded-lg">
     <div class="px-4 py-5 sm:p-6">
-        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-6">Form Ubah Data Penerima Bantuan</h3>
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-6">Form Edit Penerima Bantuan</h3>
         
         <form action="{{ route('admin.aid-recipients.update', $aidRecipient) }}" method="POST">
             @csrf
@@ -158,37 +158,37 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const districtSelect = document.getElementById('district_id');
-    const villageSelect = document.getElementById('village_id');
-    if (!districtSelect || !villageSelect) {
-        return;
-    }
-
-    const villageOptions = Array.from(villageSelect.querySelectorAll('option[data-district-id]'));
-
-    function filterVillages() {
-        const selectedDistrictId = districtSelect.value;
-        const selectedVillageOption = villageSelect.options[villageSelect.selectedIndex];
-
-        villageOptions.forEach(option => {
-            const matchesDistrict = selectedDistrictId && option.dataset.districtId === selectedDistrictId;
-            option.hidden = !matchesDistrict;
-            option.disabled = !matchesDistrict;
-        });
-
-        const selectedVillageMatchesDistrict =
-            selectedVillageOption &&
-            selectedVillageOption.dataset &&
-            selectedVillageOption.dataset.districtId === selectedDistrictId;
-
-        if (!selectedVillageMatchesDistrict) {
-            villageSelect.value = '';
+    document.addEventListener('DOMContentLoaded', function () {
+        const districtSelect = document.getElementById('district_id');
+        const villageSelect = document.getElementById('village_id');
+        if (!districtSelect || !villageSelect) {
+            return;
         }
-    }
 
-    districtSelect.addEventListener('change', filterVillages);
-    filterVillages();
-});
+        const villageOptions = Array.from(villageSelect.querySelectorAll('option[data-district-id]'));
+
+        function filterVillages() {
+            const selectedDistrictId = districtSelect.value;
+            const selectedVillageOption = villageSelect.options[villageSelect.selectedIndex];
+
+            villageOptions.forEach(option => {
+                const matchesDistrict = selectedDistrictId && option.dataset.districtId === selectedDistrictId;
+                option.hidden = !matchesDistrict;
+                option.disabled = !matchesDistrict;
+            });
+
+            const selectedVillageMatchesDistrict =
+                selectedVillageOption &&
+                selectedVillageOption.dataset &&
+                selectedVillageOption.dataset.districtId === selectedDistrictId;
+
+            if (!selectedVillageMatchesDistrict) {
+                villageSelect.value = '';
+            }
+        }
+
+        districtSelect.addEventListener('change', filterVillages);
+        filterVillages();
+    });
 </script>
 @endsection
