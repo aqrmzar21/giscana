@@ -299,6 +299,8 @@ const PJAX = (() => {
     }
 
     function handleClick(event) {
+        if (event.defaultPrevented) return;
+
         // Cari anchor element terdekat
         const anchor = event.target.closest('a');
         if (!shouldIntercept(anchor)) return;

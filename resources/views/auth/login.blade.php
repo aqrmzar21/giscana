@@ -39,9 +39,9 @@
 
                     <div class="flex items-center justify-center mt-6">
 
-                        <x-primary-button class="bg-blue-100 hover:bg-blue-700">
+                        <button class="inline-flex justify-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                             {{ __('Log in') }}
-                        </x-primary-button>
+                        </button>
                     </div>
                 </form>
 
