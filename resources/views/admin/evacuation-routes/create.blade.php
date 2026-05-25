@@ -26,33 +26,55 @@
         <form action="{{ route('admin.evacuation-routes.store') }}" method="POST">
             @csrf
             <div class="space-y-6">
-                <div>
-                    <label for="evacuation_facility_id" class="block text-sm font-medium text-gray-700">Fasilitas Tujuan (Titik Kumpul)</label>
-                    <div class="mt-1">
-                        <select name="evacuation_facility_id" id="evacuation_facility_id" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('evacuation_facility_id') border-red-300 @enderror">
-                            <option value="">-- Pilih Fasilitas Evakuasi --</option>
-                            @foreach($facilities as $f)
-                                <option value="{{ $f->id }}" {{ old('evacuation_facility_id') == $f->id ? 'selected' : '' }}>{{ $f->name }}</option>
-                            @endforeach
-                        </select>
-                        <p class="mt-2 text-sm text-gray-500">Nama fasilitas diambil dari field name tabel evacuation_facilities.</p>
-                        @error('evacuation_facility_id')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
 
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Nama Rute <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <input type="text" name="name" id="name" value="{{ old('name') }}" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('name') border-red-300 @enderror">
-                        @error('name')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+
+                    <!-- <div>
+                        <label for="district_name" class="block text-sm font-medium text-gray-700">Kecamatan</label>
+                        <div class="mt-1">
+                            <select name="district_name" id="district_name"
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('district_name') border-red-300 @enderror">
+                                <option value="">-- Pilih Kecamatan --</option>
+                                @foreach($kec as $k)
+                                    <option value="{{ $k->district_name }}" {{ old('district_name') == $k->district_name ? 'selected' : '' }}>
+                                        {{ $k->district_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('district_name')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div> -->
+
+                    <div>
+                        <label for="evacuation_facility_id" class="block text-sm font-medium text-gray-700">Fasilitas Tujuan</label>
+                        <div class="mt-1">
+                            <select name="evacuation_facility_id" id="evacuation_facility_id" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('evacuation_facility_id') border-red-300 @enderror">
+                                <option value="">-- Pilih Fasilitas Evakuasi --</option>
+                                @foreach($facilities as $f)
+                                    <option value="{{ $f->id }}" {{ old('evacuation_facility_id') == $f->id ? 'selected' : '' }}>{{ $f->name }}</option>
+                                @endforeach
+                            </select>
+                            <p class="mt-2 text-sm text-gray-500">Nama fasilitas diambil dari Titik Kumpul</p>
+                            @error('evacuation_facility_id')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
+
                 </div>
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Nama Rute <span class="text-red-500">*</span></label>
+                        <div class="mt-1">
+                            <input type="text" name="name" id="name" value="{{ old('name') }}" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('name') border-red-300 @enderror">
+                            @error('name')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
 
                     <div>
                         <label for="route_type" class="block text-sm font-medium text-gray-700">Tipe Rute <span class="text-red-500">*</span></label>
@@ -115,3 +137,4 @@
     </div>
 </div>
 @endsection
+

@@ -86,11 +86,15 @@ class EvacuationRouteController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+   public function create()
     {
+        // ambil daftar kecamatan unik dari fasilitas
+        $kec = EvacuationFacility::select('district_name')->distinct()->orderBy('district_name')->get();
         $facilities = EvacuationFacility::active()->orderBy('name')->get();
-        return $this->partialView('admin.evacuation-routes.create', compact('facilities'));
+
+        return $this->partialView('admin.evacuation-routes.create', compact('kec','facilities'));
     }
+
 
     /**
      * Store a newly created resource in storage.
