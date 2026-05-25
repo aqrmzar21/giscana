@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <div class="sm:flex px-4 py-5 justify-evenly">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
             <form action="{{ route('admin.evacuation-facilities.index') }}" method="GET" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
             <select name="district_name" class="block w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                 <option value="">Semua Kecamatan</option>
