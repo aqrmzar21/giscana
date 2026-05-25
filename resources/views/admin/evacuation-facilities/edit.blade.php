@@ -119,14 +119,6 @@
 
                 <div class="space-y-3">
                     <div class="flex items-center">
-                        <input id="has_medical_facility" name="has_medical_facility" type="checkbox" value="1" {{ old('has_medical_facility', $evacuationFacility->has_medical_facility) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                        <label for="has_medical_facility" class="ml-2 block text-sm text-gray-900">Memiliki Fasilitas Medis</label>
-                    </div>
-                    <div class="flex items-center">
-                        <input id="has_food_storage" name="has_food_storage" type="checkbox" value="1" {{ old('has_food_storage', $evacuationFacility->has_food_storage) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                        <label for="has_food_storage" class="ml-2 block text-sm text-gray-900">Memiliki Penyimpanan Makanan</label>
-                    </div>
-                    <div class="flex items-center">
                         <input id="is_accessible" name="is_accessible" type="checkbox" value="1" {{ old('is_accessible', $evacuationFacility->is_accessible) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                         <label for="is_accessible" class="ml-2 block text-sm text-gray-900">Aksesibel</label>
                     </div>
