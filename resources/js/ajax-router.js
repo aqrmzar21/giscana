@@ -94,7 +94,7 @@ const PJAX = (() => {
 
             // Peta admin dan dashboard khusus menggunakan exact match
             const isDashboardOrMap = elPath === '/dashboard' || elPath === '/dashboard/map';
-            
+
             let isMatch = false;
             if (isDashboardOrMap) {
                 isMatch = pathname === elPath;
@@ -116,7 +116,7 @@ const PJAX = (() => {
                 const dropdown = el.closest('[x-data]');
                 if (dropdown) {
                     if (dropdown._x_dataStack) {
-                        try { dropdown._x_dataStack[0].open = true; } catch (_) {}
+                        try { dropdown._x_dataStack[0].open = true; } catch (_) { }
                     }
                     const parentBtn = dropdown.querySelector('button');
                     if (parentBtn) {
@@ -160,7 +160,7 @@ const PJAX = (() => {
         const metaEl = doc.getElementById('pjax-meta');
         let meta = {};
         if (metaEl) {
-            try { meta = JSON.parse(metaEl.textContent.trim()); } catch (_) {}
+            try { meta = JSON.parse(metaEl.textContent.trim()); } catch (_) { }
         }
 
         // Ambil content wrapper
@@ -180,7 +180,7 @@ const PJAX = (() => {
 
             // Re-init Alpine.js untuk konten baru
             if (window.Alpine) {
-                try { window.Alpine.initTree(pageContent); } catch (_) {}
+                try { window.Alpine.initTree(pageContent); } catch (_) { }
             }
 
             // Update title
@@ -299,6 +299,8 @@ const PJAX = (() => {
     }
 
     function handleClick(event) {
+        if (event.defaultPrevented) return;
+
         // Cari anchor element terdekat
         const anchor = event.target.closest('a');
         if (!shouldIntercept(anchor)) return;
