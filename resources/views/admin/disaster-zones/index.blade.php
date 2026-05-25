@@ -120,9 +120,9 @@
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $zone->affected_population }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($zone->is_active)
-                            <span class="inline-flex rounded-full bg-green-100 px-2 leading-3 text-sm text-green-800">Aktif</span>
+                            <span class="inline-flex rounded-full bg-blue-100 p-2 leading-3 text-sm text-blue-800 font-semibold text-xs">Aktif</span>
                             @else
-                            <span class="inline-flex rounded-full bg-gray-100 px-2 leading-3 text-sm text-gray-800">Tidak Aktif</span>
+                            <span class="inline-flex rounded-full bg-gray-100 p-2 leading-3 text-sm text-gray-800 font-semibold text-xs">Tidak Aktif</span>
                             @endif
                         </td>
                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
