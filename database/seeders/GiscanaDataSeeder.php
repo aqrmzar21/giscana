@@ -51,11 +51,11 @@ class GiscanaDataSeeder extends Seeder
             ['email' => 'staff@giscana.local'],
             [
                 'uuid' => (string) Str::uuid(),
-                'name' => 'BPBD Staff',
+                'name' => 'Taruna Remaja Patoa',
                 'password' => bcrypt('staff123'),
                 'role' => 'staff',
                 'phone' => '+6281234567891',
-                'organization' => 'BPBD Bone Pesisir',
+                'organization' => 'Relawan Bulawa',
                 'is_active' => true,
             ]
         );
