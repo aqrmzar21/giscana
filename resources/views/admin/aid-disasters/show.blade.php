@@ -39,7 +39,7 @@
         {{-- Progress distribusi --}}
         @if(!is_null($aidDisaster->distribution_percentage))
             <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-                <p class="text-sm font-medium text-gray-700 mb-2">Aid Distribution Progress</p>
+                <p class="text-sm font-medium text-gray-700 mb-2">Progress</p>
                 <div class="flex items-center gap-3">
                     <div class="flex-1 bg-gray-200 rounded-full h-4">
                         <div class="h-4 rounded-full transition-all duration-500 {{ $aidDisaster->distribution_percentage >= 100 ? 'bg-green-500' : ($aidDisaster->distribution_percentage >= 50 ? 'bg-yellow-500' : 'bg-red-500') }}"
@@ -52,19 +52,19 @@
 
         <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
             <div>
-                <dt class="text-sm font-medium text-gray-500">District Name</dt>
+                <dt class="text-sm font-medium text-gray-500">Kecamatan</dt>
                 <dd class="mt-1 text-sm font-semibold text-gray-900">{{ $aidDisaster->district_name }}</dd>
             </div>
             <div>
-                <dt class="text-sm font-medium text-gray-500">Total Recipients</dt>
+                <dt class="text-sm font-medium text-gray-500">Total Penerima</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ number_format($aidDisaster->total_recipients ?? 0) }} people</dd>
             </div>
             <div>
-                <dt class="text-sm font-medium text-gray-500">Distributed Aid</dt>
+                <dt class="text-sm font-medium text-gray-500">Bantuan Terdistribusi</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ number_format($aidDisaster->distributed_aid ?? 0) }} people</dd>
             </div>
             <div>
-                <dt class="text-sm font-medium text-gray-500">Remaining Aid</dt>
+                <dt class="text-sm font-medium text-gray-500">Sisa Bantuan</dt>
                 <dd class="mt-1 text-sm text-gray-900">
                     @if(!is_null($aidDisaster->remaining_aid))
                         <span class="{{ $aidDisaster->remaining_aid > 0 ? 'text-orange-600 font-semibold' : 'text-green-600 font-semibold' }}">
@@ -85,20 +85,20 @@
                     @endif
                 </dd>
             </div>
-            <div>
+            <!-- <div>
                 <dt class="text-sm font-medium text-gray-500">Last API Sync</dt>
                 <dd class="mt-1 text-sm text-gray-900">
                     {{ $aidDisaster->last_synced_at ? $aidDisaster->last_synced_at->format('d/m/Y H:i:s') : 'Never synced' }}
                 </dd>
-            </div>
-            <div>
+            </div> -->
+            <!-- <div>
                 <dt class="text-sm font-medium text-gray-500">Created At</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $aidDisaster->created_at->format('d/m/Y H:i:s') }}</dd>
-            </div>
-            <div>
+            </div> -->
+            <!-- <div>
                 <dt class="text-sm font-medium text-gray-500">Updated At</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $aidDisaster->updated_at->format('d/m/Y H:i:s') }}</dd>
-            </div>
+            </div> -->
         </dl>
 
         <div class="mt-6 flex items-center justify-end">
