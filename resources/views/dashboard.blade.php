@@ -13,6 +13,21 @@
 @endsection
 
 @section('content')
+<!-- Welcome Card  -->
+<div class="lg:col-span-2 bg-white shadow rounded-lg mb-6">
+    <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Selamat Datang!</h3>
+            <p class="text-gray-500 text-sm mb-4">
+                Halo <strong class="text-blue-800">{{ Auth::user()->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
+            </p>
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</div>
+
 <!-- Statistics Cards -->
 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-6">
     <div class="bg-white overflow-hidden shadow rounded-lg">
@@ -109,21 +124,7 @@
     
 </div>
 
-<div class="lg:col-span-2 bg-white shadow rounded-lg mb-6">
-        <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-center gap-4">
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">Selamat Datang!</h3>
-                <p class="text-gray-500 text-sm mb-4">
-                    Halo <strong class="text-blue-800">{{ Auth::user()->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
-                </p>
-            </div>
-            <div>
-                
-            </div>
-        </div>
-    </div>
-
-<!-- Welcome Card + Pie Chart Row -->
+<!-- Pie Chart Row -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
 
     {{-- Welcome Card --}}
