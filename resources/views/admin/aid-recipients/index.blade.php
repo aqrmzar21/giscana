@@ -107,11 +107,9 @@
                             </span>
                         </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {{ number_format($recipient->amount, 0, ',', '.') }}
+                            <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">{{ number_format($recipient->amount, 0, ',', '.') }}</span>
                         </td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {{ $recipient->village->yard ?? '-' }}
-                        </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $recipient->village->yard ?? '-' }}</td>
                         <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $recipient->district->name ?? '-' }}</td> -->
                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                             <div class="flex items-center justify-end space-x-2">

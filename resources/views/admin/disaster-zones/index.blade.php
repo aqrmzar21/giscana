@@ -108,7 +108,7 @@
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $zone->district ? $zone->district->name : '-' }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($zone->risk_level === 'low')
-                            <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Rendah</span>
+                            <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">Rendah</span>
                             @elseif($zone->risk_level === 'medium')
                                 <span class="inline-flex rounded-full bg-yellow-100 px-2 text-xs font-semibold leading-5 text-yellow-800">Sedang</span>
                             @elseif($zone->risk_level === 'high')
@@ -120,7 +120,7 @@
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $zone->affected_population }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($zone->is_active)
-                            <span class="inline-flex rounded-full bg-blue-100 p-2 leading-3 text-sm text-blue-800 font-semibold text-xs">Aktif</span>
+                                <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Aktif</span>
                             @else
                             <span class="inline-flex rounded-full bg-gray-100 p-2 leading-3 text-sm text-gray-800 font-semibold text-xs">Tidak Aktif</span>
                             @endif
