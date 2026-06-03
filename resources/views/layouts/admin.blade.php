@@ -147,12 +147,17 @@
                                 </svg>
                             </button>
                             <div x-show="open" x-collapse class="ml-4 mt-1 space-y-1">
-                                <a href="{{ route('admin.aid-disasters.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-disasters.index') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                                    Distribusi Bantuan
-                                </a>
+                                @role('admin')
+                                <a href="{{ route('admin.aid-disasters.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-disasters.index') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">Distribusi Bantuan</a>
+                                @endrole
                                 <a href="{{ route('admin.aid-recipients.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-recipients.index') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">
                                     Penerima Bantuan
                                 </a>
+                                @role('staff')
+                                <a href="{{ route('admin.aid-recipients.create') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-recipients.create') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50' }}">
+                                    Tambah Penerima Baru
+                                </a>
+                                @endrole
                             </div>
                         </div>
                     </div>
