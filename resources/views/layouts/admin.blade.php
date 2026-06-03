@@ -63,7 +63,7 @@
                     @endif
                 </div>
 
-                @if (Auth::user()->isAdmin())
+                @if (Auth::user()->isAdmin() || Auth::user()->isStaff())
                 <div class="mt-8">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Manajemen Data</p>
                     <div class="mt-2 space-y-1">
