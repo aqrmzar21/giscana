@@ -65,7 +65,7 @@
                             @endphp
                             <div class="flex items-center">
                                 <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                                    <div class="bg-yellow-600 h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
+                                    <div class="bg-yellow-400 h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
                                 </div>
                                 <span>{{ round($percentage, 1) }}%</span>
                             </div>
