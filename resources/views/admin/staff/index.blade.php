@@ -73,9 +73,9 @@
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $staff->organization ?? '-' }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($staff->is_active)
-                            <span class="inline-flex rounded-full bg-green-100 px-2 leading-3 text-sm text-green-800">Aktif</span>
+                            <span class="inline-flex rounded-full bg-green-100 px-2 py-1 leading-3 text-xs text-green-800">Aktif</span>
                             @else
-                            <span class="inline-flex rounded-full bg-gray-100 px-2 leading-3 text-sm text-gray-800">Tidak Aktif</span>
+                            <span class="inline-flex rounded-full bg-gray-100 px-2 py-1 leading-3 text-xs text-gray-800">Tidak Aktif</span>
                             @endif
                         </td>
                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">

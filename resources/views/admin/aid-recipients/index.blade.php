@@ -19,7 +19,7 @@
     <div class="px-4 py-5 sm:p-6">
         <div class="sm:flex sm:items-center justify-between mb-4">
             <div class="sm:flex-auto">
-                <h3 class="text-lg font-medium leading-6 text-gray-900">Data Penerima Bantuan</h3>
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Daftar Penerima Bantuan</h3>
                 <p class="mt-2 text-sm text-gray-700">Daftar lengkap masyarakat yang telah menerima bantuan.</p>
             </div>
             <div class="mt-4 sm:mt-0 sm:ml-4 sm:flex-none flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">

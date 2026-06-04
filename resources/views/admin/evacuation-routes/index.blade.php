@@ -22,7 +22,7 @@
         <div class="sm:flex sm:items-center justify-between mb-4">
             <div class="sm:flex-auto">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Daftar Rute Evakuasi</h3>
-                <p class="mt-2 text-sm text-gray-700">Daftar semua rute evakuasi yang terdaftar dalam sistem.</p>
+                <p class="mt-2 text-sm text-gray-700">Daftar semua rute alternatif evakuasi yang terdaftar dalam sistem.</p>
             </div>
             <div class="mt-4 sm:mt-0 sm:ml-4 sm:flex-none">
                 <a href="{{ route('admin.evacuation-routes.create') }}"
