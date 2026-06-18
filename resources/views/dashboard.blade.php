@@ -124,7 +124,21 @@
     
 </div>
 
-<!-- Pie Chart Row -->
+<div class="lg:col-span-2 bg-white shadow rounded-lg mb-6">
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-center gap-4">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Selamat Datang!</h3>
+                <p class="text-gray-500 text-sm mb-4">
+                    Halo <strong class="text-gray-800">{{ Auth::user()->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
+                </p>
+            </div>
+            <div>
+                
+            </div>
+        </div>
+    </div>
+
+<!-- Welcome Card + Pie Chart Row -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
 
     {{-- Welcome Card --}}
@@ -140,14 +154,11 @@
             <p class="mt-1 text-sm text-gray-500">Ringkasan penyaluran bantuan di tiap kecamatan.</p>
             <a href="{{ route('admin.aid-disasters.index') }}"
                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                <svg class="mr-2 -ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
+                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                 Data Bantuan Bencana
             </a>
             <a href="{{ route('admin.aid-recipients.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                 Data Penerima Bantuan
             </a>
         </div>
@@ -178,7 +189,7 @@
         </div>
         <div class="px-2 py-2">
             <table class="min-w-full divide-y divide-gray-300 rounded-lg mb-6">
-                <thead class="bg-white-50">
+                <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kecamatan</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Progres</th>
@@ -194,7 +205,7 @@
                             @endphp
                             <div class="flex items-center">
                                 <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                                    <div class="bg-yellow-400 h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
+                                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
                                 </div>
                                 <span>{{ round($percentage, 1) }}%</span>
                             </div>

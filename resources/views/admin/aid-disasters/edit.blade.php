@@ -37,40 +37,40 @@
 
         {{-- Info terakhir disync --}}
         @if($aidDisaster->last_synced_at)
-            <div class="mb-4 rounded-md bg-blue-50 p-3 flex items-center gap-2">
-                <svg class="h-4 w-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                <p class="text-sm text-blue-700">
+        <div class="mb-4 rounded-md bg-blue-50 p-3 flex items-center gap-2">
+            <svg class="h-4 w-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <p class="text-sm text-blue-700">
                     Last synced from API: <strong>{{ $aidDisaster->last_synced_at->format('d/m/Y H:i:s') }}</strong>
                 </p>
             </div>
         @endif
 
+        <div class="space-y-6">
         <form action="{{ route('admin.aid-disasters.update', $aidDisaster) }}" method="POST">
-            @csrf
-            @method('PUT')
-            <div class="space-y-6">
+                @csrf
+                @method('PUT')
+
+                <div>
+                    <label for="district_name" class="block text-sm font-medium text-gray-700">
+                        District Name <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-1">
+                        <input type="text" name="district_name" id="district_name"
+                            value="{{ old('district_name', $aidDisaster->district_name) }}" required
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('district_name') border-red-300 @enderror">
+                        @error('district_name')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
-                        <label for="district_name" class="block text-sm font-medium text-gray-700">
-                            Nama Kecamatan <span class="text-red-500">*</span>
-                        </label>
-                        <div class="mt-1">
-                            <input type="text" name="district_name" id="district_name"
-                                value="{{ old('district_name', $aidDisaster->district_name) }}" required
-                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('district_name') border-red-300 @enderror">
-                            @error('district_name')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div>
                         <label for="total_recipients" class="block text-sm font-medium text-gray-700">
-                            Total KK
+                            Total Recipients
                         </label>
                         <div class="mt-1">
                             <input type="number" name="total_recipients" id="total_recipients"
@@ -82,7 +82,7 @@
                         </div>
                     </div>
 
-                    <!-- <div>
+                    <div>
                         <label for="distributed_aid" class="block text-sm font-medium text-gray-700">
                             Distributed Aid
                         </label>
@@ -94,18 +94,20 @@
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
-                    </div> -->
+                    </div>
                 </div>
             </div>
+        </form>
 
 
-                <!-- <div class="flex items-center">
+                <div class="flex items-center">
                     <input id="is_active" name="is_active" type="checkbox" value="1"
                            {{ old('is_active', $aidDisaster->is_active) ? 'checked' : '' }}
                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                     <label for="is_active" class="ml-2 block text-sm text-gray-900">Aktif</label>
-                </div> -->
+                </div>
 
+            </div>
 
             <div class="mt-6 flex items-center justify-end space-x-3">
                 <a href="{{ route('admin.aid-disasters.index') }}"
@@ -113,10 +115,12 @@
                     Batal
                 </a>
                 <button type="submit"
-                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Update
-                </button>
-            </div>
+                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Update
+            </button>
+        </div>
+        
+    </div>
         </form>
     </div>
 </div>

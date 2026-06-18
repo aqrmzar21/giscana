@@ -31,10 +31,10 @@
     </div>
 
     <!-- Delete Account -->
-    <div class="bg-white shadow rounded-lg">
+    <!-- <div class="bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
             @include('profile.partials.delete-user-form')
         </div>
-    </div>
+    </div> -->
 </div>
 @endsection

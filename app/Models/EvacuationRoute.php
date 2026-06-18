@@ -11,8 +11,6 @@ class EvacuationRoute extends Model
     use HasFactory, HasUuid;
 
     protected $fillable = [
-        'evacuation_facility_id',
-        'nama_fasilitas',
         'name',
         'description',
         'disaster_type',
@@ -30,11 +28,11 @@ class EvacuationRoute extends Model
     ];
 
     /**
-     * Relasi: rute evakuasi menuju satu fasilitas evakuasi (evacuation_facility).
+     * Get the evacuation facility associated with the route.
      */
     public function evacuationFacility()
     {
-        return $this->belongsTo(EvacuationFacility::class, 'evacuation_facility_id');
+        return $this->belongsTo(EvacuationFacility::class);
     }
 
     /**
@@ -71,13 +69,12 @@ class EvacuationRoute extends Model
             'properties' => [
                 'id' => $this->id,
                 'name' => $this->name,
-                'nama_fasilitas' => $this->nama_fasilitas ?? $this->evacuationFacility?->name,
                 'disaster_type' => $this->disaster_type,
                 'route_type' => $this->route_type,
             ],
             'geometry' => [
                 'type' => 'LineString',
-                'coordinates' => $this->line_coordinates,
+                'coordinates' => $this->line_coordinates ?? [],
             ],
         ];
     }

@@ -151,31 +151,6 @@ class MapController extends Controller
         $matchedAidIds = collect($districtFeatures)->pluck('properties.id')->filter()->all();
         $aidDisastersFiltered = $aidDisasters->filter(fn (AidDisaster $a) => in_array($a->id, $matchedAidIds, true))->values();
 
-        // Get village aid recipients summary
-        $aidRecipients = \App\Models\AidRecipient::with('village')->get();
-        $villageAids = [];
-
-        foreach ($aidRecipients as $recipient) {
-            $villageName = $recipient->village ? $recipient->village->full_name : null;
-            if (!$villageName) continue;
-
-            $key = strtolower(trim(str_replace(['Desa ', 'Kelurahan '], '', $villageName)));
-
-            if (!isset($villageAids[$key])) {
-                $villageAids[$key] = [
-                    'aid_types' => [],
-                    'total_amount' => 0
-                ];
-            }
-
-            $type = $recipient->aid_type;
-            if (!empty($type) && !in_array($type, $villageAids[$key]['aid_types'])) {
-                $villageAids[$key]['aid_types'][] = $type;
-            }
-
-            $villageAids[$key]['total_amount'] += (int)$recipient->amount;
-        }
-
         return response()->json([
             'disaster_zones' => [
                 'type' => 'FeatureCollection',
@@ -206,15 +181,6 @@ class MapController extends Controller
             'district_boundaries' => [
                 'type' => 'FeatureCollection',
                 'features' => $districtFeatures,
-            ],
-            'village_aids' => $villageAids,
-            'map_extent' => [
-                'southwest' => [$bbox['min_lat'], $bbox['min_lng']],
-                'northeast' => [$bbox['max_lat'], $bbox['max_lng']],
-            ],
-            'map_region' => [
-                'regency' => self::MAP_REGENCY_NAME,
-                'province' => 'Gorontalo',
             ],
         ]);
     }

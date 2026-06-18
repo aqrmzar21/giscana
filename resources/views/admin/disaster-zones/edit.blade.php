@@ -62,7 +62,6 @@
                                 <option value="">Pilih Jenis Bencana</option>
                                 <option value="longsor" {{ old('disaster_type', $disasterZone->disaster_type) === 'longsor' ? 'selected' : '' }}>Longsor</option>
                                 <option value="banjir" {{ old('disaster_type', $disasterZone->disaster_type) === 'banjir' ? 'selected' : '' }}>Banjir</option>
-                                <option value="other" {{ old('disaster_type', $disasterZone->disaster_type) === 'other' ? 'selected' : '' }}>Lainnya</option>
                             </select>
                             @error('disaster_type')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
