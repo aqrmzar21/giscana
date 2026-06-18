@@ -133,7 +133,7 @@
                     const coordinates = feature.geometry.coordinates.map(coord => [coord[1], coord[0]]);
                     const polyline = L.polyline(coordinates, {
                         color: 'rgb(153, 0, 255)',
-                        weight: 4,
+                        weight: 10,
                         opacity: 0.8
                     }).addTo(layers.evacuationRoutes);
 
