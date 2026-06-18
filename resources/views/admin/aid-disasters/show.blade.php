@@ -26,6 +26,7 @@
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Detail Bantuan Bencana</h3>
             </div>
             <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex gap-2">
+                @can('update data')
                 <a href="{{ route('admin.aid-disasters.edit', $aidDisaster) }}"
                    class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,6 +34,7 @@
                     </svg>
                     Edit
                 </a>
+                @endcan
             </div>
         </div>
 
