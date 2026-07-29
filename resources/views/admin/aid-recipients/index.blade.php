@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Data Penerima Bantuan - Admin')
+@section('title', 'Daftar Penerima Bantuan - Admin')
 
 @section('page-title', 'Manajemen Penerima Bantuan')
 

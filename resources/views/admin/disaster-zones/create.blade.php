@@ -155,12 +155,13 @@
         </form>
     </div>
 </div>
-@endsection
-
-@push('scripts')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    (function () {
+        if (typeof L === 'undefined') {
+            console.error('Leaflet is not loaded');
+            return;
+        }
+
         // Initialize map centered at default location (Gorontalo area)
         var map = L.map('map').setView([0.545, 123.06], 11);
 
@@ -206,6 +207,6 @@
             // Format expected by backend: JSON array [lng, lat]
             document.getElementById('point_coordinates').value = JSON.stringify([lng, lat]);
         });
-    });
+    })();
 </script>
-@endpush
+@endsection
