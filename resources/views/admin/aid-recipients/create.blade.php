@@ -17,7 +17,6 @@
     <span class="text-sm font-medium text-gray-500">Tambah Data</span>
 </li>
 @endsection
-
 @section('content')
 <div class="bg-white shadow rounded-lg">
     <div class="px-4 py-5 sm:p-6">
@@ -156,38 +155,41 @@
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const districtSelect = document.getElementById('district_id');
-    const villageSelect = document.getElementById('village_id');
-    if (!districtSelect || !villageSelect) {
-        return;
-    }
 
-    const villageOptions = Array.from(villageSelect.querySelectorAll('option[data-district-id]'));
-
-    function filterVillages() {
-        const selectedDistrictId = districtSelect.value;
-        const selectedVillageOption = villageSelect.options[villageSelect.selectedIndex];
-
-        villageOptions.forEach(option => {
-            const matchesDistrict = selectedDistrictId && option.dataset.districtId === selectedDistrictId;
-            option.hidden = !matchesDistrict;
-            option.disabled = !matchesDistrict;
-        });
-
-        const selectedVillageMatchesDistrict =
-            selectedVillageOption &&
-            selectedVillageOption.dataset &&
-            selectedVillageOption.dataset.districtId === selectedDistrictId;
-
-        if (!selectedVillageMatchesDistrict) {
-            villageSelect.value = '';
-        }
-    }
-
-    districtSelect.addEventListener('change', filterVillages);
-    filterVillages();
-});
-</script>
 @endsection
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const districtSelect = document.getElementById('district_id');
+        const villageSelect = document.getElementById('village_id');
+        if (!districtSelect || !villageSelect) return;
+
+        const villageOptions = Array.from(villageSelect.querySelectorAll('option[data-district-id]'));
+
+        function filterVillages() {
+            const selectedDistrictId = districtSelect.value;
+            const selectedVillageOption = villageSelect.options[villageSelect.selectedIndex];
+
+            villageOptions.forEach(option => {
+                const matchesDistrict = selectedDistrictId && option.dataset.districtId === selectedDistrictId;
+                option.hidden = !matchesDistrict;
+                option.disabled = !matchesDistrict;
+            });
+
+            const selectedVillageMatchesDistrict =
+                selectedVillageOption &&
+                selectedVillageOption.dataset &&
+                selectedVillageOption.dataset.districtId === selectedDistrictId;
+
+            if (!selectedVillageMatchesDistrict) {
+                villageSelect.value = '';
+            }
+        }
+
+        districtSelect.addEventListener('change', filterVillages);
+
+        // 🔑 panggil sekali saat load
+        filterVillages();
+    });
+</script>
+@endpush

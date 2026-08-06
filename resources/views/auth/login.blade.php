@@ -37,35 +37,14 @@
                         <x-input-error :messages="$errors->get('password')" class="mt-2" />
                     </div>
 
-                    <!-- Remember Me -->
-                    <!-- <div class="block mt-4">
-                        <label for="remember_me" class="inline-flex items-center">
-                            <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-primary-600 shadow-sm focus:ring-primary-500" name="remember">
-                            <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-                        </label>
-                    </div> -->
 
-                    <div class="flex items-center justify-between mt-6">
-                        @if (Route::has('password.request'))
-                            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" href="{{ route('password.request') }}">
-                                {{ __('Forgot your password?') }}
-                            </a>
-                        @endif
-
-                        <x-primary-button class="bg-primary-600 hover:bg-primary-700">
+                    <div class="flex items-center justify-center mt-6">
+                        <button class="inline-flex justify-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             {{ __('Log in') }}
                         </button>
                     </div>
                 </form>
 
-                {{-- <div class="mt-6 text-center">
-                    <p class="text-sm text-gray-600">
-                        Belum punya akun? 
-                        <a href="{{ route('register') }}" class="font-medium text-primary-600 hover:text-primary-500">
-                            Daftar di sini
-                        </a>
-                    </p>
-                </div> --}}
 
             </div>
         </div>

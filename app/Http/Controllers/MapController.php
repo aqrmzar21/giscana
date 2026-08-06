@@ -151,6 +151,33 @@ class MapController extends Controller
         $matchedAidIds = collect($districtFeatures)->pluck('properties.id')->filter()->all();
         $aidDisastersFiltered = $aidDisasters->filter(fn (AidDisaster $a) => in_array($a->id, $matchedAidIds, true))->values();
 
+        // Calculate village aids
+        $aidRecipients = \App\Models\AidRecipient::with('village')->get();
+        $villageAids = [];
+
+        foreach ($aidRecipients as $recipient) {
+            $village = $recipient->village;
+            if (!$village) continue;
+
+            $name = $village->full_name ?? $village->yard ?? '';
+            $key = trim(str_replace(['desa ', 'kelurahan '], '', strtolower($name)));
+
+            if (!$key) continue;
+
+            if (!isset($villageAids[$key])) {
+                $villageAids[$key] = [
+                    'total_amount' => 0,
+                    'aid_types' => [],
+                ];
+            }
+
+            $villageAids[$key]['total_amount'] += (float) $recipient->amount;
+            
+            if ($recipient->aid_type && !in_array($recipient->aid_type, $villageAids[$key]['aid_types'])) {
+                $villageAids[$key]['aid_types'][] = $recipient->aid_type;
+            }
+        }
+
         return response()->json([
             'disaster_zones' => [
                 'type' => 'FeatureCollection',
@@ -182,6 +209,7 @@ class MapController extends Controller
                 'type' => 'FeatureCollection',
                 'features' => $districtFeatures,
             ],
+            'village_aids' => $villageAids,
         ]);
     }
 

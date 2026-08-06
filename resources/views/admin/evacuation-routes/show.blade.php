@@ -26,12 +26,14 @@
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Detail Rute Evakuasi</h3>
             </div>
             <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+                @can('update data')
                 <a href="{{ route('admin.evacuation-routes.edit', $evacuationRoute) }}" class="inline-flex items-center justify-center rounded-md border border-transparent bg-yellow-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
                     <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                     Edit
                 </a>
+                @endcan
             </div>
         </div>
 
@@ -39,18 +41,6 @@
             <div>
                 <dt class="text-sm font-medium text-gray-500">Nama</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $evacuationRoute->name }}</dd>
-            </div>
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Jenis Bencana</dt>
-                <dd class="mt-1 text-sm text-gray-900">
-                    @if($evacuationRoute->disaster_type === 'longsor')
-                        <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">Longsor</span>
-                    @elseif($evacuationRoute->disaster_type === 'banjir')
-                        <span class="inline-flex rounded-full bg-indigo-100 px-2 text-xs font-semibold leading-5 text-indigo-800">Banjir</span>
-                    @else
-                        <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Lainnya</span>
-                    @endif
-                </dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-gray-500">Tipe Rute</dt>

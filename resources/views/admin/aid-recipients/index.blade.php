@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Data Penerima Bantuan - Admin')
+@section('title', 'Daftar Penerima Bantuan - Admin')
 
 @section('page-title', 'Manajemen Penerima Bantuan')
 
@@ -19,7 +19,7 @@
     <div class="px-4 py-5 sm:p-6">
         <div class="sm:flex sm:items-center justify-between mb-4">
             <div class="sm:flex-auto">
-                <h3 class="text-lg font-medium leading-6 text-gray-900">Data Penerima Bantuan</h3>
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Daftar Penerima Bantuan</h3>
                 <p class="mt-2 text-sm text-gray-700">Daftar lengkap masyarakat yang telah menerima bantuan.</p>
             </div>
             <div class="mt-4 sm:mt-0 sm:ml-4 sm:flex-none flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
@@ -81,12 +81,10 @@
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tanggal</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Penerima</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Jenis Bantuan</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Jumlah</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Desa</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Jumlah</th>
                         <!-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kecamatan</th> -->
-                        <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                            <span class="sr-only">Aksi</span>
-                        </th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
@@ -106,11 +104,9 @@
                                 {{ $recipient->aid_type }}
                             </span>
                         </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $recipient->village->yard ?? '-' }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {{ number_format($recipient->amount, 0, ',', '.') }}
-                        </td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {{ $recipient->village->yard ?? '-' }}
+                            <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">{{ $recipient->amount ?? '-' }}</span>
                         </td>
                         <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $recipient->district->name ?? '-' }}</td> -->
                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
@@ -121,11 +117,14 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
                                 </a>
+                                @can('update data')
                                 <a href="{{ route('admin.aid-recipients.edit', $recipient) }}" class="text-yellow-600 hover:text-yellow-900">
                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </a>
+                                @endcan
+                                @can('delete data')
                                 <form action="{{ route('admin.aid-recipients.destroy', $recipient) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data penerima ini?');">
                                     @csrf
                                     @method('DELETE')
@@ -135,6 +134,7 @@
                                         </svg>
                                     </button>
                                 </form>
+                                @endcan
                             </div>
                         </td>
                     </tr>

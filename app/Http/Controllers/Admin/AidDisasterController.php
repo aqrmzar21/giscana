@@ -46,12 +46,14 @@ class AidDisasterController extends Controller
 
     public function edit(AidDisaster $aidDisaster)
     {
+        abort_if(!auth()->user()->can('update data'), 403);
         $districts = \App\Models\District::orderBy('name')->get();
         return $this->partialView('admin.aid-disasters.edit', compact('aidDisaster', 'districts'));
     }
 
     public function update(Request $request, AidDisaster $aidDisaster)
     {
+        abort_if(!auth()->user()->can('update data'), 403);
         $validated = $request->validate([
             'district_name'     => 'required|string|max:255',
             'total_recipients'  => 'nullable|integer|min:0',
@@ -69,6 +71,7 @@ class AidDisasterController extends Controller
 
     public function destroy(AidDisaster $aidDisaster)
     {
+        abort_if(!auth()->user()->can('delete data'), 403);
         $aidDisaster->delete();
 
         return redirect()->route('admin.aid-disasters.index')

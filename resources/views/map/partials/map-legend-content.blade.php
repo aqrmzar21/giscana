@@ -7,11 +7,11 @@
             <span class="text-gray-700">Zona Rawan</span>
         </div>
         <div class="legend-item">
-            <div class="legend-color" style="background-color: #10b981;"></div>
+            <div class="legend-color" style="background-color: #3b82f6;"></div>
             <span class="text-gray-700">Titik Kumpul</span>
         </div>
         <div class="legend-item">
-            <div class="legend-color" style="background-color: #3b82f6;"></div>
+            <div class="legend-color" style="background-color: rgb(153, 0, 255);"></div>
             <span class="text-gray-700">Rute Evakuasi</span>
         </div>
         <div class="legend-item">

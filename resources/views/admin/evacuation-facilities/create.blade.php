@@ -76,7 +76,7 @@
                     <div>
                         <label for="contact_person" class="block text-sm font-medium text-gray-700">Kontak Person</label>
                         <div class="mt-1">
-                            <input type="number" name="contact_person" id="contact_person" value="{{ old('contact_person') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('contact_person') border-red-300 @enderror">
+                            <input type="text" name="contact_person" id="contact_person" value="{{ old('contact_person') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('contact_person') border-red-300 @enderror">
                             @error('contact_person')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -86,7 +86,7 @@
                     <div>
                         <label for="contact_phone" class="block text-sm font-medium text-gray-700">No. Telepon</label>
                         <div class="mt-1">
-                            <input type="text" name="contact_phone" id="contact_phone" value="{{ old('contact_phone') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('contact_phone') border-red-300 @enderror">
+                            <input type="number" name="contact_phone" id="contact_phone" value="{{ old('contact_phone') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('contact_phone') border-red-300 @enderror">
                             @error('contact_phone')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -105,14 +105,25 @@
                 </div> -->
 
                 <div>
-                    <label for="point_coordinates" class="block text-sm font-medium text-gray-700">Koordinat Titik (GeoJSON) <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <textarea id="point_coordinates" name="point_coordinates" rows="3" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md font-mono text-xs @error('point_coordinates') border-red-300 @enderror">{{ old('point_coordinates') }}</textarea>
-                        <p class="mt-2 text-sm text-gray-500">Format: JSON array [lng, lat]</p>
-                        @error('point_coordinates')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                    <label class="block text-sm font-medium text-gray-700">Titik Koordinat Fasilitas <span class="text-red-500">*</span></label>
+                    <p class="mt-1 text-sm text-gray-500 mb-2">Klik pada peta untuk menentukan lokasi fasilitas evakuasi.</p>
+                    <div id="map" class="mb-4 border border-gray-300"></div>
+
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <label for="latitude" class="block text-sm font-medium text-gray-700">Latitude</label>
+                            <input type="text" id="latitude" readonly class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md bg-gray-50">
+                        </div>
+                        <div>
+                            <label for="longitude" class="block text-sm font-medium text-gray-700">Longitude</label>
+                            <input type="text" id="longitude" readonly class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md bg-gray-50">
+                        </div>
                     </div>
+                    
+                    <input type="hidden" id="point_coordinates" name="point_coordinates" value="{{ old('point_coordinates') }}">
+                    @error('point_coordinates')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="space-y-3">
@@ -138,4 +149,58 @@
         </form>
     </div>
 </div>
+<script>
+    (function () {
+        if (typeof L === 'undefined') {
+            console.error('Leaflet is not loaded');
+            return;
+        }
+
+        // Initialize map centered at default location (Gorontalo area)
+        var map = L.map('map').setView([0.545, 123.06], 11);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        var marker;
+
+        // Check if there is old data from validation errors
+        var oldCoordinates = document.getElementById('point_coordinates').value;
+        if (oldCoordinates) {
+            try {
+                var coords = JSON.parse(oldCoordinates);
+                if (Array.isArray(coords) && coords.length >= 2) {
+                    var lng = coords[0];
+                    var lat = coords[1];
+                    marker = L.marker([lat, lng]).addTo(map);
+                    map.setView([lat, lng], 14);
+                    
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lng;
+                }
+            } catch (e) {
+                console.error("Invalid coordinates format.");
+            }
+        }
+
+        map.on('click', function(e) {
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            marker = L.marker([lat, lng]).addTo(map);
+            
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+            
+            // Format expected by backend: JSON array [lng, lat]
+            document.getElementById('point_coordinates').value = JSON.stringify([lng, lat]);
+        });
+    })();
+</script>
 @endsection

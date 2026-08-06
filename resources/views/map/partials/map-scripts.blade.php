@@ -129,10 +129,11 @@
                 });
 
                 data.evacuation_routes.features.forEach(feature => {
+                    if (!feature.geometry || !feature.geometry.coordinates) return;
                     const coordinates = feature.geometry.coordinates.map(coord => [coord[1], coord[0]]);
                     const polyline = L.polyline(coordinates, {
-                        color: '#3b82f6',
-                        weight: 4,
+                        color: 'rgb(153, 0, 255)',
+                        weight: 10,
                         opacity: 0.8
                     }).addTo(layers.evacuationRoutes);
 
@@ -143,11 +144,12 @@
                 });
 
                 data.evacuation_facilities.features.forEach(feature => {
+                    if (!feature.geometry || !feature.geometry.coordinates) return;
                     const [lng, lat] = feature.geometry.coordinates;
                     const marker = L.marker([lat, lng], {
                         icon: L.divIcon({
                             className: 'evacuation-facility-marker',
-                            html: '<div style="background-color: #10b981; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;"></div>',
+                            html: '<div style="background-color: #3b82f6; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;"></div>',
                             iconSize: [20, 20]
                         })
                     }).addTo(layers.evacuationFacilities);
@@ -275,7 +277,7 @@
                                     style: {
                                         color: '#ffffffff',
                                         weight: 1,
-                                        fillColor: '#60a5fa',
+                                        fillColor: '#e3fa60ff',
                                         fillOpacity: 0.1,
                                         dashArray: '3 3'
                                     },
@@ -285,11 +287,9 @@
                                             const key = name.toLowerCase().replace(/desa |kelurahan /g, '').trim();
                                             const aidInfo = villageAidsData[key];
                                             
-                                            let aidHtml = '-';
+                                            let aidHtml = '';
                                             if (aidInfo && aidInfo.total_amount > 0) {
                                                 const types = aidInfo.aid_types && aidInfo.aid_types.length > 0 ? aidInfo.aid_types.join(', ') : '-';
-                                                // Format ke Rupiah
-                                                // const formattedAmount = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(aidInfo.total_amount);
                                                 aidHtml = `
                                                     Jenis Bantuan: ${types}<br>
                                                     Total Disalurkan: ${aidInfo.total_amount}
