@@ -1,3 +1,61 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    .dark body {
+        background-color: #0f172a;
+        color: #f8fafc;
+    }
+}
+
+/* Custom dark mode fallback rules for cards, tables and forms */
+.dark .bg-white {
+    background-color: #1e293b !important;
+    color: #f1f5f9;
+}
+
+.dark .bg-gray-50 {
+    background-color: #334155 !important;
+    color: #f8fafc;
+}
+
+.dark .bg-gray-100 {
+    background-color: #0f172a !important;
+}
+
+.dark .text-gray-900, 
+.dark .text-gray-800, 
+.dark .text-gray-700 {
+    color: #f1f5f9 !important;
+}
+
+.dark .text-gray-600, 
+.dark .text-gray-500 {
+    color: #94a3b8 !important;
+}
+
+.dark .border-gray-200, 
+.dark .border-gray-300, 
+.dark .border-gray-100,
+.dark .divide-gray-200,
+.dark .divide-gray-300 {
+    border-color: #334155 !important;
+}
+
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="date"],
+.dark input[type="number"],
+.dark select,
+.dark textarea {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #475569 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+    color: #64748b !important;
+}

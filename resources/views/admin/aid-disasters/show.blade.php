@@ -42,7 +42,6 @@
         @if(!is_null($aidDisaster->distribution_percentage))
             <div class="mb-6 p-4 bg-gray-50 rounded-lg">
                 <p class="text-sm font-medium text-gray-700 mb-2">Progress</p>
-                <p class="text-sm font-medium text-gray-700 mb-2">Progress</p>
                 <div class="flex items-center gap-3">
                     <div class="flex-1 bg-gray-200 rounded-full h-4">
                         <div class="h-4 rounded-full transition-all duration-500 {{ $aidDisaster->distribution_percentage >= 100 ? 'bg-green-500' : ($aidDisaster->distribution_percentage >= 50 ? 'bg-yellow-500' : 'bg-red-500') }}"
@@ -55,7 +54,6 @@
 
         <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
             <div>
-                <dt class="text-sm font-medium text-gray-500">Kecamatan</dt>
                 <dt class="text-sm font-medium text-gray-500">Kecamatan</dt>
                 <dd class="mt-1 text-sm font-semibold text-gray-900">{{ $aidDisaster->district_name }}</dd>
             </div>
