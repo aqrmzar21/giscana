@@ -19,7 +19,7 @@
         <div>
             <h3 class="text-lg font-semibold text-gray-900 mb-2">Selamat Datang!</h3>
             <p class="text-gray-500 text-sm mb-4">
-                Halo <strong class="text-blue-800">{{ Auth::user()->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
+                Halo <strong class="text-blue-800">{{ Auth::user()?->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
             </p>
         </div>
         <div>
@@ -130,7 +130,7 @@
             <div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Selamat Datang!</h3>
                 <p class="text-gray-500 text-sm mb-4">
-                    Halo <strong class="text-gray-800">{{ Auth::user()->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
+                    Halo <strong class="text-gray-800">{{ Auth::user()?->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
                 </p>
             </div>
             <div>
@@ -231,17 +231,10 @@
 @if($aidByDistrict->isNotEmpty())
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const ctx = document.getElementById('aidPieChart');
-        if (!ctx) return;
-    document.addEventListener('DOMContentLoaded', function () {
+    (function () {
         const ctx = document.getElementById('aidPieChart');
         if (!ctx) return;
 
-        const labels  = @json($aidByDistrict->pluck('district_name'));
-        const data    = @json($aidByDistrict->pluck('distributed_aid'));
-        const colors  = ['#6366f1','#22c55e','#f59e0b','#ef4444','#14b8a6'];
-        const hovers  = ['#4f46e5','#16a34a','#d97706','#dc2626','#0d9488'];
         const labels  = @json($aidByDistrict->pluck('district_name'));
         const data    = @json($aidByDistrict->pluck('distributed_aid'));
         const colors  = ['#6366f1','#22c55e','#f59e0b','#ef4444','#14b8a6'];
@@ -284,45 +277,7 @@
                 }
             }
         });
-    });
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: data,
-                    backgroundColor: colors,
-                    hoverBackgroundColor: hovers,
-                    borderWidth: 2,
-                    borderColor: '#fff',
-                    hoverOffset: 8,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                cutout: '62%',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const pct   = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
-                                return ` ${context.label}: ${context.parsed.toLocaleString()} (${pct}%)`;
-                            }
-                        }
-                    }
-                },
-                animation: {
-                    animateScale: true,
-                    animateRotate: true,
-                    duration: 800,
-                    easing: 'easeInOutQuart',
-                }
-            }
-        });
-    });
+    })();
 </script>
 @endif
 @endsection

@@ -6,7 +6,7 @@ use App\Http\Controllers\MapController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/admin', function () { return view('admin'); })->name('layouts.admin');
+Route::get('/admin', function () { return redirect()->route('dashboard'); });
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');

@@ -58,7 +58,7 @@ class User extends Authenticatable
      */
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->role === 'admin' || $this->hasRole('admin');
     }
 
     /**
@@ -66,7 +66,7 @@ class User extends Authenticatable
      */
     public function isStaff(): bool
     {
-        return $this->role === 'staff';
+        return $this->role === 'staff' || $this->hasRole('staff');
     }
 
     /**
@@ -74,7 +74,7 @@ class User extends Authenticatable
      */
     public function isPublic(): bool
     {
-        return $this->role === 'public';
+        return $this->role === 'public' || $this->hasRole('public');
     }
 
     /**
@@ -82,6 +82,6 @@ class User extends Authenticatable
      */
     public function canManageData(): bool
     {
-        return in_array($this->role, ['admin', 'staff']);
+        return $this->isAdmin() || $this->isStaff();
     }
 }

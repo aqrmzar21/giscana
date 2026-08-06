@@ -70,7 +70,7 @@
                     </a>
                 </div>
 
-                @if (Auth::user()->isAdmin() || Auth::user()->isStaff())
+                @if (Auth::user()?->isAdmin() || Auth::user()?->isStaff())
                 <div class="mt-8">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Manajemen Data</p>
                     <div class="mt-2 space-y-1">
@@ -219,7 +219,7 @@
                             <x-dropdown align="right" width="48">
                                 <x-slot name="trigger">
                                     <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                                        <div>{{ Auth::user()->name }}</div>
+                                        <div>{{ Auth::user()?->name }}</div>
                                         <div class="ms-1">
                                             <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -291,27 +291,26 @@
                     @yield('content')
                 </div>
             @if(!$__isPjax)
-            @if(!$__isPjax)
             </main>
         </div>
     </div>
 
-    @stack('styles')
+        @stack('styles')
 
-    {{-- Map scripts (Leaflet dll) harus di-stack sebelum closing body --}}
-    @stack('scripts')
+        {{-- Map scripts (Leaflet dll) harus di-stack sebelum closing body --}}
+        @stack('scripts')
         <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    </body>
-    </html>
+</body>
+</html>
     @else
     {{-- ═══ PJAX metadata — hanya dikirim saat partial request ═══ --}}
     <script type="application/json" id="pjax-meta">
-@php
-    $__sections = \Illuminate\Support\Facades\View::getSections();
-    echo json_encode([
-        'title'     => strip_tags($__sections['title'] ?? config('app.name', 'Giscana')),
-        'pageTitle' => strip_tags($__sections['page-title'] ?? ''),
-    ]);
-@endphp
-</script>
+    @php
+        $__sections = \Illuminate\Support\Facades\View::getSections();
+        echo json_encode([
+            'title'     => strip_tags($__sections['title'] ?? config('app.name', 'Giscana')),
+            'pageTitle' => strip_tags($__sections['page-title'] ?? ''),
+        ]);
+    @endphp
+    </script>
 @endif

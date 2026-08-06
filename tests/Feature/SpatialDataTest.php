@@ -25,11 +25,7 @@ class SpatialDataTest extends TestCase
             'disaster_type' => 'banjir',
             'description' => 'Test banjir zone for testing',
             'risk_level' => 'high',
-            'polygon_coordinates' => [
-                [
-                    [123.0, 0.0], [123.1, 0.0], [123.1, 0.1], [123.0, 0.1], [123.0, 0.0]
-                ]
-            ],
+            'point_coordinates' => [123.0, 0.1],
             'area_hectares' => 100.0,
             'affected_population' => 1000,
             'is_active' => true,
@@ -44,7 +40,7 @@ class SpatialDataTest extends TestCase
         // Test GeoJSON conversion
         $geoJson = $zone->toGeoJSON();
         $this->assertEquals('Feature', $geoJson['type']);
-        $this->assertEquals('Polygon', $geoJson['geometry']['type']);
+        $this->assertEquals('Point', $geoJson['geometry']['type']);
         $this->assertEquals('Test banjir Zone', $geoJson['properties']['name']);
     }
 
@@ -143,7 +139,7 @@ class SpatialDataTest extends TestCase
             'disaster_type' => 'banjir',
             'description' => 'Test',
             'risk_level' => 'high',
-            'polygon_coordinates' => [[[123.0, 0.0], [123.1, 0.0], [123.1, 0.1], [123.0, 0.1], [123.0, 0.0]]],
+            'point_coordinates' => [123.0, 0.1],
             'is_active' => true,
         ]);
 
@@ -181,7 +177,7 @@ class SpatialDataTest extends TestCase
             'disaster_type' => 'banjir',
             'description' => 'Test banjir zone',
             'risk_level' => 'high',
-            'polygon_coordinates' => [[[123.0, 0.0], [123.1, 0.0], [123.1, 0.1], [123.0, 0.1], [123.0, 0.0]]],
+            'point_coordinates' => [123.0, 0.1],
             'is_active' => true,
         ]);
 

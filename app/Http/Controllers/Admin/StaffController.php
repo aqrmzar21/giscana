@@ -15,7 +15,9 @@ class StaffController extends Controller
 
     public function index(Request $request)
     {
-        $query = User::role('staff');
+        $query = User::where(function($q) {
+            $q->where('role', 'staff')->orWhereHas('roles', fn($rq) => $rq->where('name', 'staff'));
+        });
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -72,7 +74,7 @@ class StaffController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class.',id,'.$staff->id],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', \Illuminate\Validation\Rule::unique('users')->ignore($staff->id)],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'phone' => ['nullable', 'string', 'max:20'],
             'organization' => ['nullable', 'string', 'max:255'],
