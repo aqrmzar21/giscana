@@ -84,50 +84,24 @@
         </div>
     </div>
 
-    <!-- <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
-                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                </div>
-                <div class="ml-5 w-0 flex-1">
-                    <dl>
-                        <dt class="text-sm font-medium text-gray-500 truncate">Bantuan Bencana</dt>
-                        <dd class="text-lg font-semibold text-gray-900">{{ \App\Models\AidDisaster::count() }}</dd>
-                    </dl>
-                </div>
-            </div>
-            <div class="mt-4">
-                <a href="{{ route('admin.aid-disasters.index') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                    Lihat Detail <span aria-hidden="true">&rarr;</span>
-                </a>
-            </div>
-        </div>
-    </div> -->
-    
 </div>
 
-<div class="lg:col-span-2 bg-white shadow rounded-lg mb-6">
-        <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-center gap-4">
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">Selamat Datang!</h3>
-                <p class="text-gray-500 text-sm mb-4">
-                    Halo <strong class="text-indigo-800">{{ Auth::user()->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
-                </p>
-            </div>
-            <div>
-                
-            </div>
+<div id="welcome-card" class="lg:col-span-1 bg-white shadow rounded-lg flex flex-col justify-center">
+    <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-center gap-4">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Selamat Datang!</h3>
+            <p class="text-gray-500 text-sm mb-4">
+                Halo <strong class="text-indigo-800">{{ Auth::user()->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
+            </p>
         </div>
     </div>
+</div>
 
 <!-- Welcome Card + Pie Chart Row -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-
+    
     {{-- Welcome Card --}}
-    <div id="welcome-card" class="lg:col-span-1 bg-white shadow rounded-lg flex flex-col justify-center">
+    <div class="lg:col-span-2 bg-white shadow rounded-lg mb-6">
         <div class="px-4 py-6 sm:p-6 text-center">
             <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100 mb-4">
                 <svg class="h-8 w-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -164,6 +138,77 @@
     
 
     {{-- Pie Chart Card --}}
+    <div class="lg:col-span-1 bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex items-center justify-between">
+            <div>
+                <h3 class="text-base font-semibold text-gray-900">Distribusi Bantuan per Kecamatan</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Top 5 kecamatan berdasarkan jumlah bantuan tersalur</p>
+            </div>
+            <span class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+                Top 5
+            </span>
+        </div>
+
+        @if($aidByDistrict->isEmpty())
+            <div class="flex flex-col items-center justify-center py-16 text-gray-400">
+                <svg class="h-12 w-12 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                </svg>
+                <p class="text-sm">Belum ada data distribusi bantuan.</p>
+            </div>
+        @else
+            <div class="p-5 flex flex-col sm:flex-row items-center gap-6">
+                {{-- Canvas --}}
+                <div class="flex-shrink-0" style="width:220px; height:220px;">
+                    <canvas id="aidPieChart"></canvas>
+                </div>
+
+                {{-- Legend + Detail --}}
+                <div class="flex-1 w-full">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-xs text-gray-500 border-b border-gray-100">
+                                <th class="pb-2 text-left font-medium">Kecamatan</th>
+                                <th class="pb-2 text-right font-medium">Tersalur</th>
+                                <th class="pb-2 text-right font-medium">Penerima</th>
+                                <th class="pb-2 text-right font-medium">%</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @php
+                                $colors = ['#6366f1','#22c55e','#f59e0b','#ef4444','#14b8a6'];
+                                $totalDistributed = $aidByDistrict->sum('distributed_aid') ?: 1;
+                            @endphp
+                            @foreach($aidByDistrict as $i => $aid)
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-2 pr-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="inline-block w-3 h-3 rounded-full flex-shrink-0"
+                                              style="background:{{ $colors[$i] ?? '#9ca3af' }}"></span>
+                                        <span class="font-medium text-gray-800 truncate max-w-[130px]">{{ $aid->district_name }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-2 text-right text-gray-600">{{ number_format($aid->distributed_aid) }}</td>
+                                <td class="py-2 text-right text-gray-600">{{ number_format($aid->total_recipients) }}</td>
+                                <td class="py-2 text-right">
+                                    <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold"
+                                          style="background:{{ $colors[$i] ?? '#9ca3af' }}22; color:{{ $colors[$i] ?? '#9ca3af' }}">
+                                        {{ $totalDistributed > 0 ? round(($aid->distributed_aid / $totalDistributed) * 100, 1) : 0 }}%
+                                    </span>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
+    </div>
+
+    {{-- Bar Chart Card --}}
     <div class="lg:col-span-1 bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex items-center justify-between">
             <div>
