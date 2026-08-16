@@ -27,19 +27,19 @@
         {{-- Layer GeoJSON Rawan Bencana --}}
         <div class="legend-item">
             <div class="legend-color" style="background-color: #3b82f6; opacity: 0.7;"></div>
-            <span class="text-gray-700">🌊 Rawan Banjir</span>
+            <span class="text-gray-700">Rawan Banjir</span>
         </div>
         <div class="legend-item">
             <div class="legend-color" style="background-color: #f97316; opacity: 0.7;"></div>
-            <span class="text-gray-700">🌋 Rawan Gempa</span>
+            <span class="text-gray-700">Rawan Gempa</span>
         </div>
         <div class="legend-item">
             <div class="legend-color" style="background-color: #06b6d4; opacity: 0.7;"></div>
-            <span class="text-gray-700">🌊 Rawan Gelombang</span>
+            <span class="text-gray-700">Rawan Tsunami</span>
         </div>
         <div class="legend-item">
             <div class="legend-color" style="background-color: #84cc16; opacity: 0.7;"></div>
-            <span class="text-gray-700">⛰️ Rawan Longsor</span>
+            <span class="text-gray-700">Rawan Longsor</span>
         </div>
     </div>
 </div>

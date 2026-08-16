@@ -53,7 +53,6 @@
         "Zona Bencana": layers.disasterZones,
         "Rute Evakuasi": layers.evacuationRoutes,
         "Fasilitas Evakuasi": layers.evacuationFacilities,
-        "Batas Kecamatan": layers.districtBoundaries
     };
 
     const baseMaps = {
@@ -257,23 +256,6 @@
                                 <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:${cfg.border_color};">
                                     ${cfg.icon_emoji || ''} ${cfg.label}
                                 </div>
-                                <table style="border-collapse:collapse;width:100%;">
-                                    <tr>
-                                        <td style="color:#6b7280;padding:2px 8px 2px 0;white-space:nowrap;font-size:12px;">Nama Area</td>
-                                        <td style="font-weight:600;">${namaArea}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="color:#6b7280;padding:2px 8px 2px 0;white-space:nowrap;font-size:12px;">Tingkat Rawan</td>
-                                        <td style="font-weight:600;">${tingkat}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="color:#6b7280;padding:2px 8px 2px 0;white-space:nowrap;font-size:12px;">Luas</td>
-                                        <td>${luas}</td>
-                                    </tr>
-                                    ${keterangan
-                                        ? `<tr><td colspan="2" style="color:#374151;padding-top:5px;font-style:italic;font-size:11px;">${keterangan}</td></tr>`
-                                        : ''}
-                                </table>
                             </div>`;
 
                         layer.bindPopup(popupHtml, { maxWidth: 300 });

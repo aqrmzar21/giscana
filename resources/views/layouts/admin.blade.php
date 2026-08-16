@@ -113,7 +113,7 @@
                            class="flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-disasters.index') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
                            :class="{ 'justify-center px-2': sidebarCollapsed }">
                             <svg class="w-5 h-5 shrink-0" fill="currentColor" stroke="none" viewBox="0 0 24 24">
-                                <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
                             <span x-show="!sidebarCollapsed" class="ml-3 truncate">Distribusi Bantuan</span>
                         </a>
@@ -220,10 +220,10 @@
                                 </button>
                                 <div x-show="open && !sidebarCollapsed" x-collapse class="ml-4 mt-1 space-y-1">
                                     <a href="{{ route('admin.aid-recipients.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-recipients.index') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
-                                        Data Penerima
+                                        Daftar Penerima
                                     </a>
                                     <a href="{{ route('admin.aid-recipients.create') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-recipients.create') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
-                                        Tambah Penerima Data
+                                        Tambah Penerima Baru
                                     </a>
                                 </div>
                             </div>
