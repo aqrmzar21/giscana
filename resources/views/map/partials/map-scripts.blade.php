@@ -53,6 +53,7 @@
         "Zona Bencana": layers.disasterZones,
         "Rute Evakuasi": layers.evacuationRoutes,
         "Fasilitas Evakuasi": layers.evacuationFacilities,
+        "Batas Administrasi": layers.districtBoundaries
     };
 
     const baseMaps = {

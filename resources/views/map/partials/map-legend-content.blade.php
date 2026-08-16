@@ -5,7 +5,7 @@
         {{-- Data dari DB --}}
         <div class="legend-item">
             <div class="legend-color" style="background-color: #ef4444;"></div>
-            <span class="text-gray-700">Zona Rawan (DB)</span>
+            <span class="text-gray-700">Titik Bencana</span>
         </div>
         <div class="legend-item">
             <div class="legend-color" style="background-color: #3b82f6;"></div>
@@ -22,7 +22,7 @@
 
         {{-- Divider --}}
         <div class="legend-divider my-1"></div>
-        <div class="text-gray-500 font-semibold text-xs mb-1 w-full">Kawasan Rawan Bencana</div>
+        <div class="text-gray-500 font-semibold text-xs mb-1 w-full">Sebaran Rawan Bencana</div>
 
         {{-- Layer GeoJSON Rawan Bencana --}}
         <div class="legend-item">
