@@ -17,6 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Map routes (halaman publik + endpoint data untuk keduanya)
 Route::get('/map', [MapController::class, 'index'])->name('map.index');
 Route::get('/map/data', [MapController::class, 'getMapData'])->name('map.data');
+Route::get('/map/hazard-layers', [MapController::class, 'getHazardLayers'])->name('map.hazard-layers');
 Route::get('/map/search', [MapController::class, 'search'])->name('map.search');
 
 Route::middleware('auth')->group(function () {

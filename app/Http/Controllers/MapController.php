@@ -7,6 +7,7 @@ use App\Models\DisasterZone;
 use App\Models\EvacuationRoute;
 use App\Models\EvacuationFacility;
 use App\Models\AidDisaster;
+use App\Models\DisasterHazardLayer;
 use Illuminate\Http\Request;
 
 class MapController extends Controller
@@ -211,6 +212,20 @@ class MapController extends Controller
             ],
             'village_aids' => $villageAids,
         ]);
+    }
+
+    /**
+     * Kembalikan metadata layer kawasan rawan bencana dari database.
+     * Frontend akan fetch GeoJSON langsung dari path yang dikembalikan.
+     */
+    public function getHazardLayers()
+    {
+        $layers = DisasterHazardLayer::active()
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn ($layer) => $layer->toLayerConfig());
+
+        return response()->json(['layers' => $layers]);
     }
 
     /**

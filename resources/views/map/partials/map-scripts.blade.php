@@ -27,7 +27,6 @@
         evacuationRoutes: L.layerGroup().addTo(map),
         evacuationFacilities: L.layerGroup().addTo(map),
         districtBoundaries: L.layerGroup().addTo(map),
-        // aidDistributionPoints: L.layerGroup().addTo(map)
     };
 
     // OpenStreetMap default
@@ -48,10 +47,8 @@
         attribution: 'Tiles © Esri'
     });
 
-    // Tambahkan salah satu ke map
     osm.addTo(map);
 
-   // Buat label dalam bahasa Indonesia
     const overlayMaps = {
         "Zona Bencana": layers.disasterZones,
         "Rute Evakuasi": layers.evacuationRoutes,
@@ -59,16 +56,219 @@
         "Batas Kecamatan": layers.districtBoundaries
     };
 
-    // Jika ada basemap lain, bisa ditambahkan di sini
     const baseMaps = {
         "Peta Jalan": osm,
         "Topografi": topo,
         "Satelit": esriSat
     };
 
-    // Tambahkan kontrol ke peta
     L.control.layers(baseMaps, overlayMaps).addTo(map);
 
+    // =====================================================================
+    // HAZARD LAYERS (GeoJSON dari public/geojson/)
+    // =====================================================================
+
+    /** Map: disaster_type -> { config, leafletLayer, loaded } */
+    const hazardLayers = {};
+
+    /**
+     * Inisialisasi panel checkbox badge setelah metadata diambil dari API.
+     */
+    function buildHazardLayerUI(layerConfigs) {
+        const container = document.getElementById('hazard_layer_checkboxes');
+        if (!container) return;
+        container.innerHTML = '';
+
+        layerConfigs.forEach(cfg => {
+            // Buat layer Leaflet kosong, belum di-add ke map
+            hazardLayers[cfg.disaster_type] = {
+                config: cfg,
+                leafletLayer: L.layerGroup(),
+                loaded: false,
+                visible: false,
+            };
+
+            // Badge elemen
+            const badge = document.createElement('label');
+            badge.className = 'hazard-layer-badge inactive';
+            badge.id = `hazard_badge_${cfg.disaster_type}`;
+            badge.title = cfg.description || cfg.label;
+            badge.style.cssText = `
+                background-color: ${cfg.fill_color}22;
+                border-color: ${cfg.border_color};
+                color: ${cfg.border_color};
+            `;
+            badge.innerHTML = `
+                <input type="checkbox" id="hazard_toggle_${cfg.disaster_type}" data-type="${cfg.disaster_type}">
+                <span>${cfg.icon_emoji || ''} ${cfg.label}</span>
+            `;
+            container.appendChild(badge);
+
+            // Event: klik badge -> toggle layer
+            badge.addEventListener('click', () => {
+                const state = hazardLayers[cfg.disaster_type];
+                toggleHazardLayer(cfg.disaster_type, !state.visible);
+            });
+        });
+
+        // Tombol "Semua Aktif / Semua Nonaktif"
+        const toggleAllBtn = document.getElementById('toggle_all_hazard_layers');
+        if (toggleAllBtn) {
+            toggleAllBtn.addEventListener('click', () => {
+                const anyActive = Object.values(hazardLayers).some(s => s.visible);
+                const targetState = !anyActive;
+                toggleAllBtn.textContent = targetState ? 'Semua Nonaktif' : 'Semua Aktif';
+                Object.keys(hazardLayers).forEach(type => toggleHazardLayer(type, targetState));
+            });
+        }
+    }
+
+    /**
+     * Toggle visibilitas layer bencana tertentu.
+     * Jika belum di-load, fetch GeoJSON-nya terlebih dahulu.
+     */
+    function toggleHazardLayer(disasterType, show) {
+        const state = hazardLayers[disasterType];
+        if (!state) return;
+
+        state.visible = show;
+
+        // Update tampilan badge
+        const badge = document.getElementById(`hazard_badge_${disasterType}`);
+        if (badge) {
+            badge.classList.toggle('active', show);
+            badge.classList.toggle('inactive', !show);
+        }
+
+        if (show) {
+            // Muat GeoJSON jika belum
+            if (!state.loaded) {
+                state.loaded = true; // flag awal agar tidak double-fetch
+                loadHazardGeoJSON(disasterType);
+            } else {
+                state.leafletLayer.addTo(map);
+            }
+        } else {
+            map.removeLayer(state.leafletLayer);
+        }
+    }
+
+    /**
+     * Fetch dan render GeoJSON untuk satu jenis bencana.
+     */
+    function loadHazardGeoJSON(disasterType) {
+        const state = hazardLayers[disasterType];
+        if (!state) return;
+
+        const cfg = state.config;
+
+        // Tampilkan loading indicator pada badge
+        const badge = document.getElementById(`hazard_badge_${disasterType}`);
+        if (badge) badge.style.opacity = '0.6';
+
+        fetch(cfg.geojson_path)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status} saat memuat ${cfg.geojson_path}`);
+                return res.json();
+            })
+            .then(geojsonData => {
+                const geoLayer = L.geoJSON(geojsonData, {
+                    style: feature => ({
+                        color: cfg.border_color,
+                        weight: cfg.border_weight,
+                        fillColor: cfg.fill_color,
+                        fillOpacity: cfg.fill_opacity,
+                        opacity: 0.85,
+                    }),
+                    onEachFeature: (feature, layer) => {
+                        const p = feature.properties || {};
+
+                        // Bangun konten popup dari properti GeoJSON yang umum
+                        const namaArea  = p.NAMOBJ || p.nama || p.name || p.NAMA || p.desa || p.kecamatan || '–';
+                        const tingkat   = p.KELAS || p.kelas || p.tingkat || p.risk_level || p.RAWAN || '–';
+                        const luas      = p.SHAPE_Area ? (parseFloat(p.SHAPE_Area) / 10000).toFixed(2) + ' ha' : (p.luas || '–');
+                        const keterangan = p.KETERANGAN || p.keterangan || p.description || '';
+
+                        let popupHtml = `
+                            <div style="min-width:180px; font-size:13px;">
+                                <div style="font-weight:700; font-size:14px; margin-bottom:6px; color:${cfg.border_color};">
+                                    ${cfg.icon_emoji || ''} ${cfg.label}
+                                </div>
+                                <table style="border-collapse:collapse; width:100%;">
+                                    <tr>
+                                        <td style="color:#6b7280; padding:2px 6px 2px 0; white-space:nowrap;">Nama Area</td>
+                                        <td style="font-weight:600;">${namaArea}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:#6b7280; padding:2px 6px 2px 0; white-space:nowrap;">Tingkat Rawan</td>
+                                        <td style="font-weight:600;">${tingkat}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:#6b7280; padding:2px 6px 2px 0; white-space:nowrap;">Luas</td>
+                                        <td>${luas}</td>
+                                    </tr>
+                                    ${keterangan ? `<tr><td colspan="2" style="color:#374151; padding-top:4px; font-style:italic;">${keterangan}</td></tr>` : ''}
+                                </table>
+                            </div>
+                        `;
+
+                        layer.bindPopup(popupHtml, { maxWidth: 280 });
+
+                        // Hover highlight
+                        layer.on({
+                            mouseover(e) {
+                                e.target.setStyle({ weight: 3, fillOpacity: Math.min(cfg.fill_opacity + 0.2, 0.75) });
+                            },
+                            mouseout(e) {
+                                geoLayer.resetStyle(e.target);
+                            },
+                        });
+                    },
+                });
+
+                geoLayer.addTo(state.leafletLayer);
+
+                // Hanya tambah ke peta jika masih dikehendaki visible
+                if (state.visible) {
+                    state.leafletLayer.addTo(map);
+                }
+
+                if (badge) badge.style.opacity = '';
+            })
+            .catch(err => {
+                console.error(`Gagal memuat GeoJSON (${disasterType}):`, err);
+                state.loaded = false; // izinkan retry
+                if (badge) {
+                    badge.style.opacity = '';
+                    badge.title = `Gagal memuat: ${cfg.geojson_path}`;
+                }
+            });
+    }
+
+    /**
+     * Fetch metadata layer dari endpoint backend, lalu bangun UI.
+     */
+    function initHazardLayers() {
+        fetch('{{ route("map.hazard-layers") }}')
+            .then(res => res.json())
+            .then(data => {
+                if (data.layers && data.layers.length > 0) {
+                    buildHazardLayerUI(data.layers);
+                } else {
+                    const container = document.getElementById('hazard_layer_checkboxes');
+                    if (container) container.innerHTML = '<span class="text-xs text-red-400">Tidak ada layer tersedia.</span>';
+                }
+            })
+            .catch(err => {
+                console.error('Gagal memuat metadata hazard layers:', err);
+                const container = document.getElementById('hazard_layer_checkboxes');
+                if (container) container.innerHTML = '<span class="text-xs text-red-400">Gagal memuat layer.</span>';
+            });
+    }
+
+    // =====================================================================
+    // MAP DATA (data DB: disaster zones, routes, facilities)
+    // =====================================================================
 
     function loadMapData() {
         const disasterType = document.getElementById('disaster_type').value;
@@ -102,11 +302,9 @@
                 data.disaster_zones.features.forEach(feature => {
                     if (!feature.geometry || !feature.geometry.coordinates) return;
                     const [lng, lat] = feature.geometry.coordinates;
-                    // Tentukan warna berdasarkan disaster_type
-                    let color = '#ef4444'; // default merah
+                    let color = '#ef4444';
                     if (feature.properties.disaster_type === 'longsor') {
-                        color = '#ef4444'; // merah untuk longsor
-                        // color = '#ec4899'; // pink untuk longsor
+                        color = '#ef4444';
                     }
 
                     const marker = L.marker([lat, lng], {
@@ -231,6 +429,7 @@
     }
 
     loadMapData();
+    initHazardLayers();
 
     document.getElementById('disaster_type').addEventListener('change', loadMapData);
     document.getElementById('risk_level').addEventListener('change', loadMapData);

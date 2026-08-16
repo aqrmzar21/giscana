@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             VillageSeeder::class,
             GiscanaDataSeeder::class,
             AidRecipientSeeder::class,
+            DisasterHazardLayerSeeder::class,
         ]);
     }
 }

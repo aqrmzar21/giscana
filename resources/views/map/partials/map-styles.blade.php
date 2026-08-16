@@ -89,5 +89,40 @@
         border-radius: 3px;
         flex-shrink: 0;
     }
+    .legend-divider {
+        width: 100%;
+        height: 1px;
+        background: #e5e7eb;
+    }
+    .hazard-layer-panel {
+        border-color: #e5e7eb;
+    }
+    .hazard-layer-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.18s ease;
+        user-select: none;
+    }
+    .hazard-layer-badge input[type="checkbox"] {
+        display: none;
+    }
+    .hazard-layer-badge.active {
+        opacity: 1;
+    }
+    .hazard-layer-badge.inactive {
+        opacity: 0.45;
+        filter: grayscale(0.6);
+    }
+    .hazard-layer-badge:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
 </style>
 @endpush
