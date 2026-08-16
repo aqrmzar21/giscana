@@ -10,19 +10,39 @@
             <span>Tampilkan Batas Desa</span>
         </label>
     </div>
-
+    
     {{-- Panel Layer Rawan Bencana --}}
-    <div class="hazard-layer-panel border border-gray-200 rounded-lg p-3 bg-gray-50">
-        <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Layer Kawasan Rawan Bencana</span>
-            <button type="button" id="toggle_all_hazard_layers"
-                class="text-xs text-indigo-600 hover:text-indigo-800 font-medium underline underline-offset-2">
-                Semua Aktif
-            </button>
+        <div class="hazard-layer-panel">
+            {{-- Header dengan toggle switch master --}}
+            <div class="hazard-panel-header">
+                <div class="hazard-panel-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="hazard-panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    <span>Sebaran Kawasan Rawan Bencana</span>
+                </div>
+                {{-- Master Toggle Switch --}}
+                <label class="hazard-master-toggle" id="master_toggle_label" title="Aktifkan/nonaktifkan semua layer">
+                    <input type="checkbox" id="toggle_all_hazard_layers">
+                    <span class="hazard-toggle-track">
+                        <span class="hazard-toggle-thumb"></span>
+                    </span>
+                    <span class="hazard-toggle-text" id="master_toggle_text">Semua</span>
+                </label>
+            </div>
+
+            {{-- Hint teks --}}
+            <p class="hazard-panel-hint">Pilih satu jenis bencana untuk ditampilkan di peta</p>
+
+            {{-- Badge grid per bencana --}}
+            <div class="hazard-badges-grid" id="hazard_layer_checkboxes">
+                <span class="hazard-loading">
+                    <svg class="hazard-loading-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"/>
+                        <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" opacity="0.75"/>
+                    </svg>
+                    Memuat layer bencana...
+                </span>
+            </div>
         </div>
-        <div class="flex flex-wrap gap-2" id="hazard_layer_checkboxes">
-            {{-- Dibuat secara dinamis oleh JavaScript setelah fetch metadata --}}
-            <span class="text-xs text-gray-400 italic">Memuat layer...</span>
-        </div>
-    </div>
 </div>

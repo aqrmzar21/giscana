@@ -66,21 +66,44 @@
 
     // =====================================================================
     // HAZARD LAYERS (GeoJSON dari public/geojson/)
+    // Perilaku: EXCLUSIVE — hanya satu layer aktif sekaligus.
+    // Klik layer aktif → nonaktifkan.
+    // Klik layer lain → nonaktifkan yang aktif, aktifkan yang diklik.
+    // Master toggle → aktifkan/nonaktifkan seluruh panel.
     // =====================================================================
 
-    /** Map: disaster_type -> { config, leafletLayer, loaded } */
+    /** Map: disaster_type -> { config, leafletLayer, loaded, visible } */
     const hazardLayers = {};
 
+    /** disaster_type yang sedang aktif (atau null jika tidak ada) */
+    let activeHazardType = null;
+
+    /** Apakah panel hazard layer sedang diaktifkan (master switch) */
+    let hazardPanelEnabled = false;
+
     /**
-     * Inisialisasi panel checkbox badge setelah metadata diambil dari API.
+     * Bangun UI kartu badge per layer setelah metadata API diambil.
      */
     function buildHazardLayerUI(layerConfigs) {
         const container = document.getElementById('hazard_layer_checkboxes');
         if (!container) return;
         container.innerHTML = '';
 
+        // Warna CSS-variable per card
+        const shadowMap = {
+            'banjir':    'rgba(59,130,246,0.25)',
+            'gempa':     'rgba(249,115,22,0.25)',
+            'gelombang': 'rgba(6,182,212,0.25)',
+            'longsor':   'rgba(132,204,22,0.25)',
+        };
+        const bgMap = {
+            'banjir':    '#eff6ff',
+            'gempa':     '#fff7ed',
+            'gelombang': '#ecfeff',
+            'longsor':   '#f7fee7',
+        };
+
         layerConfigs.forEach(cfg => {
-            // Buat layer Leaflet kosong, belum di-add ke map
             hazardLayers[cfg.disaster_type] = {
                 config: cfg,
                 leafletLayer: L.layerGroup(),
@@ -88,62 +111,101 @@
                 visible: false,
             };
 
-            // Badge elemen
-            const badge = document.createElement('label');
-            badge.className = 'hazard-layer-badge inactive';
-            badge.id = `hazard_badge_${cfg.disaster_type}`;
-            badge.title = cfg.description || cfg.label;
-            badge.style.cssText = `
-                background-color: ${cfg.fill_color}22;
-                border-color: ${cfg.border_color};
-                color: ${cfg.border_color};
-            `;
-            badge.innerHTML = `
-                <input type="checkbox" id="hazard_toggle_${cfg.disaster_type}" data-type="${cfg.disaster_type}">
-                <span>${cfg.icon_emoji || ''} ${cfg.label}</span>
-            `;
-            container.appendChild(badge);
+            const card = document.createElement('div');
+            card.className = 'hazard-card inactive panel-disabled';
+            card.id = `hazard_badge_${cfg.disaster_type}`;
+            card.title = cfg.description || cfg.label;
+            card.style.setProperty('--hc-color', cfg.border_color);
+            card.style.setProperty('--hc-bg', bgMap[cfg.disaster_type] || '#f8fafc');
+            card.style.setProperty('--hc-shadow', shadowMap[cfg.disaster_type] || 'rgba(0,0,0,0.1)');
 
-            // Event: klik badge -> toggle layer
-            badge.addEventListener('click', () => {
-                const state = hazardLayers[cfg.disaster_type];
-                toggleHazardLayer(cfg.disaster_type, !state.visible);
+            card.innerHTML = `
+                <span class="hazard-card-check" aria-hidden="true">
+                    <svg viewBox="0 0 10 10"><polyline points="1.5,5.5 4,8 8.5,2.5"/></svg>
+                </span>
+                <span class="hazard-card-emoji">${cfg.icon_emoji || '🗺️'}</span>
+                <div class="hazard-card-label">${cfg.label}</div>
+                <div class="hazard-card-status" id="hazard_status_${cfg.disaster_type}">Nonaktif</div>
+            `;
+            container.appendChild(card);
+
+            // Klik card → exclusive toggle
+            card.addEventListener('click', () => {
+                if (!hazardPanelEnabled) return;
+                const isCurrentlyActive = (activeHazardType === cfg.disaster_type);
+                // Nonaktifkan semua
+                Object.keys(hazardLayers).forEach(type => _setHazardVisible(type, false));
+                // Jika tadi tidak aktif → aktifkan
+                if (!isCurrentlyActive) {
+                    _setHazardVisible(cfg.disaster_type, true);
+                    activeHazardType = cfg.disaster_type;
+                } else {
+                    activeHazardType = null;
+                }
             });
         });
 
-        // Tombol "Semua Aktif / Semua Nonaktif"
-        const toggleAllBtn = document.getElementById('toggle_all_hazard_layers');
-        if (toggleAllBtn) {
-            toggleAllBtn.addEventListener('click', () => {
-                const anyActive = Object.values(hazardLayers).some(s => s.visible);
-                const targetState = !anyActive;
-                toggleAllBtn.textContent = targetState ? 'Semua Nonaktif' : 'Semua Aktif';
-                Object.keys(hazardLayers).forEach(type => toggleHazardLayer(type, targetState));
+        // Master toggle switch
+        const masterSwitch = document.getElementById('toggle_all_hazard_layers');
+        if (masterSwitch) {
+            masterSwitch.addEventListener('change', () => {
+                hazardPanelEnabled = masterSwitch.checked;
+                _applyMasterState(hazardPanelEnabled);
             });
         }
     }
 
     /**
-     * Toggle visibilitas layer bencana tertentu.
-     * Jika belum di-load, fetch GeoJSON-nya terlebih dahulu.
+     * Terapkan state master (enable/disable seluruh panel).
+     * Jika dimatikan: semua layer dihilangkan dari peta, semua card disabled.
+     * Jika dinyalakan: card bisa diklik, tapi belum ada yang aktif.
      */
-    function toggleHazardLayer(disasterType, show) {
+    function _applyMasterState(enabled) {
+        const masterText = document.getElementById('master_toggle_text');
+        if (masterText) masterText.textContent = enabled ? 'Aktif' : 'Semua';
+
+        if (!enabled) {
+            // Matikan semua layer yang mungkin aktif
+            Object.keys(hazardLayers).forEach(type => _setHazardVisible(type, false));
+            activeHazardType = null;
+        }
+
+        // Terapkan class disabled ke semua card
+        Object.keys(hazardLayers).forEach(type => {
+            const card = document.getElementById(`hazard_badge_${type}`);
+            if (!card) return;
+            if (enabled) {
+                card.classList.remove('panel-disabled');
+            } else {
+                card.classList.remove('active');
+                card.classList.add('inactive', 'panel-disabled');
+                const status = document.getElementById(`hazard_status_${type}`);
+                if (status) status.textContent = 'Nonaktif';
+            }
+        });
+    }
+
+    /**
+     * Set visibilitas satu layer (tanpa mengubah state card lain).
+     * Fungsi internal; untuk interaksi user gunakan klik card.
+     */
+    function _setHazardVisible(disasterType, show) {
         const state = hazardLayers[disasterType];
         if (!state) return;
 
         state.visible = show;
+        const card   = document.getElementById(`hazard_badge_${disasterType}`);
+        const status = document.getElementById(`hazard_status_${disasterType}`);
 
-        // Update tampilan badge
-        const badge = document.getElementById(`hazard_badge_${disasterType}`);
-        if (badge) {
-            badge.classList.toggle('active', show);
-            badge.classList.toggle('inactive', !show);
+        if (card) {
+            card.classList.toggle('active', show);
+            card.classList.toggle('inactive', !show);
         }
+        if (status) status.textContent = show ? 'Ditampilkan ✓' : 'Nonaktif';
 
         if (show) {
-            // Muat GeoJSON jika belum
             if (!state.loaded) {
-                state.loaded = true; // flag awal agar tidak double-fetch
+                state.loaded = true;
                 loadHazardGeoJSON(disasterType);
             } else {
                 state.leafletLayer.addTo(map);
@@ -160,61 +222,62 @@
         const state = hazardLayers[disasterType];
         if (!state) return;
 
-        const cfg = state.config;
+        const cfg  = state.config;
+        const card = document.getElementById(`hazard_badge_${disasterType}`);
 
-        // Tampilkan loading indicator pada badge
-        const badge = document.getElementById(`hazard_badge_${disasterType}`);
-        if (badge) badge.style.opacity = '0.6';
+        // Loading indicator: sedikit redup
+        if (card) card.style.opacity = '0.65';
 
         fetch(cfg.geojson_path)
             .then(res => {
-                if (!res.ok) throw new Error(`HTTP ${res.status} saat memuat ${cfg.geojson_path}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status} – ${cfg.geojson_path}`);
                 return res.json();
             })
             .then(geojsonData => {
                 const geoLayer = L.geoJSON(geojsonData, {
-                    style: feature => ({
-                        color: cfg.border_color,
-                        weight: cfg.border_weight,
-                        fillColor: cfg.fill_color,
+                    style: () => ({
+                        color:       cfg.border_color,
+                        weight:      cfg.border_weight,
+                        fillColor:   cfg.fill_color,
                         fillOpacity: cfg.fill_opacity,
-                        opacity: 0.85,
+                        opacity:     0.85,
                     }),
                     onEachFeature: (feature, layer) => {
                         const p = feature.properties || {};
 
-                        // Bangun konten popup dari properti GeoJSON yang umum
-                        const namaArea  = p.NAMOBJ || p.nama || p.name || p.NAMA || p.desa || p.kecamatan || '–';
-                        const tingkat   = p.KELAS || p.kelas || p.tingkat || p.risk_level || p.RAWAN || '–';
-                        const luas      = p.SHAPE_Area ? (parseFloat(p.SHAPE_Area) / 10000).toFixed(2) + ' ha' : (p.luas || '–');
+                        const namaArea   = p.NAMOBJ || p.nama || p.name || p.NAMA || p.desa || p.kecamatan || '–';
+                        const tingkat    = p.KELAS  || p.kelas  || p.tingkat || p.risk_level || p.RAWAN || '–';
+                        const luas       = p.SHAPE_Area
+                            ? (parseFloat(p.SHAPE_Area) / 10000).toFixed(2) + ' ha'
+                            : (p.luas || '–');
                         const keterangan = p.KETERANGAN || p.keterangan || p.description || '';
 
-                        let popupHtml = `
-                            <div style="min-width:180px; font-size:13px;">
-                                <div style="font-weight:700; font-size:14px; margin-bottom:6px; color:${cfg.border_color};">
+                        const popupHtml = `
+                            <div style="min-width:190px;font-size:13px;">
+                                <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:${cfg.border_color};">
                                     ${cfg.icon_emoji || ''} ${cfg.label}
                                 </div>
-                                <table style="border-collapse:collapse; width:100%;">
+                                <table style="border-collapse:collapse;width:100%;">
                                     <tr>
-                                        <td style="color:#6b7280; padding:2px 6px 2px 0; white-space:nowrap;">Nama Area</td>
+                                        <td style="color:#6b7280;padding:2px 8px 2px 0;white-space:nowrap;font-size:12px;">Nama Area</td>
                                         <td style="font-weight:600;">${namaArea}</td>
                                     </tr>
                                     <tr>
-                                        <td style="color:#6b7280; padding:2px 6px 2px 0; white-space:nowrap;">Tingkat Rawan</td>
+                                        <td style="color:#6b7280;padding:2px 8px 2px 0;white-space:nowrap;font-size:12px;">Tingkat Rawan</td>
                                         <td style="font-weight:600;">${tingkat}</td>
                                     </tr>
                                     <tr>
-                                        <td style="color:#6b7280; padding:2px 6px 2px 0; white-space:nowrap;">Luas</td>
+                                        <td style="color:#6b7280;padding:2px 8px 2px 0;white-space:nowrap;font-size:12px;">Luas</td>
                                         <td>${luas}</td>
                                     </tr>
-                                    ${keterangan ? `<tr><td colspan="2" style="color:#374151; padding-top:4px; font-style:italic;">${keterangan}</td></tr>` : ''}
+                                    ${keterangan
+                                        ? `<tr><td colspan="2" style="color:#374151;padding-top:5px;font-style:italic;font-size:11px;">${keterangan}</td></tr>`
+                                        : ''}
                                 </table>
-                            </div>
-                        `;
+                            </div>`;
 
-                        layer.bindPopup(popupHtml, { maxWidth: 280 });
+                        layer.bindPopup(popupHtml, { maxWidth: 300 });
 
-                        // Hover highlight
                         layer.on({
                             mouseover(e) {
                                 e.target.setStyle({ weight: 3, fillOpacity: Math.min(cfg.fill_opacity + 0.2, 0.75) });
@@ -228,19 +291,17 @@
 
                 geoLayer.addTo(state.leafletLayer);
 
-                // Hanya tambah ke peta jika masih dikehendaki visible
                 if (state.visible) {
                     state.leafletLayer.addTo(map);
                 }
-
-                if (badge) badge.style.opacity = '';
+                if (card) card.style.opacity = '';
             })
             .catch(err => {
                 console.error(`Gagal memuat GeoJSON (${disasterType}):`, err);
                 state.loaded = false; // izinkan retry
-                if (badge) {
-                    badge.style.opacity = '';
-                    badge.title = `Gagal memuat: ${cfg.geojson_path}`;
+                if (card) {
+                    card.style.opacity = '';
+                    card.title = `⚠ Gagal memuat: ${cfg.geojson_path}`;
                 }
             });
     }
@@ -256,13 +317,15 @@
                     buildHazardLayerUI(data.layers);
                 } else {
                     const container = document.getElementById('hazard_layer_checkboxes');
-                    if (container) container.innerHTML = '<span class="text-xs text-red-400">Tidak ada layer tersedia.</span>';
+                    if (container) container.innerHTML =
+                        '<span style="grid-column:1/-1;font-size:12px;color:#ef4444;">Tidak ada layer tersedia.</span>';
                 }
             })
             .catch(err => {
                 console.error('Gagal memuat metadata hazard layers:', err);
                 const container = document.getElementById('hazard_layer_checkboxes');
-                if (container) container.innerHTML = '<span class="text-xs text-red-400">Gagal memuat layer.</span>';
+                if (container) container.innerHTML =
+                    '<span style="grid-column:1/-1;font-size:12px;color:#ef4444;">Gagal memuat layer bencana.</span>';
             });
     }
 
