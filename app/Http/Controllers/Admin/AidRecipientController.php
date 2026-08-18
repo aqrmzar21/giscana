@@ -70,7 +70,7 @@ class AidRecipientController extends Controller
         $vil = \App\Models\Village::select('id','yard','zone')->get();
         // dd($vil->toArray());
         $districts = \App\Models\District::with('villages')->get();
-        return $this->partialView('admin.aid-recipients.create', compact('districts'));
+        return $this->partialView('admin.aid-recipients.create', compact('districts', 'vil'));
     }
 
     public function store(Request $request)

@@ -14,7 +14,7 @@
 
 @section('content')
 <!-- Welcome Card  -->
-<div class="lg:col-span-2 bg-white shadow rounded-lg mb-6">
+<!-- <div class="lg:col-span-2 bg-white shadow rounded-lg mb-6">
     <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
             <h3 class="text-lg font-semibold text-gray-900 mb-2">Selamat Datang!</h3>
@@ -26,7 +26,7 @@
             
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Statistics Cards -->
 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-6">
@@ -56,7 +56,7 @@
     <div class="bg-white overflow-hidden shadow rounded-lg">
         <div class="p-5">
             <div class="flex items-center">
-                <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
                     <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                     </svg>
@@ -79,7 +79,7 @@
     <div class="bg-white overflow-hidden shadow rounded-lg">
         <div class="p-5">
             <div class="flex items-center">
-                <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+                <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
                     <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>

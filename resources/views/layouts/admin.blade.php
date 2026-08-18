@@ -112,7 +112,7 @@
                            :title="sidebarCollapsed ? 'Distribusi Bantuan' : ''"
                            class="flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-disasters.index') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
                            :class="{ 'justify-center px-2': sidebarCollapsed }">
-                            <svg class="w-5 h-5 shrink-0" fill="currentColor" stroke="none" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
                             <span x-show="!sidebarCollapsed" class="ml-3 truncate">Distribusi Bantuan</span>
