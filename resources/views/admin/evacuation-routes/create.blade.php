@@ -32,10 +32,15 @@
                     <div>
                         <label for="evacuation_facility_id" class="block text-sm font-medium text-gray-700">Fasilitas Tujuan</label>
                         <div class="mt-1">
-                            <select name="evacuation_facility_id" id="evacuation_facility_id" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('evacuation_facility_id') border-red-300 @enderror">
+                            <select name="evacuation_facility_id" id="evacuation_facility_id"
+                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('evacuation_facility_id') border-red-300 @enderror">
                                 <option value="">-- Pilih Fasilitas Evakuasi --</option>
                                 @foreach($facilities as $f)
-                                    <option value="{{ $f->id }}" {{ old('evacuation_facility_id') == $f->id ? 'selected' : '' }}>{{ $f->name }}</option>
+                                    <option value="{{ $f->id }}"
+                                        data-coords='@json($f->point_coordinates)'
+                                        {{ old('evacuation_facility_id', $evacuationRoute->evacuation_facility_id ?? '') == $f->id ? 'selected' : '' }}>
+                                        {{ $f->name }}
+                                    </option>
                                 @endforeach
                             </select>
                             <p class="mt-2 text-sm text-gray-500">Nama fasilitas diambil dari Titik Kumpul</p>
@@ -129,13 +134,13 @@
                     var points = [];
                     var markers = [];
                     var polyline;
+                    var facilityMarker; // marker khusus fasilitas tujuan
 
-                    // Jika ada data lama, tampilkan
+                    // Jika ada data lama, tampilkan jalur
                     var existingCoords = {!! json_encode($route->line_coordinates ?? []) !!};
                     if (existingCoords.length > 0) {
                         points = existingCoords;
 
-                        // Buat marker draggable untuk tiap titik lama
                         points.forEach(function(coord, idx) {
                             var marker = L.marker([coord[1], coord[0]], {draggable:true}).addTo(map);
                             marker.on('dragend', function(e) {
@@ -149,7 +154,7 @@
                         map.fitBounds(polyline.getBounds());
                     }
 
-                    // Klik peta untuk tambah titik baru
+                    // Klik peta untuk tambah titik jalur
                     map.on('click', function(e) {
                         var lat = e.latlng.lat;
                         var lng = e.latlng.lng;
@@ -189,7 +194,43 @@
                         }
                         document.getElementById('line_coordinates').value = '';
                     });
+
+                    // Tambahkan marker fasilitas tujuan saat dipilih
+                    document.getElementById('evacuation_facility_id').addEventListener('change', function() {
+                        var selected = this.options[this.selectedIndex];
+                        var coords = selected.getAttribute('data-coords');
+                        if (coords) {
+                            var point = JSON.parse(coords); // [lng, lat]
+
+                            // Hapus marker fasilitas lama
+                            if (facilityMarker) {
+                                map.removeLayer(facilityMarker);
+                            }
+
+                            // Tambahkan marker fasilitas (tidak draggable)
+                            facilityMarker = L.marker([point[1], point[0]], {
+                                icon: L.icon({
+                                    iconUrl: '/images/facility.png', // ganti sesuai ikon
+                                    iconSize: [25, 25]
+                                })
+                            }).addTo(map).bindPopup("Titik Kumpul: " + selected.text);
+
+                            map.setView([point[1], point[0]], 15);
+                        }
+                    });
+
+                    // Trigger sekali saat load jika ada fasilitas terpilih
+                    var selectedOption = document.querySelector('#evacuation_facility_id option:checked');
+                    if (selectedOption && selectedOption.value) {
+                        var coords = selectedOption.getAttribute('data-coords');
+                        if (coords) {
+                            var point = JSON.parse(coords);
+                            facilityMarker = L.marker([point[1], point[0]]).addTo(map).bindPopup("Titik Kumpul: " + selectedOption.text);
+                            map.setView([point[1], point[0]], 15);
+                        }
+                    }
                 </script>
+
 
                 <div class="space-y-3">
                     <div class="flex items-center">
