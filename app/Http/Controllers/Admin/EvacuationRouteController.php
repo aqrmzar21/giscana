@@ -143,7 +143,6 @@ class EvacuationRouteController extends Controller
      */
     public function update(Request $request, EvacuationRoute $evacuationRoute)
     {
-        abort_if(!auth()->user()->can('update data'), 403);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
