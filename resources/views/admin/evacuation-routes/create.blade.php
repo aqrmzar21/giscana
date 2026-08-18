@@ -29,24 +29,6 @@
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
 
-                    <!-- <div>
-                        <label for="district_name" class="block text-sm font-medium text-gray-700">Kecamatan</label>
-                        <div class="mt-1">
-                            <select name="district_name" id="district_name"
-                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('district_name') border-red-300 @enderror">
-                                <option value="">-- Pilih Kecamatan --</option>
-                                @foreach($kec as $k)
-                                    <option value="{{ $k->district_name }}" {{ old('district_name') == $k->district_name ? 'selected' : '' }}>
-                                        {{ $k->district_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('district_name')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div> -->
-
                     <div>
                         <label for="evacuation_facility_id" class="block text-sm font-medium text-gray-700">Fasilitas Tujuan</label>
                         <div class="mt-1">
@@ -102,7 +84,17 @@
                     </div>
                 </div>
 
-                <div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Jalur Evakuasi (klik di peta untuk menggambar) <span class="text-red-500">*</span>
+                    </label>
+                    <div id="map" style="height: 400px;" class="mt-2 rounded-md border"></div>
+                    <input type="text" id="geojson" name="geojson">
+                    @error('line_coordinates')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                <!-- <div>
                     <label for="line_coordinates" class="block text-sm font-medium text-gray-700">Koordinat Garis (GeoJSON) <span class="text-red-500">*</span></label>
                     <div class="mt-1">
                         <textarea id="line_coordinates" name="line_coordinates" rows="5" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md font-mono text-xs @error('line_coordinates') border-red-300 @enderror">{{ old('line_coordinates') }}</textarea>
@@ -111,7 +103,47 @@
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
-                </div>
+                </div> -->
+                
+                <script>
+                    var map = L.map('map').setView([0.4681485, 123.126115], 13);
+
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(map);
+
+                    var points = [];
+                    var polyline;
+
+                    map.on('click', function(e) {
+                        var lat = e.latlng.lat;
+                        var lng = e.latlng.lng;
+
+                        points.push([lng, lat]);
+
+                        if (polyline) {
+                            map.removeLayer(polyline);
+                        }
+
+                        polyline = L.polyline(points.map(p => [p[1], p[0]]), {color: 'blue'}).addTo(map);
+
+                        var geojson = {
+                            type: "FeatureCollection",
+                            features: [
+                                {
+                                    type: "Feature",
+                                    properties: {},
+                                    geometry: {
+                                        type: "LineString",
+                                        coordinates: points
+                                    }
+                                }
+                            ]
+                        };
+
+                        document.getElementById('geojson').value = JSON.stringify(geojson);
+                    });
+                </script>
 
                 <div class="space-y-3">
                     <div class="flex items-center">
