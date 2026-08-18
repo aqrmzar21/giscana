@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class AidRecipientController extends Controller
 {
     use \App\Http\Traits\PartialRenderable;
-
+    
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', 10);
@@ -64,8 +64,11 @@ class AidRecipientController extends Controller
         return $pdf->stream('Laporan-Penerima-Bantuan-' . date('Y-m-d') . '.pdf');
     }
 
+    
     public function create()
     {
+        $vil = \App\Models\Village::select('id','yard','zone')->get();
+        // dd($vil->toArray());
         $districts = \App\Models\District::with('villages')->get();
         return $this->partialView('admin.aid-recipients.create', compact('districts'));
     }

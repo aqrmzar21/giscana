@@ -94,7 +94,7 @@
                         <label for="district_id" class="block text-sm font-medium text-gray-700">Kecamatan <span class="text-red-500">*</span></label>
                         <div class="mt-1">
                             <select id="district_id" name="district_id" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('district_id') border-red-300 @enderror">
-                                <option value="">Pilih Kecamatan</option>
+                                <option value="" disabled selected hidden>Pilih Kecamatan</option>
                                 @foreach($districts as $district)
                                     <option value="{{ $district->id }}" {{ (string) $selectedDistrictId === (string) $district->id ? 'selected' : '' }}>
                                         {{ $district->name }}
@@ -111,15 +111,13 @@
                         <label for="village_id" class="block text-sm font-medium text-gray-700">Desa/Kelurahan <span class="text-red-500">*</span></label>
                         <div class="mt-1">
                             <select id="village_id" name="village_id" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('village_id') border-red-300 @enderror">
-                                <option value="">Pilih Desa/Kelurahan</option>
+                                <option value="" disabled selected hidden>Pilih Desa/Kelurahan</option>
                                 @foreach($districts as $district)
                                     @foreach($district->villages as $village)
                                         <option
                                             value="{{ $village->id }}"
                                             data-district-id="{{ $district->id }}"
-                                            {{ (string) $selectedVillageId === (string) $village->id ? 'selected' : '' }}
-                                        >
-                                            {{ $village->yard }}
+                                            {{ (string) $selectedVillageId === (string) $village->id ? 'selected' : '' }} > {{ $village->yard }}
                                         </option>
                                     @endforeach
                                 @endforeach
@@ -130,6 +128,40 @@
                         </div>
                     </div>
                 </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const districtSelect = document.getElementById('district_id');
+                        const villageSelect = document.getElementById('village_id');
+                        if (!districtSelect || !villageSelect) return;
+                
+                        const villageOptions = Array.from(villageSelect.querySelectorAll('option[data-district-id]'));
+                
+                        function filterVillages() {
+                            const selectedDistrictId = districtSelect.value;
+                            const selectedVillageOption = villageSelect.options[villageSelect.selectedIndex];
+                
+                            villageOptions.forEach(option => {
+                                const matchesDistrict = selectedDistrictId && option.dataset.districtId === selectedDistrictId;
+                                option.hidden = !matchesDistrict;
+                                option.disabled = !matchesDistrict;
+                            });
+                
+                            const selectedVillageMatchesDistrict =
+                                selectedVillageOption &&
+                                selectedVillageOption.dataset &&
+                                selectedVillageOption.dataset.districtId === selectedDistrictId;
+                
+                            if (!selectedVillageMatchesDistrict) {
+                                villageSelect.value = '';
+                            }
+                        }
+                
+                        districtSelect.addEventListener('change', filterVillages);
+                
+                        // 🔑 panggil sekali saat load
+                        filterVillages();
+                    });
+                </script>
 
                 <div>
                     <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi Keterangan</label>
@@ -157,39 +189,3 @@
 
 
 @endsection
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const districtSelect = document.getElementById('district_id');
-        const villageSelect = document.getElementById('village_id');
-        if (!districtSelect || !villageSelect) return;
-
-        const villageOptions = Array.from(villageSelect.querySelectorAll('option[data-district-id]'));
-
-        function filterVillages() {
-            const selectedDistrictId = districtSelect.value;
-            const selectedVillageOption = villageSelect.options[villageSelect.selectedIndex];
-
-            villageOptions.forEach(option => {
-                const matchesDistrict = selectedDistrictId && option.dataset.districtId === selectedDistrictId;
-                option.hidden = !matchesDistrict;
-                option.disabled = !matchesDistrict;
-            });
-
-            const selectedVillageMatchesDistrict =
-                selectedVillageOption &&
-                selectedVillageOption.dataset &&
-                selectedVillageOption.dataset.districtId === selectedDistrictId;
-
-            if (!selectedVillageMatchesDistrict) {
-                villageSelect.value = '';
-            }
-        }
-
-        districtSelect.addEventListener('change', filterVillages);
-
-        // 🔑 panggil sekali saat load
-        filterVillages();
-    });
-</script>
-@endpush
