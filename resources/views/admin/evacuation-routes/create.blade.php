@@ -84,16 +84,6 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">
-                        Jalur Evakuasi (klik di peta untuk menggambar) <span class="text-red-500">*</span>
-                    </label>
-                    <div id="map" style="height: 400px;" class="mt-2 rounded-md border"></div>
-                    <input type="text" id="geojson" name="geojson">
-                    @error('line_coordinates')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
                 <!-- <div>
                     <label for="line_coordinates" class="block text-sm font-medium text-gray-700">Koordinat Garis (GeoJSON) <span class="text-red-500">*</span></label>
                     <div class="mt-1">
@@ -105,6 +95,30 @@
                     </div>
                 </div> -->
                 
+                <div>
+                    <label for="line_coordinates" class="block text-sm font-medium text-gray-700">
+                        Koordinat Garis (GeoJSON) <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-1">
+                        <textarea id="line_coordinates" name="line_coordinates" rows="5" required
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md font-mono text-xs @error('line_coordinates') border-red-300 @enderror">
+                            {{ old('line_coordinates', $route->line_coordinates ?? '') }}
+                        </textarea>
+                        <p class="mt-2 text-sm text-gray-500">
+                            Format: JSON FeatureCollection dengan LineString
+                        </p>
+                        @error('line_coordinates')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div id="map" style="height: 400px;" class="mt-4 rounded-md border"></div>
+                <button type="button" id="resetRoute"
+                    class="mt-3 bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded">
+                    Reset Jalur
+                </button>
+
                 <script>
                     var map = L.map('map').setView([0.4681485, 123.126115], 13);
 
@@ -113,18 +127,61 @@
                     }).addTo(map);
 
                     var points = [];
+                    var markers = [];
                     var polyline;
 
+                    // Jika ada data lama, tampilkan
+                    var existingGeojson = {!! json_encode($route->line_coordinates ?? null) !!};
+                    if (existingGeojson) {
+                        try {
+                            var parsed = JSON.parse(existingGeojson);
+                            L.geoJSON(parsed, { style: { color: 'blue' } }).addTo(map);
+                            map.fitBounds(L.geoJSON(parsed).getBounds());
+
+                            if (parsed.features.length > 0) {
+                                points = parsed.features[0].geometry.coordinates;
+
+                                // Buat marker draggable untuk tiap titik lama
+                                points.forEach(function(coord, idx) {
+                                    var marker = L.marker([coord[1], coord[0]], {draggable:true}).addTo(map);
+                                    marker.on('dragend', function(e) {
+                                        var latlng = e.target.getLatLng();
+                                        points[idx] = [latlng.lng, latlng.lat];
+                                        updatePolyline();
+                                    });
+                                    markers.push(marker);
+                                });
+                                updatePolyline();
+                            }
+                        } catch (e) {
+                            console.error("GeoJSON lama tidak valid", e);
+                        }
+                    }
+
+                    // Klik peta untuk tambah titik baru
                     map.on('click', function(e) {
                         var lat = e.latlng.lat;
                         var lng = e.latlng.lng;
 
                         points.push([lng, lat]);
 
+                        var marker = L.marker([lat, lng], {draggable:true}).addTo(map);
+                        marker.on('dragend', function(ev) {
+                            var latlng = ev.target.getLatLng();
+                            var idx = markers.indexOf(marker);
+                            points[idx] = [latlng.lng, latlng.lat];
+                            updatePolyline();
+                        });
+                        markers.push(marker);
+
+                        updatePolyline();
+                    });
+
+                    // Update polyline & textarea
+                    function updatePolyline() {
                         if (polyline) {
                             map.removeLayer(polyline);
                         }
-
                         polyline = L.polyline(points.map(p => [p[1], p[0]]), {color: 'blue'}).addTo(map);
 
                         var geojson = {
@@ -141,7 +198,19 @@
                             ]
                         };
 
-                        document.getElementById('geojson').value = JSON.stringify(geojson);
+                        document.getElementById('line_coordinates').value = JSON.stringify(geojson, null, 2);
+                    }
+
+                    // Reset jalur
+                    document.getElementById('resetRoute').addEventListener('click', function() {
+                        points = [];
+                        markers.forEach(m => map.removeLayer(m));
+                        markers = [];
+                        if (polyline) {
+                            map.removeLayer(polyline);
+                            polyline = null;
+                        }
+                        document.getElementById('line_coordinates').value = '';
                     });
                 </script>
 
