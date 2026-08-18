@@ -106,6 +106,7 @@ class EvacuationRouteController extends Controller
             'description' => 'nullable|string',
             'line_coordinates' => 'required|json',
             'route_type' => 'required|in:primary,secondary,emergency',
+            'evacuation_facility_id' => 'nullable|exists:evacuation_facilities,id',
             'is_accessible' => 'boolean',
             'is_active' => 'boolean',
         ]);
@@ -147,7 +148,8 @@ class EvacuationRouteController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'line_coordinates' => 'required|json',
-            'route_type' => 'required|in:primary,secondary,emergency',
+            'route_type' => 'required|in:primary,secondary,emergency',    
+            'evacuation_facility_id' => 'nullable|exists:evacuation_facilities,id',
             'is_accessible' => 'boolean',
             'is_active' => 'boolean',
         ]);
