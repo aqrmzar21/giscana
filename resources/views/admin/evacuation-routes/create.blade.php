@@ -131,31 +131,22 @@
                     var polyline;
 
                     // Jika ada data lama, tampilkan
-                    var existingGeojson = {!! json_encode($route->line_coordinates ?? null) !!};
-                    if (existingGeojson) {
-                        try {
-                            var parsed = JSON.parse(existingGeojson);
-                            L.geoJSON(parsed, { style: { color: 'blue' } }).addTo(map);
-                            map.fitBounds(L.geoJSON(parsed).getBounds());
+                    var existingCoords = {!! json_encode($route->line_coordinates ?? []) !!};
+                    if (existingCoords.length > 0) {
+                        points = existingCoords;
 
-                            if (parsed.features.length > 0) {
-                                points = parsed.features[0].geometry.coordinates;
-
-                                // Buat marker draggable untuk tiap titik lama
-                                points.forEach(function(coord, idx) {
-                                    var marker = L.marker([coord[1], coord[0]], {draggable:true}).addTo(map);
-                                    marker.on('dragend', function(e) {
-                                        var latlng = e.target.getLatLng();
-                                        points[idx] = [latlng.lng, latlng.lat];
-                                        updatePolyline();
-                                    });
-                                    markers.push(marker);
-                                });
+                        // Buat marker draggable untuk tiap titik lama
+                        points.forEach(function(coord, idx) {
+                            var marker = L.marker([coord[1], coord[0]], {draggable:true}).addTo(map);
+                            marker.on('dragend', function(e) {
+                                var latlng = e.target.getLatLng();
+                                points[idx] = [latlng.lng, latlng.lat];
                                 updatePolyline();
-                            }
-                        } catch (e) {
-                            console.error("GeoJSON lama tidak valid", e);
-                        }
+                            });
+                            markers.push(marker);
+                        });
+                        updatePolyline();
+                        map.fitBounds(polyline.getBounds());
                     }
 
                     // Klik peta untuk tambah titik baru
@@ -184,21 +175,7 @@
                         }
                         polyline = L.polyline(points.map(p => [p[1], p[0]]), {color: 'blue'}).addTo(map);
 
-                        var geojson = {
-                            type: "FeatureCollection",
-                            features: [
-                                {
-                                    type: "Feature",
-                                    properties: {},
-                                    geometry: {
-                                        type: "LineString",
-                                        coordinates: points
-                                    }
-                                }
-                            ]
-                        };
-
-                        document.getElementById('line_coordinates').value = JSON.stringify(geojson, null, 2);
+                        document.getElementById('line_coordinates').value = JSON.stringify(points, null, 2);
                     }
 
                     // Reset jalur
