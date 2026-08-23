@@ -5,29 +5,55 @@
 @include('map.partials.map-styles', ['mapUiVariant' => 'landing-fs'])
 
 @section('content')
-<div class="map-landing-fs" id="map-landing-wrapper">
-    <div id="map"></div>
-</div>
-@endsection
-@section('map-toolbar')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
-    <div class="flex flex-col lg:grid lg:grid-cols-12 lg:gap-x-0 lg:items-start">
-        <!-- Text: Mobile Bottom (order 3), Desktop Top-Left -->
-        <div class="order-3 lg:order-none lg:col-span-4 lg:col-start-1 lg:row-start-1 lg:pr-6 border-t border-gray-200 pt-5 mt-5 lg:border-t-0 lg:pt-0 lg:mt-0">
-            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Kontrol peta</p>
-        </div>
 
-        <!-- Legend: Mobile Top (order 1), Desktop Bottom-Left -->
-        <div class="order-1 lg:order-none lg:col-span-4 lg:col-start-1 lg:row-start-2 lg:pr-6 lg:mt-4">
+<div id="map" class="absolute inset-0 h-screen w-screen z-50"></div>
+
+<!-- Toolbar melayang transparan -->
+<div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-[95%] lg:w-[90%] z-50">
+    <div class="grid grid-cols-1 lg:grid-cols-[auto,1fr,1fr] gap-6">
+        
+        <!-- Panel Legenda -->
+        <div class="bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-4">
             @include('map.partials.map-legend-content')
         </div>
 
-        <!-- Controls: Mobile Middle (order 2), Desktop Right (spans 2 rows) -->
-        <div class="order-2 lg:order-none lg:col-span-8 lg:col-start-5 lg:row-start-1 lg:row-span-2 min-w-0 space-y-3 lg:border-l border-gray-200 lg:pl-6 border-t border-gray-200 pt-5 mt-5 lg:border-t-0 lg:pt-0 lg:mt-0">
-            @include('map.partials.map-controls-inner', ['toolbarContext' => 'footer', 'hideToolbarHeading' => false, 'hideLegend' => true])
+        <!-- Panel Filter + Checkbox -->
+        <div class="bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-4 space-y-4">
+            <h3 class="text-sm font-semibold text-gray-800 mb-3">Filter Peta</h3>
+            @include('map.partials.map-filters-fields')
+
+            <div class="border-t border-gray-200 pt-3">
+                @include('map.partials.map-district-checkbox')
+            </div>
         </div>
+
+        <!-- Panel Layer Rawan Bencana -->
+        <div class="bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-4 space-y-4">
+            <h3 class="text-sm font-semibold text-gray-800 mb-3">Layer Rawan Bencana</h3>
+            @include('map.partials.map-panel-hazard')
+        </div>
+
     </div>
 </div>
+
+    <!-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4"> -->
+        <!-- <div class="flex flex-col lg:grid lg:grid-cols-12 lg:gap-x-0 lg:items-start"> -->
+            <!-- Text: Mobile Bottom (order 3), Desktop Top-Left -->
+            <!-- <div class="order-3 lg:order-none lg:col-span-4 lg:col-start-1 lg:row-start-1 lg:pr-6 border-t border-gray-200 pt-5 mt-5 lg:border-t-0 lg:pt-0 lg:mt-0">
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Kontrol peta</p>
+            </div> -->
+        <!-- </div> -->
+
+        <!-- Legend: Mobile Top (order 1), Desktop Bottom-Left -->
+        <!-- <div class="order-1 lg:order-none lg:col-span-4 lg:col-start-1 lg:row-start-2 lg:pr-6 lg:mt-4">
+            @include('map.partials.map-legend-content')
+        </div> -->
+
+        <!-- Controls: Mobile Middle (order 2), Desktop Right (spans 2 rows) -->
+        <!-- <div class="order-2 lg:order-none lg:col-span-8 lg:col-start-5 lg:row-start-1 lg:row-span-2 min-w-0 space-y-3 lg:border-l border-gray-200 lg:pl-6 border-t border-gray-200 pt-5 mt-5 lg:border-t-0 lg:pt-0 lg:mt-0">
+            @include('map.partials.map-controls-inner', ['toolbarContext' => 'footer', 'hideToolbarHeading' => false, 'hideLegend' => true])
+        </div> -->
+    <!-- </div> -->
 @endsection
 
 

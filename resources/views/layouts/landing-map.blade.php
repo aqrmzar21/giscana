@@ -22,15 +22,16 @@
 
     @include('components.landing-nav')
 
-    <main id="page-content" class="flex flex-1 flex-col min-h-0 min-w-0">
+    <main id="page-content" class="flex-1 relative">
         @endif
         {{-- ═══ KONTEN UTAMA ═══ --}}
                 @yield('content')
-        @if(!$__isPjax)
+                @if(!$__isPjax)
     </main>
-
-    <footer class="shrink-0 z-40 border-t border-gray-200 bg-white shadow-[0_-4px_24px_rgba(0,0,0,0.08)] max-h-[100vh] overflow-y-auto overscroll-contain">
-        @yield('map-toolbar')
+    
+    <footer class="justify-center text-center py-2 bg-white relative z-50">
+        <!-- @yield('map-toolbar') -->
+        copyright @aqrmlhdytllh || 2026
     </footer>
 
     @stack('scripts')
