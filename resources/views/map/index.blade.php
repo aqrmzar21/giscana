@@ -9,11 +9,11 @@
 <div id="map" class="absolute inset-0 h-screen w-screen z-50"></div>
 
 <!-- Toolbar melayang transparan -->
-<div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-[95%] lg:w-[90%] z-50">
-    <div class="grid grid-cols-1 lg:grid-cols-[auto,1fr,1fr] gap-6">
+<div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-[85%] lg:w-[60%] z-50">
+    <div class="grid grid-cols-1 lg:grid-cols-[auto,1fr,1fr] gap-6 items-end">
         
         <!-- Panel Legenda -->
-        <div class="bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-4">
+        <div class="bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-4 h-auto w-auto">
             @include('map.partials.map-legend-content')
         </div>
 
