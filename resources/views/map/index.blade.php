@@ -14,7 +14,7 @@
     </div>
     
 <!-- Toolbar melayang transparan -->
-<div class="absolute bottom-6 left-0 w-full z-50">
+<div class="absolute bottom-6 right-0 z-50">
     <div class="flex justify-end gap-6 items-end px-6">
         
         <!-- Panel Legenda -->
