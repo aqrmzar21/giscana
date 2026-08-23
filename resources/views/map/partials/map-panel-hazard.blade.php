@@ -6,14 +6,6 @@
         </svg>
         <span>Sebaran Kawasan Rawan Bencana</span>
     </div>
-    {{-- Master Toggle Switch --}}
-    <label class="hazard-master-toggle" id="master_toggle_label" title="Aktifkan/nonaktifkan semua layer">
-        <input type="checkbox" id="toggle_all_hazard_layers">
-        <span class="hazard-toggle-track">
-            <span class="hazard-toggle-thumb"></span>
-        </span>
-        <span class="hazard-toggle-text" id="master_toggle_text">Semua</span>
-    </label>
 </div>
 
 {{-- Hint teks --}}

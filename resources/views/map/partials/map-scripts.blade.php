@@ -67,9 +67,7 @@
     // =====================================================================
     // HAZARD LAYERS (GeoJSON dari public/geojson/)
     // Perilaku: EXCLUSIVE — hanya satu layer aktif sekaligus.
-    // Klik layer aktif → nonaktifkan.
-    // Klik layer lain → nonaktifkan yang aktif, aktifkan yang diklik.
-    // Master toggle → aktifkan/nonaktifkan seluruh panel.
+    // Klik card → aktifkan/nonaktifkan layer.
     // =====================================================================
 
     /** Map: disaster_type -> { config, leafletLayer, loaded, visible } */
@@ -77,9 +75,6 @@
 
     /** disaster_type yang sedang aktif (atau null jika tidak ada) */
     let activeHazardType = null;
-
-    /** Apakah panel hazard layer sedang diaktifkan (master switch) */
-    let hazardPanelEnabled = false;
 
     /**
      * Bangun UI kartu badge per layer setelah metadata API diambil.
@@ -112,7 +107,7 @@
             };
 
             const card = document.createElement('div');
-            card.className = 'hazard-card inactive panel-disabled';
+            card.className = 'hazard-card inactive';
             card.id = `hazard_badge_${cfg.disaster_type}`;
             card.title = cfg.description || cfg.label;
             card.style.setProperty('--hc-color', cfg.border_color);
@@ -131,11 +126,9 @@
 
             // Klik card → exclusive toggle
             card.addEventListener('click', () => {
-                if (!hazardPanelEnabled) return;
                 const isCurrentlyActive = (activeHazardType === cfg.disaster_type);
-                // Nonaktifkan semua
+                // Nonaktifkan semua dulu
                 Object.keys(hazardLayers).forEach(type => _setHazardVisible(type, false));
-                // Jika tadi tidak aktif → aktifkan
                 if (!isCurrentlyActive) {
                     _setHazardVisible(cfg.disaster_type, true);
                     activeHazardType = cfg.disaster_type;
@@ -144,50 +137,10 @@
                 }
             });
         });
-
-        // Master toggle switch
-        const masterSwitch = document.getElementById('toggle_all_hazard_layers');
-        if (masterSwitch) {
-            masterSwitch.addEventListener('change', () => {
-                hazardPanelEnabled = masterSwitch.checked;
-                _applyMasterState(hazardPanelEnabled);
-            });
-        }
-    }
-
-    /**
-     * Terapkan state master (enable/disable seluruh panel).
-     * Jika dimatikan: semua layer dihilangkan dari peta, semua card disabled.
-     * Jika dinyalakan: card bisa diklik, tapi belum ada yang aktif.
-     */
-    function _applyMasterState(enabled) {
-        const masterText = document.getElementById('master_toggle_text');
-        if (masterText) masterText.textContent = enabled ? 'Aktif' : 'Semua';
-
-        if (!enabled) {
-            // Matikan semua layer yang mungkin aktif
-            Object.keys(hazardLayers).forEach(type => _setHazardVisible(type, false));
-            activeHazardType = null;
-        }
-
-        // Terapkan class disabled ke semua card
-        Object.keys(hazardLayers).forEach(type => {
-            const card = document.getElementById(`hazard_badge_${type}`);
-            if (!card) return;
-            if (enabled) {
-                card.classList.remove('panel-disabled');
-            } else {
-                card.classList.remove('active');
-                card.classList.add('inactive', 'panel-disabled');
-                const status = document.getElementById(`hazard_status_${type}`);
-                if (status) status.textContent = 'Nonaktif';
-            }
-        });
     }
 
     /**
      * Set visibilitas satu layer (tanpa mengubah state card lain).
-     * Fungsi internal; untuk interaksi user gunakan klik card.
      */
     function _setHazardVisible(disasterType, show) {
         const state = hazardLayers[disasterType];
@@ -225,7 +178,6 @@
         const cfg  = state.config;
         const card = document.getElementById(`hazard_badge_${disasterType}`);
 
-        // Loading indicator: sedikit redup
         if (card) card.style.opacity = '0.65';
 
         fetch(cfg.geojson_path)
@@ -244,21 +196,15 @@
                     }),
                     onEachFeature: (feature, layer) => {
                         const p = feature.properties || {};
-
                         const namaArea   = p.NAMOBJ || p.nama || p.name || p.NAMA || p.desa || p.kecamatan || '–';
-                        const tingkat    = p.KELAS  || p.kelas  || p.tingkat || p.risk_level || p.RAWAN || '–';
-                        const luas       = p.SHAPE_Area
-                            ? (parseFloat(p.SHAPE_Area) / 10000).toFixed(2) + ' ha'
-                            : (p.luas || '–');
-                        const keterangan = p.KETERANGAN || p.keterangan || p.description || '';
 
                         const popupHtml = `
                             <div style="min-width:190px;font-size:13px;">
                                 <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:${cfg.border_color};">
                                     ${cfg.icon_emoji || ''} ${cfg.label}
                                 </div>
+                                <div>${namaArea}</div>
                             </div>`;
-
                         layer.bindPopup(popupHtml, { maxWidth: 300 });
 
                         layer.on({
@@ -311,6 +257,7 @@
                     '<span style="grid-column:1/-1;font-size:12px;color:#ef4444;">Gagal memuat layer bencana.</span>';
             });
     }
+
 
     // =====================================================================
     // MAP DATA (data DB: disaster zones, routes, facilities)
