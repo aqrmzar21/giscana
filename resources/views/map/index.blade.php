@@ -9,8 +9,8 @@
 <div id="map" class="absolute inset-0 h-screen w-screen z-50"></div>
 
 <!-- Toolbar melayang transparan -->
-<div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-[85%] lg:w-[60%] z-50">
-    <div class="grid grid-cols-1 lg:grid-cols-[auto,1fr,1fr] gap-6 items-end">
+<div class="absolute bottom-6 left-0 w-full z-50">
+    <div class="flex justify-end gap-6 items-end px-6">
         
         <!-- Panel Legenda -->
         <div class="bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-4 h-auto w-auto">
@@ -18,7 +18,7 @@
         </div>
 
         <!-- Panel Filter + Checkbox -->
-        <div class="bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-4 space-y-4">
+        <div class="bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-4 space-y-4 h-auto">
             <h3 class="text-sm font-semibold text-gray-800 mb-3">Filter Peta</h3>
             @include('map.partials.map-filters-fields')
 
@@ -28,13 +28,14 @@
         </div>
 
         <!-- Panel Layer Rawan Bencana -->
-        <div class="bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-4 space-y-4">
+        <div class="bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-4 space-y-4 h-auto">
             <h3 class="text-sm font-semibold text-gray-800 mb-3">Layer Rawan Bencana</h3>
             @include('map.partials.map-panel-hazard')
         </div>
 
     </div>
 </div>
+
 
     <!-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4"> -->
         <!-- <div class="flex flex-col lg:grid lg:grid-cols-12 lg:gap-x-0 lg:items-start"> -->
