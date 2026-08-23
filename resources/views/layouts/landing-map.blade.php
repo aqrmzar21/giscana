@@ -29,9 +29,9 @@
                 @if(!$__isPjax)
     </main>
     
-    <footer class="justify-center text-center py-2 bg-white relative z-50">
+    <footer class="inline-flex justify-center text-center py-2 bg-white relative z-50">
         <!-- @yield('map-toolbar') -->
-        copyright @aqrmlhdytllh || 2026
+        copyright v1.0 ©2026 || aqrmlhdytllh
     </footer>
 
     @stack('scripts')

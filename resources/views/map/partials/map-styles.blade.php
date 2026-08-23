@@ -132,10 +132,9 @@
         flex-shrink: 0;
     }
     .hazard-panel-hint {
-        font-size: 11px;
+        font-size: 10px;
         color: #9ca3af;
-        padding: 5px 14px 0;
-        margin: 0;
+        padding: 5px 2px 0;
         font-style: italic;
     }
 

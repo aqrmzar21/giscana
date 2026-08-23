@@ -8,14 +8,18 @@
 
 <div id="map" class="absolute inset-0 h-screen w-screen z-50"></div>
 
+    <!-- Legenda di pojok kiri bawah -->
+    <div class="absolute bottom-4 left-4 z-50 p-3">
+        @include('map.partials.map-legend-content')
+    </div>
+    
 <!-- Toolbar melayang transparan -->
 <div class="absolute bottom-6 left-0 w-full z-50">
     <div class="flex justify-end gap-6 items-end px-6">
         
         <!-- Panel Legenda -->
-        <div class="bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-4 h-auto w-auto">
-            @include('map.partials.map-legend-content')
-        </div>
+        <!-- <div class="bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-4 h-auto w-auto">
+        </div> -->
 
         <!-- Panel Filter + Checkbox -->
         <div class="bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-4 space-y-4 h-auto">
@@ -56,7 +60,5 @@
         </div> -->
     <!-- </div> -->
 @endsection
-
-
 
 @include('map.partials.map-scripts', ['mapUiVariant' => 'landing-fs'])

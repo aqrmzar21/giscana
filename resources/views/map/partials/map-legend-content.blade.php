@@ -19,27 +19,5 @@
             <div class="legend-color" style="background-color: #fde68a; border: 1px dashed #facc15;"></div>
             <span class="text-gray-700">Batas Wilayah</span>
         </div>
-
-        {{-- Divider --}}
-        <!-- <div class="legend-divider my-1"></div>
-        <div class="text-gray-500 font-semibold text-xs mb-1 w-full">Sebaran Rawan Bencana</div>
-
-        {{-- Layer GeoJSON Rawan Bencana --}}
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #3b82f6; opacity: 0.7;"></div>
-            <span class="text-gray-700">Rawan Banjir</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #f97316; opacity: 0.7;"></div>
-            <span class="text-gray-700">Rawan Gempa</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #06b6d4; opacity: 0.7;"></div>
-            <span class="text-gray-700">Rawan Tsunami</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #84cc16; opacity: 0.7;"></div>
-            <span class="text-gray-700">Rawan Longsor</span>
-        </div> -->
     </div>
 </div>

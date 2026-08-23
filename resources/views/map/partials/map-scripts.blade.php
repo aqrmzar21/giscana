@@ -467,7 +467,7 @@
                             .then(data => {
                                 L.geoJSON(data, {
                                     style: {
-                                        color: '#ffffffff',
+                                        color: '#00ff37ff',
                                         weight: 1,
                                         fillColor: '#e3fa60ff',
                                         fillOpacity: 0.1,
