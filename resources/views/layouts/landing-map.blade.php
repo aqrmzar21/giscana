@@ -23,13 +23,13 @@
     @include('components.landing-nav')
 
     <main id="page-content" class="flex flex-1 flex-col min-h-0 min-w-0">
-@endif
-{{-- ═══ KONTEN UTAMA ═══ --}}
-        @yield('content')
-@if(!$__isPjax)
+        @endif
+        {{-- ═══ KONTEN UTAMA ═══ --}}
+                @yield('content')
+        @if(!$__isPjax)
     </main>
 
-    <footer class="shrink-0 z-40 border-t border-gray-200 bg-white shadow-[0_-4px_24px_rgba(0,0,0,0.08)] max-h-[42vh] overflow-y-auto overscroll-contain">
+    <footer class="shrink-0 z-40 border-t border-gray-200 bg-white shadow-[0_-4px_24px_rgba(0,0,0,0.08)] max-h-[100vh] overflow-y-auto overscroll-contain">
         @yield('map-toolbar')
     </footer>
 

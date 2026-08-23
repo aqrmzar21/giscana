@@ -21,7 +21,7 @@
         </div>
 
         {{-- Divider --}}
-        <div class="legend-divider my-1"></div>
+        <!-- <div class="legend-divider my-1"></div>
         <div class="text-gray-500 font-semibold text-xs mb-1 w-full">Sebaran Rawan Bencana</div>
 
         {{-- Layer GeoJSON Rawan Bencana --}}
@@ -40,6 +40,6 @@
         <div class="legend-item">
             <div class="legend-color" style="background-color: #84cc16; opacity: 0.7;"></div>
             <span class="text-gray-700">Rawan Longsor</span>
-        </div>
+        </div> -->
     </div>
 </div>
