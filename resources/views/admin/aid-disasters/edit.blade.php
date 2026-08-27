@@ -54,7 +54,7 @@
 
                 <div>
                     <label for="district_name" class="block text-sm font-medium text-gray-700">
-                        District Name <span class="text-red-500">*</span>
+                        Nama Kecamatan <span class="text-red-500">*</span>
                     </label>
                     <div class="mt-1">
                         <input type="text" name="district_name" id="district_name"
@@ -70,7 +70,7 @@
                     <div>
                         <div class="my-2">
                         <label for="total_recipients" class="block text-sm font-medium text-gray-700 py-2">
-                            Total Recipients
+                            Jumlah KK Penerima
                         </label>
                             <input type="number" name="total_recipients" id="total_recipients"
                                 value="{{ old('total_recipients', $aidDisaster->total_recipients) }}" min="0"
@@ -84,10 +84,10 @@
                     <div>
                         <div class="my-2">
                         <label for="distributed_aid" class="block text-sm font-medium text-gray-700 py-2">
-                            Distributed Aid
+                            Bantuan Terdistribusi
                         </label>
                             <input type="number" name="distributed_aid" id="distributed_aid"
-                                value="{{ old('distributed_aid', $aidDisaster->distributed_aid) }}" min="0"
+                                value="{{ old('distributed_aid', $aidDisaster->distributed_aid) }}" min="0" disabled
                                 class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('distributed_aid') border-red-300 @enderror">
                             @error('distributed_aid')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

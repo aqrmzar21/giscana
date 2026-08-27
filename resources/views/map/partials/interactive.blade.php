@@ -22,7 +22,7 @@
         </div>
 
         {{-- Hint teks --}}
-        <p class="hazard-panel-hint">Pilih satu jenis bencana untuk ditampilkan di peta</p>
+        <p class="hazard-panel-hint mx-4">Pilih satu jenis bencana untuk ditampilkan di peta</p>
 
         {{-- Badge grid per bencana --}}
         <div class="hazard-badges-grid" id="hazard_layer_checkboxes">

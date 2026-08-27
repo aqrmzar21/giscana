@@ -31,7 +31,7 @@
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Nama Rute <span class="text-red-500">*</span></label>
                     <div class="mt-1">
-                        <input type="text" name="name" id="name" value="{{ old('name', $evacuationRoute->name) }}" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('name') border-red-300 @enderror">
+                        <input type="text" name="name" id="name" value="{{ old('name', $evacuationRoute->name) }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('name') border-red-300 @enderror">
                         @error('name')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
