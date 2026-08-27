@@ -22,6 +22,7 @@
         map.invalidateSize({ animate: false });
     }
 
+    // --- existing layers and tile layers (keep your definitions) ---
     const layers = {
         disasterZones: L.layerGroup().addTo(map),
         evacuationRoutes: L.layerGroup().addTo(map),
@@ -29,26 +30,21 @@
         districtBoundaries: L.layerGroup().addTo(map),
     };
 
-    // OpenStreetMap default
     const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19
     });
-
-    // OpenTopoMap
     const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenTopoMap contributors',
         maxZoom: 17
     });
-
-    // Esri World Imagery (satellite)
-    const esriSat = L.tileLayer(
-        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles © Esri'
     });
-
     osm.addTo(map);
 
+    // mapping keys to objects for UI
+    const baseMaps = { osm, topo, esriSat };
     const overlayMaps = {
         "Zona Bencana": layers.disasterZones,
         "Rute Evakuasi": layers.evacuationRoutes,
@@ -56,13 +52,156 @@
         "Batas Administrasi": layers.districtBoundaries
     };
 
-    const baseMaps = {
-        "Peta Jalan": osm,
-        "Topografi": topo,
-        "Satelit": esriSat
-    };
+    // --- helper to create overlay item node ---
+    function createOverlayItem(label, key, layerObj) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'flex items-center justify-between gap-3';
 
-    L.control.layers(baseMaps, overlayMaps).addTo(map);
+        const left = document.createElement('div');
+        left.className = 'flex items-center gap-3';
+
+        // small icon placeholder
+        const icon = document.createElement('div');
+        icon.className = 'h-8 w-8 rounded-md flex items-center justify-center text-sm';
+        icon.style.background = '#f3f4f6';
+        icon.innerText = label.charAt(0);
+
+        const title = document.createElement('div');
+        title.className = 'text-sm text-gray-800';
+        title.innerText = label;
+
+        left.appendChild(icon);
+        left.appendChild(title);
+
+        const toggle = document.createElement('button');
+        toggle.className = 'overlay-toggle inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-white/60 hover:bg-white/80 border border-transparent';
+        toggle.innerText = 'Nonaktif';
+        toggle.dataset.key = key;
+
+        // click handler: exclusive for disasterZones group, others toggle independently
+        toggle.addEventListener('click', () => {
+            // UX: show loading state
+            toggle.disabled = true;
+            toggle.classList.add('opacity-70');
+
+            // exclusive behavior for disasterZones group (if key contains 'disaster' or label matches)
+            const isDisaster = /zona|bencana/i.test(label);
+            if (isDisaster) {
+                // turn off all disaster-related layers first
+                Object.keys(overlayMaps).forEach(k => {
+                    if (/zona|bencana/i.test(k)) {
+                        _setOverlayVisible(k, false);
+                    }
+                });
+                // toggle this one
+                const currentlyOn = toggle.classList.contains('active');
+                if (!currentlyOn) {
+                    _setOverlayVisible(label, true);
+                } else {
+                    _setOverlayVisible(label, false);
+                }
+            } else {
+                // independent toggle
+                const currentlyOn = toggle.classList.contains('active');
+                _setOverlayVisible(label, !currentlyOn);
+            }
+
+            // small delay to simulate loading UX; real loading handled in _setOverlayVisible
+            setTimeout(() => {
+                toggle.disabled = false;
+                toggle.classList.remove('opacity-70');
+            }, 300);
+        });
+
+        wrapper.appendChild(left);
+        wrapper.appendChild(toggle);
+        return wrapper;
+    }
+
+    // --- function to set overlay visible by label key ---
+    function _setOverlayVisible(label, show) {
+        const layer = overlayMaps[label];
+        if (!layer) return;
+        const overlayList = document.getElementById('overlay-list');
+        const btn = overlayList.querySelector(`button[data-key="${label}"]`);
+        if (show) {
+            layer.addTo(map);
+            if (btn) { btn.classList.add('active'); btn.innerText = 'Aktif ✓'; }
+        } else {
+            map.removeLayer(layer);
+            if (btn) { btn.classList.remove('active'); btn.innerText = 'Nonaktif'; }
+        }
+    }
+
+    // --- populate overlay list in UI ---
+    function initLayerControlUI() {
+        const overlayList = document.getElementById('overlay-list');
+        overlayList.innerHTML = '';
+        Object.keys(overlayMaps).forEach(label => {
+            const item = createOverlayItem(label, label, overlayMaps[label]);
+            overlayList.appendChild(item);
+        });
+
+        // base map buttons
+        const baseBtns = document.querySelectorAll('.basemap-btn');
+        baseBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const key = btn.dataset.basemap;
+                // visual active state
+                baseBtns.forEach(b => b.classList.remove('ring-2','ring-indigo-300','bg-indigo-50'));
+                btn.classList.add('ring-2','ring-indigo-300','bg-indigo-50');
+                // switch tile layer
+                Object.values(baseMaps).forEach(t => map.removeLayer(t));
+                if (key === 'osm') osm.addTo(map);
+                if (key === 'topo') topo.addTo(map);
+                if (key === 'esriSat') esriSat.addTo(map);
+            });
+        });
+
+        // set default base active visual
+        const defaultBtn = document.querySelector('.basemap-btn[data-basemap="osm"]');
+        if (defaultBtn) defaultBtn.classList.add('ring-2','ring-indigo-300','bg-indigo-50');
+    }
+
+    // --- mobile collapse behavior ---
+    function initLayerControlMobile() {
+        const fab = document.getElementById('layer-control-fab');
+        const card = document.getElementById('layer-control-card');
+        const toggle = document.getElementById('layer-control-toggle');
+
+        function openCard() { card.classList.remove('hidden'); }
+        function closeCard() { card.classList.add('hidden'); }
+
+        if (fab) {
+            fab.addEventListener('click', () => {
+                if (card.classList.contains('hidden')) openCard(); else closeCard();
+            });
+        }
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                if (card.classList.contains('hidden')) openCard(); else closeCard();
+            });
+        }
+
+        // responsive: show card on md+, hide on small
+        function handleResize() {
+            if (window.matchMedia('(min-width: 768px)').matches) {
+                card.classList.remove('hidden');
+                fab.classList.add('hidden');
+            } else {
+                card.classList.add('hidden');
+                fab.classList.remove('hidden');
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        handleResize();
+    }
+
+    // --- init all ---
+    initLayerControlUI();
+    initLayerControlMobile();
+
+    // L.control.layers(baseMaps, overlayMaps).addTo(map);
 
     // =====================================================================
     // HAZARD LAYERS (GeoJSON dari public/geojson/)

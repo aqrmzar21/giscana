@@ -96,6 +96,12 @@
         margin: 5px 0;
     }
 
+    .map-card {
+        background-color: rgba(255,255,255,0.75);
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+    }
+
     /* =========================================================
        HAZARD LAYER PANEL — redesign
     ========================================================= */
