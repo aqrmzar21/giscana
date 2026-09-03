@@ -59,14 +59,25 @@
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($aid->total_recipients) }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($aid->distributed_aid) }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            @php
+                                $percentage = $aid->total_recipients > 0 ? ($aid->distributed_aid / $aid->total_recipients) * 100 : 0;
+                            @endphp
+                            <div class="flex items-center">
+                                <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
+                                    <div class="bg-green-400 h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
+                                </div>
+                                <span>{{ round($percentage, 1) }}%</span>
+                            </div>
+                        </td>
+                        <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($aid->is_active)
                             <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Aktif</span>
                             @else
                             <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Selesai</span>
                             @endif
-                        </td>
-                        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                            <div class="flex items-center justify-end space-x-2">
+                        </td> -->
+                        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-6">
+                            <div class="flex items-center justify-center space-x-2">
                                 <a href="{{ route('admin.aid-disasters.show', $aid) }}" class="text-indigo-600 hover:text-indigo-900">
                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

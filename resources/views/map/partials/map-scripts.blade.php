@@ -49,19 +49,6 @@
 
     osm.addTo(map);
 
-    // const overlayMaps = {
-    //     "Zona Bencana": layers.disasterZones,
-    //     "Rute Evakuasi": layers.evacuationRoutes,
-    //     "Fasilitas Evakuasi": layers.evacuationFacilities,
-    //     "Batas Administrasi": layers.districtBoundaries
-    // };
-
-    // const baseMaps = {
-    //     "Peta Jalan": osm,
-    //     "Topografi": topo,
-    //     "Satelit": esriSat
-    // };
-
     // L.control.layers(baseMaps, overlayMaps).addTo(map);
 
     // Base maps
