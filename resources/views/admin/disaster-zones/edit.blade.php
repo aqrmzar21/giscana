@@ -54,7 +54,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     <div>
                         <label for="disaster_type" class="block text-sm font-medium text-gray-700">Jenis Bencana <span class="text-red-500">*</span></label>
                         <div class="mt-1">
@@ -84,30 +84,7 @@
                             @enderror
                         </div>
                     </div>
-                </div>
 
-                <div>
-                    <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                    <div class="mt-1">
-                        <textarea id="description" name="description" rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('description') border-red-300 @enderror">{{ old('description', $disasterZone->description) }}</textarea>
-                        @error('description')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <div>
-                        <label for="area_hectares" class="block text-sm font-medium text-gray-700">Luas (Hektar)</label>
-                        <div class="mt-1">
-                            <input type="number" step="0.01" name="area_hectares" id="area_hectares" value="{{ old('area_hectares', $disasterZone->area_hectares) }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('area_hectares') border-red-300 @enderror">
-                            @error('area_hectares')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
-                </div> -->
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <label for="affected_population" class="block text-sm font-medium text-gray-700">Terdampak (Korban)</label>
                         <div class="mt-1">
@@ -119,7 +96,28 @@
                     </div>
                 </div>
 
-
+                
+                <!-- <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="area_hectares" class="block text-sm font-medium text-gray-700">Luas (Hektar)</label>
+                        <div class="mt-1">
+                            <input type="number" step="0.01" name="area_hectares" id="area_hectares" value="{{ old('area_hectares', $disasterZone->area_hectares) }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('area_hectares') border-red-300 @enderror">
+                            @error('area_hectares')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div> -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                    <div class="mt-1">
+                        <textarea id="description" name="description" rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('description') border-red-300 @enderror">{{ old('description', $disasterZone->description) }}</textarea>
+                        @error('description')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+                    
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Titik Koordinat Bencana <span class="text-red-500">*</span></label>
                     <p class="mt-1 text-sm text-gray-500 mb-2">Klik pada peta untuk memperbarui lokasi zona bencana.</p>
