@@ -1,6 +1,7 @@
 
 
 {{-- Badge grid per bencana --}}
+
 {{-- Hint teks --}}
 <div class="hazard-badges-grid flex flex-col items-center max-h-[300px] overflow-auto" id="hazard_layer_checkboxes">
     <p class="hazard-panel-hint">Pilih satu jenis bencana untuk ditampilkan di peta</p>
