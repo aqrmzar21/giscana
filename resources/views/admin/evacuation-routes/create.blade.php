@@ -27,7 +27,7 @@
             @csrf
             <div class="space-y-6">
 
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
 
                     <div>
                         <label for="evacuation_facility_id" class="block text-sm font-medium text-gray-700">Fasilitas Tujuan</label>
@@ -50,9 +50,6 @@
                         </div>
                     </div>
 
-                </div>
-
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700">Nama Rute <span class="text-red-500">*</span></label>
                         <div class="mt-1">

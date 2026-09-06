@@ -171,16 +171,22 @@
                     </script>
 
 
-                <div class="space-y-3">
+                <div class="flex items-center gap-x-6">
                     <div class="flex items-center">
-                        <input id="is_accessible" name="is_accessible" type="checkbox" value="1" {{ old('is_accessible', $evacuationRoute->is_accessible) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                        <input id="is_accessible" name="is_accessible" type="checkbox" value="1"
+                            {{ old('is_accessible', $evacuationRoute->is_accessible) ? 'checked' : '' }}
+                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                         <label for="is_accessible" class="ml-2 block text-sm text-gray-900">Aksesibel</label>
                     </div>
+
                     <div class="flex items-center">
-                        <input id="is_active" name="is_active" type="checkbox" value="1" {{ old('is_active', $evacuationRoute->is_active) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                        <input id="is_active" name="is_active" type="checkbox" value="1"
+                            {{ old('is_active', $evacuationRoute->is_active) ? 'checked' : '' }}
+                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                         <label for="is_active" class="ml-2 block text-sm text-gray-900">Aktif</label>
                     </div>
                 </div>
+
             </div>
 
             <div class="mt-6 flex items-center justify-end space-x-3">
