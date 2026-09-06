@@ -75,7 +75,7 @@
     // Control untuk overlay
     const overlayControl = L.control.layers(null, overlayMaps, {
         collapsed: true,
-        position: 'topright'
+        position: 'bottomright'
     }).addTo(map);
 
     // =====================================================================

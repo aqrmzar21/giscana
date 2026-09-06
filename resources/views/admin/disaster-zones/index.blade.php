@@ -87,7 +87,7 @@
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tingkat Risiko</th>
                         <!-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Luas (ha)</th> -->
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Terdampak</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                        <!-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th> -->
                         <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">Aksi</th>
                     </tr>
                 </thead>
@@ -110,21 +110,21 @@
                             @if($zone->risk_level === 'low')
                             <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">Rendah</span>
                             @elseif($zone->risk_level === 'medium')
-                                <span class="inline-flex rounded-full bg-yellow-800 px-2 text-xs font-semibold leading-5 text-yellow-100">Sedang</span>
+                                <span class="inline-flex rounded-full bg-yellow-100 px-2 text-xs font-semibold leading-5 text-yellow-800">Sedang</span>
                             @elseif($zone->risk_level === 'high')
-                                <span class="inline-flex rounded-full bg-orange-800 px-2 text-xs font-semibold leading-5 text-orange-100">Tinggi</span>
+                                <span class="inline-flex rounded-full bg-orange-100 px-2 text-xs font-semibold leading-5 text-orange-800">Tinggi</span>
                             @else
-                                <span class="inline-flex rounded-full bg-red-800 px-2 text-xs font-semibold leading-5 text-red-100">Sangat Tinggi</span>
+                                <span class="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800">Sangat Tinggi</span>
                             @endif
                         </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $zone->affected_population }}</td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($zone->is_active)
                             <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Aktif</span>
                             @else
                             <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Tidak Aktif</span>
                             @endif
-                        </td>
+                        </td> -->
                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                             <div class="flex items-center justify-end space-x-2">
                                 <a href="{{ route('admin.disaster-zones.show', $zone) }}" class="text-indigo-600 hover:text-indigo-900">

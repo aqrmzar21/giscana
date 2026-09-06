@@ -34,7 +34,7 @@
             <div class="border-b border-gray-200 pb-3">
                 @include('map.partials.map-district-checkbox')
             </div>
-            <h3 class="text-sm font-semibold text-gray-800 mb-3">Layer Rawan Bencana</h3>
+            <h3 class="text-sm font-semibold text-gray-800 mb-3">Sebaran Rawan Bencana</h3>
             @include('map.partials.map-panel-hazard')
         </div>
 

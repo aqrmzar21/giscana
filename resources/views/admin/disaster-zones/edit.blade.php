@@ -42,7 +42,7 @@
                         <label for="district_id" class="block text-sm font-medium text-gray-700">Kecamatan <span class="text-red-500">*</span></label>
                         <div class="mt-1">
                             <select id="district_id" name="district_id" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('district_id') border-red-300 @enderror">
-                                <option value="">Pilih Kecamatan</option>
+                                <option value="" hidden>Pilih Kecamatan</option>
                                 @foreach($districts as $district)
                                     <option value="{{ $district->id }}" {{ old('district_id', $disasterZone->district_id) == $district->id ? 'selected' : '' }}>{{ $district->name }}</option>
                                 @endforeach
@@ -59,7 +59,7 @@
                         <label for="disaster_type" class="block text-sm font-medium text-gray-700">Jenis Bencana <span class="text-red-500">*</span></label>
                         <div class="mt-1">
                             <select id="disaster_type" name="disaster_type" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('disaster_type') border-red-300 @enderror">
-                                <option value="">Pilih Jenis Bencana</option>
+                                <option value="" hidden>Pilih Jenis Bencana</option>
                                 <option value="longsor" {{ old('disaster_type', $disasterZone->disaster_type) === 'longsor' ? 'selected' : '' }}>Longsor</option>
                                 <option value="banjir" {{ old('disaster_type', $disasterZone->disaster_type) === 'banjir' ? 'selected' : '' }}>Banjir</option>
                             </select>
@@ -73,7 +73,7 @@
                         <label for="risk_level" class="block text-sm font-medium text-gray-700">Tingkat Risiko <span class="text-red-500">*</span></label>
                         <div class="mt-1">
                             <select id="risk_level" name="risk_level" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('risk_level') border-red-300 @enderror">
-                                <option value="">Pilih Tingkat Risiko</option>
+                                <option value="" hidden>Pilih Tingkat Risiko</option>
                                 <option value="low" {{ old('risk_level', $disasterZone->risk_level) === 'low' ? 'selected' : '' }}>Rendah</option>
                                 <option value="medium" {{ old('risk_level', $disasterZone->risk_level) === 'medium' ? 'selected' : '' }}>Sedang</option>
                                 <option value="high" {{ old('risk_level', $disasterZone->risk_level) === 'high' ? 'selected' : '' }}>Tinggi</option>
@@ -140,10 +140,10 @@
                     @enderror
                 </div>
 
-                <div class="flex items-center">
+                <!-- <div class="flex items-center">
                     <input id="is_active" name="is_active" type="checkbox" value="1" {{ old('is_active', $disasterZone->is_active) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                     <label for="is_active" class="ml-2 block text-sm text-gray-900">Aktif</label>
-                </div>
+                </div> -->
             </div>
 
             <div class="mt-6 flex items-center justify-end space-x-3">
