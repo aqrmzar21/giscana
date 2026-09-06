@@ -31,25 +31,36 @@
                     <label for="aid_disaster_id" class="block text-sm font-medium text-gray-700">Kecamatan (Bantuan Bencana)</label>
                     <div class="mt-1">
                         <select name="aid_disaster_id" id="aid_disaster_id" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_disaster_id') border-red-300 @enderror">
-                            <option value="">-- Pilih Kecamatan --</option>
+                            <option value="" hidden>-- Pilih Kecamatan --</option>
                             @foreach($aidDisasters as $ad)
                                 <option value="{{ $ad->id }}" {{ old('aid_disaster_id', $evacuationFacility->aid_disaster_id) == $ad->id ? 'selected' : '' }}>{{ $ad->district_name }}</option>
                             @endforeach
                         </select>
-                        <p class="mt-2 text-sm text-gray-500">Nama kecamatan diambil dari data Bantuan Bencana (aid_disasters).</p>
+                        <!-- <p class="mt-2 text-sm text-gray-500">Nama kecamatan diambil dari data Bantuan Bencana (aid_disasters).</p> -->
                         @error('aid_disaster_id')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
 
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Nama Fasilitas <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <input type="text" name="name" id="name" value="{{ old('name', $evacuationFacility->name) }}" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('name') border-red-300 @enderror">
-                        @error('name')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Nama Fasilitas <span class="text-red-500">*</span></label>
+                        <div class="mt-1">
+                            <input type="text" name="name" id="name" value="{{ old('name', $evacuationFacility->name) }}" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('name') border-red-300 @enderror">
+                            @error('name')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    <div>
+                        <label for="address" class="block text-sm font-medium text-gray-700">Alamat</label>
+                        <div class="mt-1">
+                            <input type="text" id="address" name="address" value="{{ old('address', $evacuationFacility->address) }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('address') border-red-300 @enderror">
+                            @error('address')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
                 </div>
 
@@ -64,15 +75,6 @@
                     </div>
                 </div>
 
-                <div>
-                    <label for="address" class="block text-sm font-medium text-gray-700">Alamat</label>
-                    <div class="mt-1">
-                        <textarea id="address" name="address" rows="2" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('address') border-red-300 @enderror">{{ old('address', $evacuationFacility->address) }}</textarea>
-                        @error('address')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
@@ -128,7 +130,7 @@
                     @enderror
                 </div>
 
-                <div class="space-y-3">
+                <div class="flex items-center gap-6">
                     <div class="flex items-center">
                         <input id="is_accessible" name="is_accessible" type="checkbox" value="1" {{ old('is_accessible', $evacuationFacility->is_accessible) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                         <label for="is_accessible" class="ml-2 block text-sm text-gray-900">Aksesibel</label>

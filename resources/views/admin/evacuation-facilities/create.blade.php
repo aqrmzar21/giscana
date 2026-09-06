@@ -42,13 +42,24 @@
                     </div>
                 </div>
 
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Nama Fasilitas <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <input type="text" name="name" id="name" value="{{ old('name') }}" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('name') border-red-300 @enderror">
-                        @error('name')
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Nama Fasilitas <span class="text-red-500">*</span></label>
+                        <div class="mt-1">
+                            <input type="text" name="name" id="name" value="{{ old('name') }}" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('name') border-red-300 @enderror">
+                            @error('name')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                            @enderror
+                        </div>
+                    </div>
+                    <div>
+                        <label for="address" class="block text-sm font-medium text-gray-700">Alamat</label>
+                        <div class="mt-1">
+                            <input type="text" id="address" name="address" value="{{ old('address') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('address') border-red-300 @enderror">
+                            @error('address')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
                 </div>
 
@@ -62,15 +73,6 @@
                     </div>
                 </div>
 
-                <div>
-                    <label for="address" class="block text-sm font-medium text-gray-700">Alamat</label>
-                    <div class="mt-1">
-                        <textarea id="address" name="address" rows="2" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('address') border-red-300 @enderror">{{ old('address') }}</textarea>
-                        @error('address')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
@@ -126,16 +128,22 @@
                     @enderror
                 </div>
 
-                <div class="space-y-3">
+                <div class="flex items-center gap-x-6">
                     <div class="flex items-center">
-                        <input id="is_accessible" name="is_accessible" type="checkbox" value="1" {{ old('is_accessible', true) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                        <input id="is_accessible" name="is_accessible" type="checkbox" value="1"
+                            {{ old('is_accessible', true) ? 'checked' : '' }}
+                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                         <label for="is_accessible" class="ml-2 block text-sm text-gray-900">Aksesibel</label>
                     </div>
+
                     <div class="flex items-center">
-                        <input id="is_active" name="is_active" type="checkbox" value="1" {{ old('is_active', true) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                        <input id="is_active" name="is_active" type="checkbox" value="1"
+                            {{ old('is_active', true) ? 'checked' : '' }}
+                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                         <label for="is_active" class="ml-2 block text-sm text-gray-900">Aktif</label>
                     </div>
                 </div>
+
             </div>
 
             <div class="mt-6 flex items-center justify-end space-x-3">
