@@ -117,7 +117,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 10px 14px;
+        padding: 10px;
         background: #fff;
         border-bottom: 1px solid #f3f4f6;
     }
@@ -192,12 +192,22 @@
     }
 
     /* Badge grid */
+    /* Default: 2 kolom */
     .hazard-badges-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-        padding: 10px 14px 12px;
+        gap: 12px;
+        /* padding: 10px; */
+        width: 100%;
     }
+
+    /* Mobile: 1 kolom */
+    @media (max-width: 640px) {
+        .hazard-badges-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
 
     /* Individual Hazard Card Badge */
     .hazard-card {

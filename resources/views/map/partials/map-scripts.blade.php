@@ -214,7 +214,7 @@
 
                         const popupHtml = `
                             <div style="min-width:190px;font-size:13px;">
-                                <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:${cfg.border_color};">
+                                <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:${cfg.border_color};">
                                     ${cfg.icon_emoji || ''} ${cfg.label}
                                 </div>
                                 <div>${namaArea}</div>
