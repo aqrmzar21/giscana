@@ -66,9 +66,8 @@ class DisasterZone extends Model
      */
     public function toGeoJSON()
     {
-        $coords = $this->polygon_coordinates;
-        $isPoint = is_array($coords) && count($coords) === 2
-            && is_numeric($coords[0] ?? null) && is_numeric($coords[1] ?? null);
+        $coords = $this->point_coordinates;
+        $isPolygon = is_array($coords) && isset($coords[0]) && is_array($coords[0]);
 
         return [
             'type' => 'Feature',
@@ -81,12 +80,9 @@ class DisasterZone extends Model
                 'area_hectares' => $this->area_hectares,
                 'affected_population' => $this->affected_population,
             ],
-            'geometry' => $isPoint
-                ? ['type' => 'Point', 'coordinates' => $coords]
-                : ['type' => 'Polygon', 'coordinates' => $coords],
             'geometry' => [
-                'type' => 'Point',
-                'coordinates' => $this->point_coordinates,
+                'type' => $isPolygon ? 'Polygon' : 'Point',
+                'coordinates' => $coords,
             ],
         ];
     }

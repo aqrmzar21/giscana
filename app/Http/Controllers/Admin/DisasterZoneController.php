@@ -90,6 +90,7 @@ class DisasterZoneController extends Controller
      */
     public function create()
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         $districts = District::orderBy('name')->get();
         return $this->partialView('admin.disaster-zones.create', compact('districts'));
     }
@@ -99,15 +100,16 @@ class DisasterZoneController extends Controller
      */
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'district_id' => 'required|exists:districts,id',
             'disaster_type' => 'required|in:longsor,banjir,other',
             'description' => 'nullable|string',
             'risk_level' => 'required|in:low,medium,high,critical',
-            'point_coordinates' => 'json',
+            'point_coordinates' => 'required|json',
             'area_hectares' => 'nullable|numeric|min:0',
-            'affected_population' => 'numeric|min:0',
+            'affected_population' => 'nullable|numeric|min:0',
             'is_active' => 'boolean',
         ]);
         $validated['point_coordinates'] = json_decode($validated['point_coordinates'], true);
@@ -133,6 +135,7 @@ class DisasterZoneController extends Controller
      */
     public function edit(DisasterZone $disasterZone)
     {
+        abort_if(!auth()->user()->can('update data'), 403);
         $districts = District::orderBy('name')->get();
         return $this->partialView('admin.disaster-zones.edit', compact('disasterZone', 'districts'));
     }
@@ -142,6 +145,7 @@ class DisasterZoneController extends Controller
      */
     public function update(Request $request, DisasterZone $disasterZone)
     {
+        abort_if(!auth()->user()->can('update data'), 403);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'district_id' => 'required|exists:districts,id',
@@ -168,6 +172,7 @@ class DisasterZoneController extends Controller
      */
     public function destroy(DisasterZone $disasterZone)
     {
+        abort_if(!auth()->user()->can('delete data'), 403);
         $disasterZone->delete();
 
         return redirect()->route('admin.disaster-zones.index')

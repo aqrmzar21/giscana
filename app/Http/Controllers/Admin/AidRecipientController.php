@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class AidRecipientController extends Controller
 {
     use \App\Http\Traits\PartialRenderable;
-
+    
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', 10);
@@ -64,10 +64,13 @@ class AidRecipientController extends Controller
         return $pdf->stream('Laporan-Penerima-Bantuan-' . date('Y-m-d') . '.pdf');
     }
 
+    
     public function create()
     {
+        $vil = \App\Models\Village::select('id','yard','zone')->get();
+        // dd($vil->toArray());
         $districts = \App\Models\District::with('villages')->get();
-        return $this->partialView('admin.aid-recipients.create', compact('districts'));
+        return $this->partialView('admin.aid-recipients.create', compact('districts', 'vil'));
     }
 
     public function store(Request $request)
@@ -101,12 +104,14 @@ class AidRecipientController extends Controller
 
     public function edit(\App\Models\AidRecipient $aidRecipient)
     {
+        abort_if(!auth()->user()->can('update data'), 403);
         $districts = \App\Models\District::with('villages')->get();
         return $this->partialView('admin.aid-recipients.edit', compact('aidRecipient', 'districts'));
     }
 
     public function update(Request $request, \App\Models\AidRecipient $aidRecipient)
     {
+        abort_if(!auth()->user()->can('update data'), 403);
         $validated = $request->validate([
             'date' => 'required|date',
             'aid_type' => 'required|string|max:255',
@@ -130,6 +135,7 @@ class AidRecipientController extends Controller
 
     public function destroy(\App\Models\AidRecipient $aidRecipient)
     {
+        abort_if(!auth()->user()->can('delete data'), 403);
         $aidRecipient->delete();
         return redirect()->route('admin.aid-recipients.index')->with('success', 'Data Penerima Bantuan berhasil dihapus.');
     }

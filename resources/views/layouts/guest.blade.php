@@ -15,13 +15,17 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
-                {{-- <a href="/"><x-application-logo class="w-20 h-20 fill-current text-gray-500" /></a> --}}
+        <div class="min-h-screen flex flex-row sm:justify-center items-center bg-white-100">
+            <!-- Kolom kiri: login -->
+            <div class="flex items-center justify-center p-12">
+                <div class="px-6 py-4 bg-white overflow-hidden sm:rounded-lg">
+                    {{ $slot }}
+                </div>
             </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-                {{ $slot }}
+            <!-- Kolom kanan: gambar/peta -->
+            <div class="hidden md:flex flex-1 max-screen">
+                <img src="{{ asset('images/map-gorontalo.png') }}" alt="Map Gorontalo" class="object-cover w-full h-screen">
             </div>
         </div>
     </body>

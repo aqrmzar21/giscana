@@ -87,14 +87,16 @@ const PJAX = (() => {
             el.classList.add('text-gray-600', 'hover:bg-gray-50');
         });
 
-        // Set active pada link yang cocok
+        let bestMatch = null;
+        let bestMatchLen = -1;
+
+        // Cari link yang paling cocok (terpanjang)
         document.querySelectorAll('aside nav a').forEach(el => {
             if (!el.href) return;
             const elPath = new URL(el.href).pathname;
 
-            // Peta admin dan dashboard khusus menggunakan exact match
             const isDashboardOrMap = elPath === '/dashboard' || elPath === '/dashboard/map';
-            
+
             let isMatch = false;
             if (isDashboardOrMap) {
                 isMatch = pathname === elPath;
@@ -102,30 +104,36 @@ const PJAX = (() => {
                 isMatch = pathname === elPath || (elPath !== '/' && pathname.startsWith(elPath + '/'));
             }
 
-            if (isMatch) {
-                // Jika ini adalah sub-link, stylingnya berbeda
-                if (el.closest('[x-show]')) {
-                    el.classList.add('bg-indigo-50', 'text-indigo-700');
-                    el.classList.remove('text-gray-600', 'text-gray-700', 'hover:bg-gray-50', 'hover:bg-gray-100');
-                } else {
-                    el.classList.add('bg-indigo-100', 'text-indigo-700');
-                    el.classList.remove('text-gray-700', 'text-gray-600', 'hover:bg-gray-100', 'hover:bg-gray-50');
-                }
-
-                // Expand parent dropdown jika ada, dan beri styling active pada parent button
-                const dropdown = el.closest('[x-data]');
-                if (dropdown) {
-                    if (dropdown._x_dataStack) {
-                        try { dropdown._x_dataStack[0].open = true; } catch (_) {}
-                    }
-                    const parentBtn = dropdown.querySelector('button');
-                    if (parentBtn) {
-                        parentBtn.classList.add('bg-indigo-100', 'text-indigo-700');
-                        parentBtn.classList.remove('text-gray-700', 'hover:bg-gray-100');
-                    }
-                }
+            if (isMatch && elPath.length > bestMatchLen) {
+                bestMatch = el;
+                bestMatchLen = elPath.length;
             }
         });
+
+        if (bestMatch) {
+            const el = bestMatch;
+            // Jika ini adalah sub-link, stylingnya berbeda
+            if (el.closest('[x-show]')) {
+                el.classList.add('bg-indigo-50', 'text-indigo-700');
+                el.classList.remove('text-gray-600', 'text-gray-700', 'hover:bg-gray-50', 'hover:bg-gray-100');
+            } else {
+                el.classList.add('bg-indigo-100', 'text-indigo-700');
+                el.classList.remove('text-gray-700', 'text-gray-600', 'hover:bg-gray-100', 'hover:bg-gray-50');
+            }
+
+            // Expand parent dropdown jika ada, dan beri styling active pada parent button
+            const dropdown = el.closest('[x-data]');
+            if (dropdown) {
+                if (dropdown._x_dataStack) {
+                    try { dropdown._x_dataStack[0].open = true; } catch (_) { }
+                }
+                const parentBtn = dropdown.querySelector('button');
+                if (parentBtn) {
+                    parentBtn.classList.add('bg-indigo-100', 'text-indigo-700');
+                    parentBtn.classList.remove('text-gray-700', 'hover:bg-gray-100');
+                }
+            }
+        }
     }
 
     // ─── Inject & Execute scripts ─────────────────────────────────────────────
@@ -160,7 +168,7 @@ const PJAX = (() => {
         const metaEl = doc.getElementById('pjax-meta');
         let meta = {};
         if (metaEl) {
-            try { meta = JSON.parse(metaEl.textContent.trim()); } catch (_) {}
+            try { meta = JSON.parse(metaEl.textContent.trim()); } catch (_) { }
         }
 
         // Ambil content wrapper
@@ -180,7 +188,7 @@ const PJAX = (() => {
 
             // Re-init Alpine.js untuk konten baru
             if (window.Alpine) {
-                try { window.Alpine.initTree(pageContent); } catch (_) {}
+                try { window.Alpine.initTree(pageContent); } catch (_) { }
             }
 
             // Update title

@@ -6,7 +6,7 @@ use App\Http\Controllers\MapController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/admin', function () { return view('admin'); })->name('layouts.admin');
+Route::get('/admin', function () { return redirect()->route('dashboard'); });
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
@@ -17,6 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Map routes (halaman publik + endpoint data untuk keduanya)
 Route::get('/map', [MapController::class, 'index'])->name('map.index');
 Route::get('/map/data', [MapController::class, 'getMapData'])->name('map.data');
+Route::get('/map/hazard-layers', [MapController::class, 'getHazardLayers'])->name('map.hazard-layers');
 Route::get('/map/search', [MapController::class, 'search'])->name('map.search');
 
 Route::middleware('auth')->group(function () {
@@ -36,6 +37,10 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::resource('aid-disasters', \App\Http\Controllers\Admin\AidDisasterController::class);
     Route::get('aid-recipients/print', [\App\Http\Controllers\Admin\AidRecipientController::class, 'print'])->name('aid-recipients.print');
     Route::resource('aid-recipients', \App\Http\Controllers\Admin\AidRecipientController::class);
+    // Staff Management - Hanya untuk admin
+    Route::middleware(['role:admin'])->group(function () {
+        Route::resource('staff', \App\Http\Controllers\Admin\StaffController::class);
+    });
 });
 
 require __DIR__.'/auth.php';

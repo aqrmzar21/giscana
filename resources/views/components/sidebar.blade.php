@@ -15,7 +15,7 @@
                     <p>Peta Interaktif</p>
                 </a>
             </li>
-            @if (Auth::user()->isAdmin())
+            @hasanyrole('admin|staff')
             <li class="nav-header">MANAJEMEN DATA</li>
             <li class="nav-item {{ request()->routeIs('admin.disaster-zones.*') ? 'menu-open' : '' }}">
                 <a href="#" class="nav-link {{ request()->routeIs('admin.disaster-zones.*') ? 'active' : '' }}">
@@ -32,12 +32,14 @@
                             <p>Daftar Zona</p>
                         </a>
                     </li>
+                    @can('create data')
                     <li class="nav-item">
                         <a href="{{ route('admin.disaster-zones.create') }}" class="nav-link {{ request()->routeIs('admin.disaster-zones.create') ? 'active' : '' }}">
                             <i class="far fa-circle nav-icon"></i>
                             <p>Tambah Zona Baru</p>
                         </a>
                     </li>
+                    @endcan
                 </ul>
             </li>
             <li class="nav-item {{ request()->routeIs('admin.evacuation-routes.*') ? 'menu-open' : '' }}">
@@ -55,12 +57,14 @@
                             <p>Daftar Rute</p>
                         </a>
                     </li>
+                    @can('create data')
                     <li class="nav-item">
                         <a href="{{ route('admin.evacuation-routes.create') }}" class="nav-link {{ request()->routeIs('admin.evacuation-routes.create') ? 'active' : '' }}">
                             <i class="far fa-circle nav-icon"></i>
                             <p>Tambah Rute Baru</p>
                         </a>
                     </li>
+                    @endcan
                 </ul>
             </li>
             <li class="nav-item {{ request()->routeIs('admin.evacuation-facilities.*') ? 'menu-open' : '' }}">
@@ -78,12 +82,14 @@
                             <p>Daftar Fasilitas</p>
                         </a>
                     </li>
+                    @can('create data')
                     <li class="nav-item">
                         <a href="{{ route('admin.evacuation-facilities.create') }}" class="nav-link {{ request()->routeIs('admin.evacuation-facilities.create') ? 'active' : '' }}">
                             <i class="far fa-circle nav-icon"></i>
                             <p>Tambah Fasilitas Baru</p>
                         </a>
                     </li>
+                    @endcan
                 </ul>
             </li>
             <li class="nav-item {{ request()->routeIs('admin.aid-disasters.*') ? 'menu-open' : '' }}">
@@ -101,15 +107,44 @@
                             <p>Daftar Bantuan</p>
                         </a>
                     </li>
+                    @can('create data')
                     <li class="nav-item">
                         <a href="{{ route('admin.aid-disasters.create') }}" class="nav-link {{ request()->routeIs('admin.aid-disasters.create') ? 'active' : '' }}">
                             <i class="far fa-circle nav-icon"></i>
                             <p>Tambah Data Baru</p>
                         </a>
                     </li>
+                    @endcan
                 </ul>
             </li>
-            @endif
+            @endhasanyrole
+
+            @role('admin')
+            <li class="nav-header">PENGATURAN</li>
+            <li class="nav-item {{ request()->routeIs('admin.staff.*') ? 'menu-open' : '' }}">
+                <a href="#" class="nav-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-users-cog"></i>
+                    <p>
+                        Kelola Staff
+                        <i class="right fas fa-angle-left"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="{{ route('admin.staff.index') }}" class="nav-link {{ request()->routeIs('admin.staff.index') ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Daftar Staff</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.staff.create') }}" class="nav-link {{ request()->routeIs('admin.staff.create') ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Tambah Staff Baru</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            @endrole
         </ul>
     </nav>
     <!-- /.sidebar-menu -->

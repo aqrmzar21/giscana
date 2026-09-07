@@ -6,12 +6,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 use App\Traits\HasUuid;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasUuid;
+    use HasFactory, Notifiable, HasUuid, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -57,7 +58,7 @@ class User extends Authenticatable
      */
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->role === 'admin' || $this->hasRole('admin');
     }
 
     /**
@@ -65,7 +66,7 @@ class User extends Authenticatable
      */
     public function isStaff(): bool
     {
-        return $this->role === 'staff';
+        return $this->role === 'staff' || $this->hasRole('staff');
     }
 
     /**
@@ -73,7 +74,7 @@ class User extends Authenticatable
      */
     public function isPublic(): bool
     {
-        return $this->role === 'public';
+        return $this->role === 'public' || $this->hasRole('public');
     }
 
     /**
@@ -81,6 +82,6 @@ class User extends Authenticatable
      */
     public function canManageData(): bool
     {
-        return in_array($this->role, ['admin', 'staff']);
+        return $this->isAdmin() || $this->isStaff();
     }
 }

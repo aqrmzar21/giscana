@@ -31,25 +31,36 @@
                     <label for="aid_disaster_id" class="block text-sm font-medium text-gray-700">Kecamatan (Bantuan Bencana)</label>
                     <div class="mt-1">
                         <select name="aid_disaster_id" id="aid_disaster_id" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_disaster_id') border-red-300 @enderror">
-                            <option value="">-- Pilih Kecamatan --</option>
+                            <option value="" hidden>-- Pilih Kecamatan --</option>
                             @foreach($aidDisasters as $ad)
                                 <option value="{{ $ad->id }}" {{ old('aid_disaster_id', $evacuationFacility->aid_disaster_id) == $ad->id ? 'selected' : '' }}>{{ $ad->district_name }}</option>
                             @endforeach
                         </select>
-                        <p class="mt-2 text-sm text-gray-500">Nama kecamatan diambil dari data Bantuan Bencana (aid_disasters).</p>
+                        <!-- <p class="mt-2 text-sm text-gray-500">Nama kecamatan diambil dari data Bantuan Bencana (aid_disasters).</p> -->
                         @error('aid_disaster_id')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
 
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Nama Fasilitas <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <input type="text" name="name" id="name" value="{{ old('name', $evacuationFacility->name) }}" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('name') border-red-300 @enderror">
-                        @error('name')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Nama Fasilitas <span class="text-red-500">*</span></label>
+                        <div class="mt-1">
+                            <input type="text" name="name" id="name" value="{{ old('name', $evacuationFacility->name) }}" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('name') border-red-300 @enderror">
+                            @error('name')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    <div>
+                        <label for="address" class="block text-sm font-medium text-gray-700">Alamat</label>
+                        <div class="mt-1">
+                            <input type="text" id="address" name="address" value="{{ old('address', $evacuationFacility->address) }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('address') border-red-300 @enderror">
+                            @error('address')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
                 </div>
 
@@ -64,15 +75,6 @@
                     </div>
                 </div>
 
-                <div>
-                    <label for="address" class="block text-sm font-medium text-gray-700">Alamat</label>
-                    <div class="mt-1">
-                        <textarea id="address" name="address" rows="2" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('address') border-red-300 @enderror">{{ old('address', $evacuationFacility->address) }}</textarea>
-                        @error('address')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
@@ -107,25 +109,28 @@
                 </div> -->
 
                 <div>
-                    <label for="point_coordinates" class="block text-sm font-medium text-gray-700">Koordinat Titik (GeoJSON) <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <textarea id="point_coordinates" name="point_coordinates" rows="3" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md font-mono text-xs @error('point_coordinates') border-red-300 @enderror">{{ old('point_coordinates', json_encode($evacuationFacility->point_coordinates, JSON_PRETTY_PRINT)) }}</textarea>
-                        <p class="mt-2 text-sm text-gray-500">Format: JSON array [lng, lat]</p>
-                        @error('point_coordinates')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                    <label class="block text-sm font-medium text-gray-700">Titik Koordinat Fasilitas <span class="text-red-500">*</span></label>
+                    <p class="mt-1 text-sm text-gray-500 mb-2">Klik pada peta untuk memperbarui lokasi fasilitas evakuasi.</p>
+                    <div id="map" class="mb-4 border border-gray-300"></div>
+
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <label for="latitude" class="block text-sm font-medium text-gray-700">Latitude</label>
+                            <input type="text" id="latitude" readonly class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md bg-gray-50">
+                        </div>
+                        <div>
+                            <label for="longitude" class="block text-sm font-medium text-gray-700">Longitude</label>
+                            <input type="text" id="longitude" readonly class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md bg-gray-50">
+                        </div>
                     </div>
+
+                    <input type="hidden" id="point_coordinates" name="point_coordinates" value="{{ old('point_coordinates', is_array($evacuationFacility->point_coordinates) ? json_encode($evacuationFacility->point_coordinates) : $evacuationFacility->point_coordinates) }}">
+                    @error('point_coordinates')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <div class="space-y-3">
-                    <div class="flex items-center">
-                        <input id="has_medical_facility" name="has_medical_facility" type="checkbox" value="1" {{ old('has_medical_facility', $evacuationFacility->has_medical_facility) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                        <label for="has_medical_facility" class="ml-2 block text-sm text-gray-900">Memiliki Fasilitas Medis</label>
-                    </div>
-                    <div class="flex items-center">
-                        <input id="has_food_storage" name="has_food_storage" type="checkbox" value="1" {{ old('has_food_storage', $evacuationFacility->has_food_storage) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                        <label for="has_food_storage" class="ml-2 block text-sm text-gray-900">Memiliki Penyimpanan Makanan</label>
-                    </div>
+                <div class="flex items-center gap-6">
                     <div class="flex items-center">
                         <input id="is_accessible" name="is_accessible" type="checkbox" value="1" {{ old('is_accessible', $evacuationFacility->is_accessible) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                         <label for="is_accessible" class="ml-2 block text-sm text-gray-900">Aksesibel</label>
@@ -148,4 +153,58 @@
         </form>
     </div>
 </div>
+<script>
+    (function () {
+        if (typeof L === 'undefined') {
+            console.error('Leaflet is not loaded');
+            return;
+        }
+
+        // Initialize map centered at default location (Gorontalo area)
+        var map = L.map('map').setView([0.545, 123.06], 11);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        var marker;
+
+        // Check if there is old data or existing data
+        var oldCoordinates = document.getElementById('point_coordinates').value;
+        if (oldCoordinates) {
+            try {
+                var coords = JSON.parse(oldCoordinates);
+                if (Array.isArray(coords) && coords.length >= 2) {
+                    var lng = coords[0];
+                    var lat = coords[1];
+                    marker = L.marker([lat, lng]).addTo(map);
+                    map.setView([lat, lng], 14);
+                    
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lng;
+                }
+            } catch (e) {
+                console.error("Invalid coordinates format.");
+            }
+        }
+
+        map.on('click', function(e) {
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            marker = L.marker([lat, lng]).addTo(map);
+            
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+            
+            // Format expected by backend: JSON array [lng, lat]
+            document.getElementById('point_coordinates').value = JSON.stringify([lng, lat]);
+        });
+    })();
+</script>
 @endsection

@@ -130,6 +130,7 @@ class EvacuationFacilityController extends Controller
      */
     public function edit(EvacuationFacility $evacuationFacility)
     {
+        abort_if(!auth()->user()->can('update data'), 403);
         $aidDisasters = AidDisaster::active()->orderBy('district_name')->get();
         return $this->partialView('admin.evacuation-facilities.edit', compact('evacuationFacility', 'aidDisasters'));
     }
@@ -139,6 +140,7 @@ class EvacuationFacilityController extends Controller
      */
     public function update(Request $request, EvacuationFacility $evacuationFacility)
     {
+        abort_if(!auth()->user()->can('update data'), 403);
         $validated = $request->validate([
             'aid_disaster_id' => 'nullable|exists:aid_disasters,id',
             'name' => 'required|string|max:255',
@@ -178,6 +180,7 @@ class EvacuationFacilityController extends Controller
      */
     public function destroy(EvacuationFacility $evacuationFacility)
     {
+        abort_if(!auth()->user()->can('delete data'), 403);
         $evacuationFacility->delete();
 
         return redirect()->route('admin.evacuation-facilities.index')

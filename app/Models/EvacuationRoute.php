@@ -11,6 +11,9 @@ class EvacuationRoute extends Model
     use HasFactory, HasUuid;
 
     protected $fillable = [
+        'uuid',
+        'evacuation_facility_id',
+        'nama_fasilitas',
         'name',
         'description',
         'disaster_type',

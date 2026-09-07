@@ -96,7 +96,7 @@
                 <div class="pt-4 pb-3 border-t border-gray-200 px-4">
                     @auth
                         <div class="flex items-center mb-3">
-                            <div class="text-base font-medium text-gray-800">{{ Auth::user()->name }}</div>
+                            <div class="text-base font-medium text-gray-800">{{ Auth::user()?->name }}</div>
                         </div>
                         <div class="mt-3 space-y-1">
                             <a href="{{ route('dashboard') }}" class="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-md text-base font-medium hover:bg-blue-700 mb-2">

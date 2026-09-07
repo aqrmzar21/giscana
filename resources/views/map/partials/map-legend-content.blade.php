@@ -2,16 +2,17 @@
 <div class="map-legend-content text-xs">
     <div class="font-semibold mb-2 text-gray-800 @if($legendLayout === 'inline') text-sm @endif">Legenda</div>
     <div class="@if($legendLayout === 'inline') flex flex-wrap gap-x-4 gap-y-1 @endif">
+        {{-- Data dari DB --}}
         <div class="legend-item">
             <div class="legend-color" style="background-color: #ef4444;"></div>
-            <span class="text-gray-700">Zona Rawan</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #10b981;"></div>
-            <span class="text-gray-700">Titik Kumpul</span>
+            <span class="text-gray-700">Titik Bencana</span>
         </div>
         <div class="legend-item">
             <div class="legend-color" style="background-color: #3b82f6;"></div>
+            <span class="text-gray-700">Titik Kumpul</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: rgb(153, 0, 255);"></div>
             <span class="text-gray-700">Rute Evakuasi</span>
         </div>
         <div class="legend-item">

@@ -1,9 +1,8 @@
 @extends('layouts.admin')
 
+
 @section('title', 'Tambah Zona Bencana - Admin')
-
 @section('page-title', 'Tambah Zona Bencana Baru')
-
 @section('breadcrumb')
 <li class="inline-flex items-center">
     <a href="{{ route('dashboard') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-indigo-600">Dashboard</a>
@@ -41,7 +40,7 @@
                         <label for="district_id" class="block text-sm font-medium text-gray-700">Kecamatan <span class="text-red-500">*</span></label>
                         <div class="mt-1">
                             <select id="district_id" name="district_id" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('district_id') border-red-300 @enderror">
-                                <option value="">Pilih Kecamatan</option>
+                                <option value="" hidden>Pilih Kecamatan</option>
                                 @foreach($districts as $district)
                                     <option value="{{ $district->id }}" {{ old('district_id') == $district->id ? 'selected' : '' }}>{{ $district->name }}</option>
                                 @endforeach
@@ -53,12 +52,12 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     <div>
                         <label for="disaster_type" class="block text-sm font-medium text-gray-700">Jenis Bencana <span class="text-red-500">*</span></label>
                         <div class="mt-1">
                             <select id="disaster_type" name="disaster_type" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('disaster_type') border-red-300 @enderror">
-                                <option value="">Pilih Jenis Bencana</option>
+                                <option value="" hidden>Pilih Jenis Bencana</option>
                                 <option value="longsor" {{ old('disaster_type') === 'longsor' ? 'selected' : '' }}>Longsor</option>
                                 <option value="banjir" {{ old('disaster_type') === 'banjir' ? 'selected' : '' }}>Banjir</option>
                             </select>
@@ -72,7 +71,7 @@
                         <label for="risk_level" class="block text-sm font-medium text-gray-700">Tingkat Risiko <span class="text-red-500">*</span></label>
                         <div class="mt-1">
                             <select id="risk_level" name="risk_level" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('risk_level') border-red-300 @enderror">
-                                <option value="">Pilih Tingkat Risiko</option>
+                                <option value="" hidden>Pilih Tingkat Risiko</option>
                                 <option value="low" {{ old('risk_level') === 'low' ? 'selected' : '' }}>Rendah</option>
                                 <option value="medium" {{ old('risk_level') === 'medium' ? 'selected' : '' }}>Sedang</option>
                                 <option value="high" {{ old('risk_level') === 'high' ? 'selected' : '' }}>Tinggi</option>
@@ -81,6 +80,16 @@
                             @error('risk_level')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="affected_population" class="block text-sm font-medium text-gray-700">Terdampak (Korban) <span class="text-red-500">*</span></label>
+                        <div class="mt-1">
+                        <input type="number" name="affected_population" id="affected_population" value="{{ old('affected_population') }}" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('affected_population') border-red-300 @enderror">
+                        @error('affected_population')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                         </div>
                     </div>
                 </div>
@@ -95,8 +104,8 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <!-- <div>
+                <!-- <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
                         <label for="area_hectares" class="block text-sm font-medium text-gray-700">Luas (Hektar)</label>
                         <div class="mt-1">
                             <input type="number" step="0.01" name="area_hectares" id="area_hectares" value="{{ old('area_hectares') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('area_hectares') border-red-300 @enderror">
@@ -104,33 +113,35 @@
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
-                    </div> -->
-                    <div>
-                        <label for="affected_population" class="block text-sm font-medium text-gray-700">Terdampak (Korban)</label>
-                        <div class="mt-1">
-                        <input type="number" name="affected_population" id="affected_population" value="{{ old('affected_population') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('affected_population') border-red-300 @enderror">
-                        @error('affected_population')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                        </div>
                     </div>
-                </div>
+                </div> -->
 
                 <div>
-                    <label for="point_coordinates" class="block text-sm font-medium text-gray-700">Koordinat Point (GeoJSON) <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <textarea id="point_coordinates" name="point_coordinates" rows="5" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md font-mono text-xs @error('point_coordinates') border-red-300 @enderror">{{ old('point_coordinates') }}</textarea>
-                        <p class="mt-2 text-sm text-gray-500">Format: JSON array of coordinates [[[lng, lat], [lng, lat], ...]]</p>
-                        @error('point_coordinates')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                    <label class="block text-sm font-medium text-gray-700">Titik Koordinat Bencana <span class="text-red-500">*</span></label>
+                    <p class="mt-1 text-sm text-gray-500 mb-2">Klik pada peta untuk menentukan lokasi zona bencana.</p>
+                    <div id="map" class="mb-4 border border-gray-300"></div>
+
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <label for="latitude" class="block text-sm font-medium text-gray-700">Latitude</label>
+                            <input type="text" id="latitude" readonly class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md bg-gray-50">
+                        </div>
+                        <div>
+                            <label for="longitude" class="block text-sm font-medium text-gray-700">Longitude</label>
+                            <input type="text" id="longitude" readonly class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md bg-gray-50">
+                        </div>
                     </div>
+                    
+                    <input type="hidden" id="point_coordinates" name="point_coordinates" value="{{ old('point_coordinates') }}">
+                    @error('point_coordinates')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <div class="flex items-center">
+                <!-- <div class="flex items-center">
                     <input id="is_active" name="is_active" type="checkbox" value="1" {{ old('is_active', true) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                     <label for="is_active" class="ml-2 block text-sm text-gray-900">Aktif</label>
-                </div>
+                </div> -->
             </div>
 
             <div class="mt-6 flex items-center justify-end space-x-3">
@@ -144,4 +155,58 @@
         </form>
     </div>
 </div>
+<script>
+    (function () {
+        if (typeof L === 'undefined') {
+            console.error('Leaflet is not loaded');
+            return;
+        }
+
+        // Initialize map centered at default location (Gorontalo area)
+        var map = L.map('map').setView([0.545, 123.06], 11);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        var marker;
+
+        // Check if there is old data from validation errors
+        var oldCoordinates = document.getElementById('point_coordinates').value;
+        if (oldCoordinates) {
+            try {
+                var coords = JSON.parse(oldCoordinates);
+                if (Array.isArray(coords) && coords.length >= 2) {
+                    var lng = coords[0];
+                    var lat = coords[1];
+                    marker = L.marker([lat, lng]).addTo(map);
+                    map.setView([lat, lng], 14);
+                    
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lng;
+                }
+            } catch (e) {
+                console.error("Invalid coordinates format.");
+            }
+        }
+
+        map.on('click', function(e) {
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            marker = L.marker([lat, lng]).addTo(map);
+            
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+            
+            // Format expected by backend: JSON array [lng, lat]
+            document.getElementById('point_coordinates').value = JSON.stringify([lng, lat]);
+        });
+    })();
+</script>
 @endsection

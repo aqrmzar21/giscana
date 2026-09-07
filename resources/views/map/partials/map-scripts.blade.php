@@ -27,7 +27,6 @@
         evacuationRoutes: L.layerGroup().addTo(map),
         evacuationFacilities: L.layerGroup().addTo(map),
         districtBoundaries: L.layerGroup().addTo(map),
-        // aidDistributionPoints: L.layerGroup().addTo(map)
     };
 
     // OpenStreetMap default
@@ -48,27 +47,235 @@
         attribution: 'Tiles © Esri'
     });
 
-    // Tambahkan salah satu ke map
     osm.addTo(map);
 
-   // Buat label dalam bahasa Indonesia
-    const overlayMaps = {
-        "Zona Bencana": layers.disasterZones,
-        "Rute Evakuasi": layers.evacuationRoutes,
-        "Fasilitas Evakuasi": layers.evacuationFacilities,
-        "Batas Kecamatan": layers.districtBoundaries
-    };
+    // L.control.layers(baseMaps, overlayMaps).addTo(map);
 
-    // Jika ada basemap lain, bisa ditambahkan di sini
+    // Base maps
     const baseMaps = {
         "Peta Jalan": osm,
         "Topografi": topo,
         "Satelit": esriSat
     };
 
-    // Tambahkan kontrol ke peta
-    L.control.layers(baseMaps, overlayMaps).addTo(map);
+    // Overlay maps
+    const overlayMaps = {
+        "Zona Bencana": layers.disasterZones,
+        "Rute Evakuasi": layers.evacuationRoutes,
+        "Fasilitas Evakuasi": layers.evacuationFacilities,
+        "Batas Administrasi": layers.districtBoundaries
+    };
 
+    // Control untuk base map
+    const baseMapControl = L.control.layers(baseMaps, null, {
+        collapsed: true,   // biar jadi tombol kecil
+        position: 'topright'
+    }).addTo(map);
+
+    // Control untuk overlay
+    const overlayControl = L.control.layers(null, overlayMaps, {
+        collapsed: true,
+        position: 'bottomright'
+    }).addTo(map);
+
+    // =====================================================================
+    // HAZARD LAYERS (GeoJSON dari public/geojson/)
+    // Perilaku: EXCLUSIVE — hanya satu layer aktif sekaligus.
+    // Klik card → aktifkan/nonaktifkan layer.
+    // =====================================================================
+
+    /** Map: disaster_type -> { config, leafletLayer, loaded, visible } */
+    const hazardLayers = {};
+
+    /** disaster_type yang sedang aktif (atau null jika tidak ada) */
+    let activeHazardType = null;
+
+    /**
+     * Bangun UI kartu badge per layer setelah metadata API diambil.
+     */
+    function buildHazardLayerUI(layerConfigs) {
+        const container = document.getElementById('hazard_layer_checkboxes');
+        if (!container) return;
+        container.innerHTML = '';
+
+        // Warna CSS-variable per card
+        const shadowMap = {
+            'banjir':    'rgba(59,130,246,0.25)',
+            'gempa':     'rgba(249,115,22,0.25)',
+            'gelombang': 'rgba(6,182,212,0.25)',
+            'longsor':   'rgba(132,204,22,0.25)',
+        };
+        const bgMap = {
+            'banjir':    '#eff6ff',
+            'gempa':     '#fff7ed',
+            'gelombang': '#ecfeff',
+            'longsor':   '#f7fee7',
+        };
+
+        layerConfigs.forEach(cfg => {
+            hazardLayers[cfg.disaster_type] = {
+                config: cfg,
+                leafletLayer: L.layerGroup(),
+                loaded: false,
+                visible: false,
+            };
+
+            const card = document.createElement('div');
+            card.className = 'hazard-card inactive';
+            card.id = `hazard_badge_${cfg.disaster_type}`;
+            card.title = cfg.description || cfg.label;
+            card.style.setProperty('--hc-color', cfg.border_color);
+            card.style.setProperty('--hc-bg', bgMap[cfg.disaster_type] || '#f8fafc');
+            card.style.setProperty('--hc-shadow', shadowMap[cfg.disaster_type] || 'rgba(0,0,0,0.1)');
+
+            card.innerHTML = `
+                <span class="hazard-card-check" aria-hidden="true">
+                    <svg viewBox="0 0 10 10"><polyline points="1.5,5.5 4,8 8.5,2.5"/></svg>
+                </span>
+                <span class="hazard-card-emoji">${cfg.icon_emoji || '🗺️'}</span>
+                <div class="hazard-card-label">${cfg.label}</div>
+                <div class="hazard-card-status" id="hazard_status_${cfg.disaster_type}">Nonaktif</div>
+            `;
+            container.appendChild(card);
+
+            // Klik card → exclusive toggle
+            card.addEventListener('click', () => {
+                const isCurrentlyActive = (activeHazardType === cfg.disaster_type);
+                // Nonaktifkan semua dulu
+                Object.keys(hazardLayers).forEach(type => _setHazardVisible(type, false));
+                if (!isCurrentlyActive) {
+                    _setHazardVisible(cfg.disaster_type, true);
+                    activeHazardType = cfg.disaster_type;
+                } else {
+                    activeHazardType = null;
+                }
+            });
+        });
+    }
+
+    /**
+     * Set visibilitas satu layer (tanpa mengubah state card lain).
+     */
+    function _setHazardVisible(disasterType, show) {
+        const state = hazardLayers[disasterType];
+        if (!state) return;
+
+        state.visible = show;
+        const card   = document.getElementById(`hazard_badge_${disasterType}`);
+        const status = document.getElementById(`hazard_status_${disasterType}`);
+
+        if (card) {
+            card.classList.toggle('active', show);
+            card.classList.toggle('inactive', !show);
+        }
+        if (status) status.textContent = show ? 'Ditampilkan ✓' : 'Nonaktif';
+
+        if (show) {
+            if (!state.loaded) {
+                state.loaded = true;
+                loadHazardGeoJSON(disasterType);
+            } else {
+                state.leafletLayer.addTo(map);
+            }
+        } else {
+            map.removeLayer(state.leafletLayer);
+        }
+    }
+
+    /**
+     * Fetch dan render GeoJSON untuk satu jenis bencana.
+     */
+    function loadHazardGeoJSON(disasterType) {
+        const state = hazardLayers[disasterType];
+        if (!state) return;
+
+        const cfg  = state.config;
+        const card = document.getElementById(`hazard_badge_${disasterType}`);
+
+        if (card) card.style.opacity = '0.65';
+
+        fetch(cfg.geojson_path)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status} – ${cfg.geojson_path}`);
+                return res.json();
+            })
+            .then(geojsonData => {
+                const geoLayer = L.geoJSON(geojsonData, {
+                    style: () => ({
+                        color:       cfg.border_color,
+                        weight:      cfg.border_weight,
+                        fillColor:   cfg.fill_color,
+                        fillOpacity: cfg.fill_opacity,
+                        opacity:     0.85,
+                    }),
+                    onEachFeature: (feature, layer) => {
+                        const p = feature.properties || {};
+                        const namaArea   = p.NAMOBJ || p.nama || p.name || p.NAMA || p.desa || p.kecamatan || '–';
+
+                        const popupHtml = `
+                            <div style="min-width:190px;font-size:13px;">
+                                <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:${cfg.border_color};">
+                                    ${cfg.icon_emoji || ''} ${cfg.label}
+                                </div>
+                                <div>${namaArea}</div>
+                            </div>`;
+                        layer.bindPopup(popupHtml, { maxWidth: 300 });
+
+                        layer.on({
+                            mouseover(e) {
+                                e.target.setStyle({ weight: 3, fillOpacity: Math.min(cfg.fill_opacity + 0.2, 0.75) });
+                            },
+                            mouseout(e) {
+                                geoLayer.resetStyle(e.target);
+                            },
+                        });
+                    },
+                });
+
+                geoLayer.addTo(state.leafletLayer);
+
+                if (state.visible) {
+                    state.leafletLayer.addTo(map);
+                }
+                if (card) card.style.opacity = '';
+            })
+            .catch(err => {
+                console.error(`Gagal memuat GeoJSON (${disasterType}):`, err);
+                state.loaded = false; // izinkan retry
+                if (card) {
+                    card.style.opacity = '';
+                    card.title = `⚠ Gagal memuat: ${cfg.geojson_path}`;
+                }
+            });
+    }
+
+    /**
+     * Fetch metadata layer dari endpoint backend, lalu bangun UI.
+     */
+    function initHazardLayers() {
+        fetch('{{ route("map.hazard-layers") }}')
+            .then(res => res.json())
+            .then(data => {
+                if (data.layers && data.layers.length > 0) {
+                    buildHazardLayerUI(data.layers);
+                } else {
+                    const container = document.getElementById('hazard_layer_checkboxes');
+                    if (container) container.innerHTML =
+                        '<span style="grid-column:1/-1;font-size:12px;color:#ef4444;">Tidak ada layer tersedia.</span>';
+                }
+            })
+            .catch(err => {
+                console.error('Gagal memuat metadata hazard layers:', err);
+                const container = document.getElementById('hazard_layer_checkboxes');
+                if (container) container.innerHTML =
+                    '<span style="grid-column:1/-1;font-size:12px;color:#ef4444;">Gagal memuat layer bencana.</span>';
+            });
+    }
+
+
+    // =====================================================================
+    // MAP DATA (data DB: disaster zones, routes, facilities)
+    // =====================================================================
 
     function loadMapData() {
         const disasterType = document.getElementById('disaster_type').value;
@@ -102,11 +309,9 @@
                 data.disaster_zones.features.forEach(feature => {
                     if (!feature.geometry || !feature.geometry.coordinates) return;
                     const [lng, lat] = feature.geometry.coordinates;
-                    // Tentukan warna berdasarkan disaster_type
-                    let color = '#ef4444'; // default merah
+                    let color = '#ef4444';
                     if (feature.properties.disaster_type === 'longsor') {
-                        color = '#ef4444'; // merah untuk longsor
-                        // color = '#ec4899'; // pink untuk longsor
+                        color = '#ef4444';
                     }
 
                     const marker = L.marker([lat, lng], {
@@ -129,10 +334,11 @@
                 });
 
                 data.evacuation_routes.features.forEach(feature => {
+                    if (!feature.geometry || !feature.geometry.coordinates) return;
                     const coordinates = feature.geometry.coordinates.map(coord => [coord[1], coord[0]]);
                     const polyline = L.polyline(coordinates, {
-                        color: '#3b82f6',
-                        weight: 4,
+                        color: 'rgb(153, 0, 255)',
+                        weight: 10,
                         opacity: 0.8
                     }).addTo(layers.evacuationRoutes);
 
@@ -143,11 +349,12 @@
                 });
 
                 data.evacuation_facilities.features.forEach(feature => {
+                    if (!feature.geometry || !feature.geometry.coordinates) return;
                     const [lng, lat] = feature.geometry.coordinates;
                     const marker = L.marker([lat, lng], {
                         icon: L.divIcon({
                             className: 'evacuation-facility-marker',
-                            html: '<div style="background-color: #10b981; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;"></div>',
+                            html: '<div style="background-color: #3b82f6; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;"></div>',
                             iconSize: [20, 20]
                         })
                     }).addTo(layers.evacuationFacilities);
@@ -229,6 +436,7 @@
     }
 
     loadMapData();
+    initHazardLayers();
 
     document.getElementById('disaster_type').addEventListener('change', loadMapData);
     document.getElementById('risk_level').addEventListener('change', loadMapData);
@@ -273,9 +481,9 @@
                             .then(data => {
                                 L.geoJSON(data, {
                                     style: {
-                                        color: '#000000',
+                                        color: '#00ff37ff',
                                         weight: 1,
-                                        fillColor: '#60a5fa',
+                                        fillColor: '#e3fa60ff',
                                         fillOpacity: 0.1,
                                         dashArray: '3 3'
                                     },
@@ -285,11 +493,9 @@
                                             const key = name.toLowerCase().replace(/desa |kelurahan /g, '').trim();
                                             const aidInfo = villageAidsData[key];
                                             
-                                            let aidHtml = '-';
+                                            let aidHtml = '';
                                             if (aidInfo && aidInfo.total_amount > 0) {
                                                 const types = aidInfo.aid_types && aidInfo.aid_types.length > 0 ? aidInfo.aid_types.join(', ') : '-';
-                                                // Format ke Rupiah
-                                                // const formattedAmount = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(aidInfo.total_amount);
                                                 aidHtml = `
                                                     Jenis Bantuan: ${types}<br>
                                                     Total Disalurkan: ${aidInfo.total_amount}

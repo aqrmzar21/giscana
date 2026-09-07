@@ -32,24 +32,24 @@
             </div>
         </div>
 
-        <div class="sm:flex px-4 py-5 justify-evenly">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
             <form action="{{ route('admin.evacuation-facilities.index') }}" method="GET" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-            <select name="district_name" class="block w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                <option value="">Semua Kecamatan</option>
-                @foreach($districts as $district)
-                <option value="{{ $district->district_name }}" {{ request('district_name') == $district->district_name ? 'selected' : '' }}>
-                    {{ $district->district_name }}
-                    </option>
-                @endforeach
-            </select>
-            <button type="submit" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                Filter
-            </button>
-            @if(request()->anyFilled(['district_name', 'start_date', 'end_date']))
-                <a href="{{ route('admin.evacuation-facilities.index') }}" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    Reset
-                </a>
-            @endif
+                <select name="district_name" class="block w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <option value="">Semua Kecamatan</option>
+                    @foreach($districts as $district)
+                    <option value="{{ $district->district_name }}" {{ request('district_name') == $district->district_name ? 'selected' : '' }}>
+                        {{ $district->district_name }}
+                        </option>
+                    @endforeach
+                </select>
+                <button type="submit" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Filter
+                </button>
+                @if(request()->anyFilled(['district_name', 'start_date', 'end_date']))
+                    <a href="{{ route('admin.evacuation-facilities.index') }}" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        Reset
+                    </a>
+                @endif
             </form>
             {{-- Tombol Cetak PDF --}}
             @php
@@ -81,9 +81,7 @@
                         <!-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kapasitas</th> -->
                         <!-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Fasilitas</th> -->
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                        <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                            <span class="sr-only">Aksi</span>
-                        </th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
@@ -124,11 +122,14 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
                                 </a>
+                                @can('update data')
                                 <a href="{{ route('admin.evacuation-facilities.edit', $facility) }}" class="text-yellow-600 hover:text-yellow-900">
                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </a>
+                                @endcan
+                                @can('delete data')
                                 <form action="{{ route('admin.evacuation-facilities.destroy', $facility) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus fasilitas ini?');">
                                     @csrf
                                     @method('DELETE')
@@ -138,6 +139,7 @@
                                         </svg>
                                     </button>
                                 </form>
+                                @endcan
                             </div>
                         </td>
                     </tr>

@@ -86,11 +86,15 @@ class EvacuationRouteController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+   public function create()
     {
+        // ambil daftar kecamatan unik dari fasilitas
+        $kec = EvacuationFacility::select('district_name')->distinct()->orderBy('district_name')->get();
         $facilities = EvacuationFacility::active()->orderBy('name')->get();
-        return $this->partialView('admin.evacuation-routes.create', compact('facilities'));
+
+        return $this->partialView('admin.evacuation-routes.create', compact('kec','facilities'));
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -102,6 +106,7 @@ class EvacuationRouteController extends Controller
             'description' => 'nullable|string',
             'line_coordinates' => 'required|json',
             'route_type' => 'required|in:primary,secondary,emergency',
+            'evacuation_facility_id' => 'nullable|exists:evacuation_facilities,id',
             'is_accessible' => 'boolean',
             'is_active' => 'boolean',
         ]);
@@ -129,6 +134,7 @@ class EvacuationRouteController extends Controller
      */
     public function edit(EvacuationRoute $evacuationRoute)
     {
+        abort_if(!auth()->user()->can('update data'), 403);
         $facilities = EvacuationFacility::active()->orderBy('name')->get();
         return $this->partialView('admin.evacuation-routes.edit', compact('evacuationRoute', 'facilities'));
     }
@@ -142,7 +148,8 @@ class EvacuationRouteController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'line_coordinates' => 'required|json',
-            'route_type' => 'required|in:primary,secondary,emergency',
+            'route_type' => 'required|in:primary,secondary,emergency',    
+            'evacuation_facility_id' => 'nullable|exists:evacuation_facilities,id',
             'is_accessible' => 'boolean',
             'is_active' => 'boolean',
         ]);
@@ -162,6 +169,7 @@ class EvacuationRouteController extends Controller
      */
     public function destroy(EvacuationRoute $evacuationRoute)
     {
+        abort_if(!auth()->user()->can('delete data'), 403);
         $evacuationRoute->delete();
 
         return redirect()->route('admin.evacuation-routes.index')
