@@ -98,18 +98,6 @@
             </div>
         </div>
     </div>
-<<<<<<< HEAD
-
-</div>
-
-<div id="welcome-card" class="lg:col-span-1 bg-white shadow rounded-lg flex flex-col justify-center">
-    <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-center gap-4">
-        <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Selamat Datang!</h3>
-            <p class="text-gray-500 text-sm mb-4">
-                Halo <strong class="text-indigo-800">{{ Auth::user()->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
-            </p>
-=======
     
 </div>
 
@@ -122,21 +110,14 @@
                     Halo <strong class="text-gray-800">{{ Auth::user()?->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
                 </p>
             </div>
->>>>>>> peta
         </div>
     </div>
 </div>
 
 <!-- Chart Progress Row -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-<<<<<<< HEAD
-    
-    {{-- Welcome Card --}}
-    <div class="lg:col-span-2 bg-white shadow rounded-lg mb-6">
-=======
 
     <div id="welcome-card" class="lg:col-span-1 bg-white shadow rounded-lg flex flex-col justify-center">
->>>>>>> peta
         <div class="px-4 py-6 sm:p-6 text-center">
             <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-400 mb-4">
                 <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 576 512"><path d="M288-32c8 0 15.4 4 19.9 10.6l58.8 87.4 103.4-20.2c7.8-1.5 15.9 .9 21.6 6.6s8.1 13.8 6.6 21.6L478 177.3 565.4 236.1C572 240.5 576 248 576 256s-4 15.4-10.6 19.9L478 334.7 498.2 438c1.5 7.8-.9 15.9-6.6 21.6s-13.8 8.1-21.6 6.6L366.7 446 307.9 533.4C303.4 540 296 544 288 544s-15.4-4-19.9-10.6L209.3 446 105.9 466.2c-7.8 1.5-15.9-.9-21.6-6.6s-8.1-13.8-6.6-21.6L98 334.7 10.6 275.9C4 271.4 0 264 0 256s4-15.4 10.6-19.9L98 177.3 77.8 73.9c-1.5-7.8 .9-15.9 6.6-21.6s13.8-8.1 21.6-6.6l103.3 20.2 58.8-87.4 1.8-2.3C274.4-29 281-32 288-32zm-47.8 138c-5.4 8-15 12-24.5 10.2l-84-16.4 16.4 84c1.8 9.5-2.2 19.1-10.2 24.5L67 256 138 303.8c8 5.4 12 15 10.2 24.5l-16.4 84 84-16.4 3.5-.4c8.3-.4 16.3 3.6 21 10.6l47.8 71 47.8-71 2.2-2.8c5.6-6.1 14-9 22.3-7.3l84 16.4-16.4-84c-1.8-9.5 2.2-19.1 10.2-24.5l71-47.8-71-47.8c-8-5.4-12-15-10.2-24.5l16.4-84-84 16.4c-9.5 1.8-19.1-2.2-24.5-10.2l-47.8-71-47.8 71zM288 376a120 120 0 1 1 0-240 120 120 0 1 1 0 240zm0-192a72 72 0 1 0 0 144 72 72 0 1 0 0-144z"/></svg>
