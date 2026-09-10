@@ -19,12 +19,8 @@ return new class extends Migration
             $table->string('province', 100)->nullable();        // provinsi
             $table->geometry('geom');                           // geometri wilayah desa
             $table->timestamps();
-
-            $table->foreign('district_id')
-                  ->references('id')
-                  ->on('districts')
-                  ->onDelete('cascade');
-
+            
+            $table->foreign('district_id')->references('id')->on('districts')->onDelete('cascade');
             $table->spatialIndex('geom');
         });
     }

@@ -19,12 +19,13 @@ return new class extends Migration
             $table->string('aid_type');
             $table->integer('amount');
             $table->string('recipient_name');
-            $table->unsignedBigInteger('village_id')->nullable();
-            // $table->unsignedBigInteger('district_id')->nullable();
+            $table->foreignId('village_id')->nullable()->constrained('villages')->nullOnDelete();
+            $table->foreignId('aid_disaster_id')->nullable()->constrained('aid_disasters')->nullOnDelete();
             $table->string('name')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
 
+            $table->foreign('aid_disaster_id')->references('id')->on('aid_disasters')->onDelete('set null');
             $table->foreign('village_id')->references('id')->on('villages')->onDelete('set null');
         });
     }

@@ -14,6 +14,8 @@ return new class extends Migration
     {
         Schema::create('evacuation_routes', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('evacuation_facility_id')->nullable()->constrained('evacuation_facilities')->nullOnDelete();
+            $table->string('facility_name')->nullable();
             $table->uuid('uuid')->unique();
             $table->string('name');
             $table->text('description')->nullable();
@@ -23,6 +25,7 @@ return new class extends Migration
             $table->boolean('is_accessible')->default(true);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            
         });
     }
 

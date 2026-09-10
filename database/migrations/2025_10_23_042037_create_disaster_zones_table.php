@@ -24,6 +24,8 @@ return new class extends Migration
             $table->decimal('area_hectares', 10, 2)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            $table->foreignId('district_id')->nullable()->constrained('districts')->nullOnDelete();
         });
     }
 
