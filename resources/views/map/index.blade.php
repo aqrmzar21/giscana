@@ -12,7 +12,7 @@
     <div class="absolute bottom-4 left-4 z-50 p-3">
         @include('map.partials.map-legend-content')
     </div>
-
+    
     <!-- Wrapper Kontrol Peta -->
     <div x-data="{ openPanel: false }">
 
@@ -29,11 +29,7 @@
         <!-- 🗂️ Panel Utama (Mobile: Bottom Sheet | Desktop: Floating Card Top-Right) -->
         <div 
             :class="openPanel ? 'translate-y-0 opacity-100 pointer-events-auto' : 'translate-y-full opacity-0 pointer-events-none md:translate-y-0 md:opacity-100 md:pointer-events-auto'"
-            class="fixed z-[1000] transition-all duration-300 ease-in-out
-                /* Mobile Styling */
-                bottom-20 left-4 right-4 max-h-[60vh] overflow-y-auto bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-slate-200
-                /* Desktop Styling (Selalu Tampil di Pojok Kanan Atas) */
-                md:top-4 md:right-4 md:bottom-auto md:left-auto md:w-80 md:max-h-[85vh] md:rounded-xl md:shadow-xl md:bg-white/90"
+            class="fixed z-[1000] transition-all duration-300 ease-in-out bottom-20 left-4 right-4 max-h-[60vh] overflow-y-auto bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-slate-200 md:top-4 md:right-4 md:bottom-auto md:left-auto md:w-80 md:max-h-[85vh] md:rounded-xl md:shadow-xl md:bg-white/90"
             @click.outside="openPanel = false"
             x-cloak>
             
@@ -47,15 +43,18 @@
                     &times;
                 </button>
             </div>
-
-            <!-- Section 1: Sebaran Rawan Bencana (Dari Database) -->
+            
+            <!-- Section 1: Batas Administrasi -->
             <div class="space-y-2 mb-4">
-                <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Sebaran Rawan Bencana</p>
-                
-                <!-- Tempat fungsi buildHazardLayerUI() merender kartu bencana -->
-                <div id="hazard_layer_checkboxes" class="grid grid-cols-2 gap-2">
-                    <!-- Kartu Bencana Di-generate oleh JavaScript -->
+                <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Batas Administrasi</p>
+                <div class="grid grid-cols-2 gap-2">
+                     @include('map.partials.map-district-checkbox') 
                 </div>
+            </div>
+            
+            <!-- Section 2: Sebaran Rawan Bencana (Menggunakan Partial Panel Hazard) -->
+            <div class="mb-2">
+                @include('map.partials.map-panel-hazard')
             </div>
 
         </div>

@@ -6,11 +6,6 @@
     const mapUiVariant = @json($mapUiVariant);
     const map = L.map('map').setView([0.45, 123.2], 10);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19
-    }).addTo(map);
-
     let mapMaxBoundsApplied = false;
     let mapInitialExtentDone = false;
 
@@ -29,36 +24,28 @@
         districtBoundaries: L.layerGroup().addTo(map),
     };
 
-    // OpenStreetMap default
+    // Base Maps
     const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19
-    });
+    }).addTo(map);
 
-    // OpenTopoMap
     const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenTopoMap contributors',
         maxZoom: 17
     });
 
-    // Esri World Imagery (satellite)
     const esriSat = L.tileLayer(
         'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles © Esri'
     });
 
-    osm.addTo(map);
-
-    // L.control.layers(baseMaps, overlayMaps).addTo(map);
-
-    // Base maps
     const baseMaps = {
         "Peta Jalan": osm,
         "Topografi": topo,
         "Satelit": esriSat
     };
 
-    // Overlay maps
     const overlayMaps = {
         "Zona Bencana": layers.disasterZones,
         "Rute Evakuasi": layers.evacuationRoutes,
@@ -66,14 +53,13 @@
         "Batas Administrasi": layers.districtBoundaries
     };
 
-    // Control untuk base map
-    const baseMapControl = L.control.layers(baseMaps, null, {
-        collapsed: true,   // biar jadi tombol kecil
+    // Control Layer Leaflet
+    L.control.layers(baseMaps, null, {
+        collapsed: true,
         position: 'topright'
     }).addTo(map);
 
-    // Control untuk overlay
-    const overlayControl = L.control.layers(null, overlayMaps, {
+    L.control.layers(null, overlayMaps, {
         collapsed: true,
         position: 'bottomright'
     }).addTo(map);
@@ -81,57 +67,15 @@
     // =====================================================================
     // HAZARD LAYERS (GeoJSON dari public/geojson/)
     // Perilaku: EXCLUSIVE — hanya satu layer aktif sekaligus.
-    // Klik card → aktifkan/nonaktifkan layer.
     // =====================================================================
-
-    document.addEventListener('DOMContentLoaded', () => {
-    // 🗺️ Toggle Batas Kecamatan
-    const mobileDistrictToggle = document.getElementById('toggle_district_boundaries');
-    if (mobileDistrictToggle) {
-        mobileDistrictToggle.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                map.addLayer(districtLayer); // Nama variabel layer kecamatan kamu
-            } else {
-                map.removeLayer(districtLayer);
-            }
-        });
-    }
-
-    // 🏡 Toggle Batas Desa
-    const mobileVillageToggle = document.getElementById('toggle_village_boundaries');
-    if (mobileVillageToggle) {
-        mobileVillageToggle.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                map.addLayer(villageLayer); // Nama variabel layer desa kamu
-            } else {
-                map.removeLayer(villageLayer);
-            }
-        });
-    }
-    });
-    // Memanggil fungsi inisialisasi saat peta selesai dimuat
-    document.addEventListener('DOMContentLoaded', () => {
-    // Pastikan variabel 'map' Leaflet Anda sudah terinisialisasi sebelum memanggil fungsi ini
-    if (typeof map !== 'undefined') {
-        initHazardLayers();
-    }
-    });
-
-    /** Map: disaster_type -> { config, leafletLayer, loaded, visible } */
     const hazardLayers = {};
-
-    /** disaster_type yang sedang aktif (atau null jika tidak ada) */
     let activeHazardType = null;
 
-    /**
-     * Bangun UI kartu badge per layer setelah metadata API diambil.
-     */
     function buildHazardLayerUI(layerConfigs) {
         const container = document.getElementById('hazard_layer_checkboxes');
         if (!container) return;
         container.innerHTML = '';
 
-        // Warna CSS-variable per card
         const shadowMap = {
             'banjir':    'rgba(59,130,246,0.25)',
             'gempa':     'rgba(249,115,22,0.25)',
@@ -171,10 +115,8 @@
             `;
             container.appendChild(card);
 
-            // Klik card → exclusive toggle
             card.addEventListener('click', () => {
                 const isCurrentlyActive = (activeHazardType === cfg.disaster_type);
-                // Nonaktifkan semua dulu
                 Object.keys(hazardLayers).forEach(type => _setHazardVisible(type, false));
                 if (!isCurrentlyActive) {
                     _setHazardVisible(cfg.disaster_type, true);
@@ -186,9 +128,6 @@
         });
     }
 
-    /**
-     * Set visibilitas satu layer (tanpa mengubah state card lain).
-     */
     function _setHazardVisible(disasterType, show) {
         const state = hazardLayers[disasterType];
         if (!state) return;
@@ -215,9 +154,6 @@
         }
     }
 
-    /**
-     * Fetch dan render GeoJSON untuk satu jenis bencana.
-     */
     function loadHazardGeoJSON(disasterType) {
         const state = hazardLayers[disasterType];
         if (!state) return;
@@ -243,7 +179,7 @@
                     }),
                     onEachFeature: (feature, layer) => {
                         const p = feature.properties || {};
-                        const namaArea   = p.NAMOBJ || p.nama || p.name || p.NAMA || p.desa || p.kecamatan || '–';
+                        const namaArea = p.NAMOBJ || p.nama || p.name || p.NAMA || p.desa || p.kecamatan || '–';
 
                         const popupHtml = `
                             <div style="min-width:190px;font-size:13px;">
@@ -274,7 +210,7 @@
             })
             .catch(err => {
                 console.error(`Gagal memuat GeoJSON (${disasterType}):`, err);
-                state.loaded = false; // izinkan retry
+                state.loaded = false;
                 if (card) {
                     card.style.opacity = '';
                     card.title = `⚠ Gagal memuat: ${cfg.geojson_path}`;
@@ -282,9 +218,6 @@
             });
     }
 
-    /**
-     * Fetch metadata layer dari endpoint backend, lalu bangun UI.
-     */
     function initHazardLayers() {
         fetch('{{ route("map.hazard-layers") }}')
             .then(res => res.json())
@@ -305,15 +238,16 @@
             });
     }
 
-
     // =====================================================================
     // MAP DATA (data DB: disaster zones, routes, facilities)
     // =====================================================================
 
     function loadMapData() {
-        const disasterType = document.getElementById('disaster_type').value;
-        const riskLevel = document.getElementById('risk_level').value;
-        const districtToggle = document.getElementById('toggle_district_boundaries');
+        const disasterTypeElem = document.getElementById('disaster_type');
+        const riskLevelElem = document.getElementById('risk_level');
+
+        const disasterType = disasterTypeElem ? disasterTypeElem.value : 'all';
+        const riskLevel = riskLevelElem ? riskLevelElem.value : 'all';
 
         const url = new URL('{{ route("map.data") }}', window.location.origin);
         if (disasterType !== 'all') url.searchParams.append('disaster_type', disasterType);
@@ -351,9 +285,9 @@
                         icon: L.divIcon({
                             className: 'disaster-zone-marker',
                             html: `<div style="background-color: ${color}; 
-                                            width: 18px; height: 18px; 
-                                            border-radius: 50%; 
-                                            border: 2px solid white;"></div>`,
+                                        width: 18px; height: 18px; 
+                                        border-radius: 50%; 
+                                        border: 2px solid white;"></div>`,
                             iconSize: [18, 18]
                         })
                     }).addTo(layers.disasterZones);
@@ -440,14 +374,11 @@
                     });
                 }
 
+                const districtToggle = document.getElementById('toggle_district_boundaries');
                 if (districtToggle && !districtToggle.checked) {
                     map.removeLayer(layers.districtBoundaries);
                 } else {
                     layers.districtBoundaries.addTo(map);
-                }
-
-                if (data.aid_disasters && data.aid_disasters.features.length > 0) {
-                    console.log('Data bantuan bencana:', data.aid_disasters.features.length, 'kecamatan');
                 }
 
                 if (!data.map_extent && !mapInitialExtentDone &&
@@ -468,100 +399,104 @@
             });
     }
 
-    loadMapData();
-    initHazardLayers();
+    // Inisialisasi Event Listener setelah DOM Siap
+    document.addEventListener('DOMContentLoaded', () => {
+        loadMapData();
+        initHazardLayers();
 
-    document.getElementById('disaster_type').addEventListener('change', loadMapData);
-    document.getElementById('risk_level').addEventListener('change', loadMapData);
+        const disasterTypeElem = document.getElementById('disaster_type');
+        if (disasterTypeElem) disasterTypeElem.addEventListener('change', loadMapData);
 
-    const districtToggle = document.getElementById('toggle_district_boundaries');
-    if (districtToggle) {
-        districtToggle.addEventListener('change', () => {
-            if (districtToggle.checked) {
-                layers.districtBoundaries.addTo(map);
-            } else {
-                map.removeLayer(layers.districtBoundaries);
-            }
-        });
-    }
+        const riskLevelElem = document.getElementById('risk_level');
+        if (riskLevelElem) riskLevelElem.addEventListener('change', loadMapData);
 
-    const villageToggle = document.getElementById('toggle_village_boundaries');
-    if (villageToggle) {
-        villageToggle.addEventListener('change', () => {
-            if (villageToggle.checked) {
-                villageBoundariesLayer.addTo(map);
+        const districtToggle = document.getElementById('toggle_district_boundaries');
+        if (districtToggle) {
+            districtToggle.addEventListener('change', () => {
+                if (districtToggle.checked) {
+                    layers.districtBoundaries.addTo(map);
+                } else {
+                    map.removeLayer(layers.districtBoundaries);
+                }
+            });
+        }
 
-                // Sembunyikan popup kecamatan
-                layers.districtBoundaries.eachLayer(layer => {
-                    if (layer.getPopup()) {
-                        layer._storedPopup = layer.getPopup();
-                        layer.unbindPopup();
-                    }
-                });
+        const villageToggle = document.getElementById('toggle_village_boundaries');
+        if (villageToggle) {
+            villageToggle.addEventListener('change', () => {
+                if (villageToggle.checked) {
+                    villageBoundariesLayer.addTo(map);
 
-                if (!villageGeojsonLoaded) {
-                    villageGeojsonLoaded = true;
-                    const files = [
-                        '/geojson/Kecamatan Bone Raya-KEL_DESA.geojson',
-                        '/geojson/Kecamatan Bone-KEL_DESA.geojson',
-                        '/geojson/Kecamatan Bonepantai-KEL_DESA.geojson',
-                        '/geojson/Kecamatan Bulawa-KEL_DESA.geojson',
-                        '/geojson/Kecamatan Kabila Bone-KEL_DESA.geojson'
-                    ];
-                    files.forEach(file => {
-                        fetch(file)
-                            .then(res => res.json())
-                            .then(data => {
-                                L.geoJSON(data, {
-                                    style: {
-                                        color: '#00ff37ff',
-                                        weight: 1,
-                                        fillColor: '#e3fa60ff',
-                                        fillOpacity: 0.1,
-                                        dashArray: '3 3'
-                                    },
-                                    onEachFeature: function(feature, layer) {
-                                        if (feature.properties) {
-                                            const name = feature.properties.nama || feature.properties.kel_desa || feature.properties.NAMOBJ || 'Tidak diketahui';
-                                            const key = name.toLowerCase().replace(/desa |kelurahan /g, '').trim();
-                                            const aidInfo = villageAidsData[key];
-                                            
-                                            let aidHtml = '';
-                                            if (aidInfo && aidInfo.total_amount > 0) {
-                                                const types = aidInfo.aid_types && aidInfo.aid_types.length > 0 ? aidInfo.aid_types.join(', ') : '-';
-                                                aidHtml = `
-                                                    Jenis Bantuan: ${types}<br>
-                                                    Total Disalurkan: ${aidInfo.total_amount}
-                                                `;
+                    layers.districtBoundaries.eachLayer(layer => {
+                        if (layer.getPopup()) {
+                            layer._storedPopup = layer.getPopup();
+                            layer.unbindPopup();
+                        }
+                    });
+
+                    if (!villageGeojsonLoaded) {
+                        villageGeojsonLoaded = true;
+                        const files = [
+                            '/geojson/Kecamatan Bone Raya-KEL_DESA.geojson',
+                            '/geojson/Kecamatan Bone-KEL_DESA.geojson',
+                            '/geojson/Kecamatan Bonepantai-KEL_DESA.geojson',
+                            '/geojson/Kecamatan Bulawa-KEL_DESA.geojson',
+                            '/geojson/Kecamatan Kabila Bone-KEL_DESA.geojson'
+                        ];
+                        files.forEach(file => {
+                            fetch(file)
+                                .then(res => res.json())
+                                .then(data => {
+                                    L.geoJSON(data, {
+                                        style: {
+                                            color: '#00ff37ff',
+                                            weight: 1,
+                                            fillColor: '#e3fa60ff',
+                                            fillOpacity: 0.1,
+                                            dashArray: '3 3'
+                                        },
+                                        onEachFeature: function(feature, layer) {
+                                            if (feature.properties) {
+                                                const name = feature.properties.nama || feature.properties.kel_desa || feature.properties.NAMOBJ || 'Tidak diketahui';
+                                                const key = name.toLowerCase().replace(/desa |kelurahan /g, '').trim();
+                                                const aidInfo = villageAidsData[key];
+                                                
+                                                let aidHtml = '';
+                                                if (aidInfo && aidInfo.total_amount > 0) {
+                                                    const types = aidInfo.aid_types && aidInfo.aid_types.length > 0 ? aidInfo.aid_types.join(', ') : '-';
+                                                    aidHtml = `
+                                                        Jenis Bantuan: ${types}<br>
+                                                        Total Disalurkan: ${aidInfo.total_amount}
+                                                    `;
+                                                }
+                                                
+                                                layer.bindPopup(`
+                                                    <strong>${name}</strong><br>
+                                                    ${aidHtml}
+                                                `);
                                             }
-                                            
-                                            layer.bindPopup(`
-                                                <strong>${name}</strong><br>
-                                                ${aidHtml}
-                                            `);
                                         }
-                                    }
-                                }).addTo(villageBoundariesLayer);
-                            })
-                            .catch(err => console.error('Error loading village boundaries:', err));
+                                    }).addTo(villageBoundariesLayer);
+                                })
+                                .catch(err => console.error('Error loading village boundaries:', err));
+                        });
+                    }
+                } else {
+                    map.removeLayer(villageBoundariesLayer);
+
+                    layers.districtBoundaries.eachLayer(layer => {
+                        if (layer._storedPopup && !layer.getPopup()) {
+                            layer.bindPopup(layer._storedPopup);
+                        }
                     });
                 }
-            } else {
-                map.removeLayer(villageBoundariesLayer);
+            });
 
-                // Tampilkan kembali popup kecamatan
-                layers.districtBoundaries.eachLayer(layer => {
-                    if (layer._storedPopup && !layer.getPopup()) {
-                        layer.bindPopup(layer._storedPopup);
-                    }
-                });
+            if (villageToggle.checked) {
+                villageToggle.dispatchEvent(new Event('change'));
             }
-        });
-
-        if (villageToggle.checked) {
-            villageToggle.dispatchEvent(new Event('change'));
         }
-    }
+    });
 
     if (mapUiVariant === 'landing-fs') {
         window.addEventListener('resize', invalidateMapSize);

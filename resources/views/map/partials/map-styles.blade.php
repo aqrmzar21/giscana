@@ -53,6 +53,7 @@
     }
     @endif
 
+    /* Common Form & Filter Controls */
     .map-ui--admin .filter-group label,
     footer .filter-group label {
         display: block;
@@ -73,6 +74,8 @@
     footer .filter-group {
         margin-bottom: 0;
     }
+
+    /* Common Legend Elements */
     .map-legend-content .legend-item,
     .legend .legend-item {
         display: flex;
@@ -97,13 +100,13 @@
     }
 
     .map-card {
-        background-color: rgba(255,255,255,0.75);
+        background-color: rgba(255, 255, 255, 0.75);
         -webkit-backdrop-filter: blur(6px);
         backdrop-filter: blur(6px);
     }
 
     /* =========================================================
-       HAZARD LAYER PANEL — redesign
+       HAZARD LAYER PANEL
     ========================================================= */
     .hazard-layer-panel {
         border: 1px solid #e5e7eb;
@@ -191,25 +194,21 @@
         color: #6366f1;
     }
 
-    /* Badge grid */
-    /* Default: 2 kolom */
+    /* Badge Grid */
     .hazard-badges-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
-        /* padding: 10px; */
         width: 100%;
     }
 
-    /* Mobile: 1 kolom */
     @media (max-width: 640px) {
         .hazard-badges-grid {
             grid-template-columns: 1fr;
         }
     }
 
-
-    /* Individual Hazard Card Badge */
+    /* Alpine.js Guard */
     [x-cloak] { display: none !important; }
 
     /* Style Kartu Bencana Dinamis */
@@ -284,7 +283,7 @@
         background-color: var(--hc-color, #3b82f6);
         border-radius: 50%;
         align-items: center;
-        justify-center;
+        justify-content: center;
     }
 
     .hazard-card-check svg {
