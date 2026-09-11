@@ -210,129 +210,89 @@
 
 
     /* Individual Hazard Card Badge */
+    [x-cloak] { display: none !important; }
+
+    /* Style Kartu Bencana Dinamis */
     .hazard-card {
-        position: relative;
-        border-radius: 8px;
-        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0.65rem;
+        border-radius: 0.75rem;
+        border: 1.5px solid #e2e8f0;
+        background-color: var(--hc-bg, #f8fafc);
         cursor: pointer;
-        border: 2px solid transparent;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        background: #fff;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-        overflow: hidden;
+        transition: all 0.2s ease-in-out;
+        position: relative;
         user-select: none;
     }
-    .hazard-card::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 3px;
-        background: var(--hc-color, #6b7280);
-        opacity: 0;
-        transition: opacity 0.2s ease;
-    }
-    .hazard-card.active::before {
-        opacity: 1;
-    }
-    .hazard-card.active {
-        border-color: var(--hc-color, #6b7280);
-        background: var(--hc-bg, #f8fafc);
-        box-shadow: 0 4px 12px var(--hc-shadow, rgba(0,0,0,0.1));
-    }
-    .hazard-card.inactive {
-        opacity: 0.55;
-        filter: grayscale(0.5);
-    }
-    .hazard-card.panel-disabled {
-        opacity: 0.3;
-        pointer-events: none;
-        filter: grayscale(1);
-    }
-    .hazard-card:hover:not(.inactive):not(.panel-disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px var(--hc-shadow, rgba(0,0,0,0.12));
-    }
-    .hazard-card:hover.inactive:not(.panel-disabled) {
-        opacity: 0.7;
+
+    .hazard-card:hover {
         transform: translateY(-1px);
     }
-    .hazard-card-emoji {
-        font-size: 20px;
-        line-height: 1;
-        margin-bottom: 6px;
-        display: block;
-    }
-    .hazard-card-label {
-        font-size: 11px;
-        font-weight: 700;
-        color: #1f2937;
-        line-height: 1.3;
-        margin-bottom: 3px;
-    }
-    .hazard-card.active .hazard-card-label {
-        color: var(--hc-color, #1f2937);
-    }
-    .hazard-card-status {
-        font-size: 10px;
-        color: #9ca3af;
-        font-weight: 500;
-    }
-    .hazard-card.active .hazard-card-status {
-        color: var(--hc-color, #6b7280);
-        font-weight: 600;
-    }
-    /* Active check indicator */
-    .hazard-card-check {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background: var(--hc-color, #6b7280);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transform: scale(0.5);
-        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .hazard-card.active .hazard-card-check {
-        opacity: 1;
-        transform: scale(1);
-    }
-    .hazard-card-check svg {
-        width: 9px;
-        height: 9px;
-        stroke: #fff;
-        stroke-width: 2.5;
-        fill: none;
+
+    /* Status Aktif */
+    .hazard-card.active {
+        border-color: var(--hc-color, #3b82f6);
+        box-shadow: 0 4px 12px var(--hc-shadow, rgba(0,0,0,0.1));
+        background-color: var(--hc-bg, #ffffff);
     }
 
-    /* Loading state */
-    .hazard-loading {
-        grid-column: 1 / -1;
+    .hazard-card.active .hazard-card-check {
         display: flex;
+    }
+
+    /* Status Nonaktif */
+    .hazard-card.inactive {
+        opacity: 0.7;
+        border-color: #cbd5e1;
+        background-color: #f8fafc;
+    }
+
+    /* Elemen Internal Kartu */
+    .hazard-card-emoji {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .hazard-card-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.2;
+    }
+
+    .hazard-card-status {
+        font-size: 0.65rem;
+        color: #64748b;
+        margin-top: 0.2rem;
+    }
+
+    .hazard-card.active .hazard-card-status {
+        color: var(--hc-color, #2563eb);
+        font-weight: 600;
+    }
+
+    /* Tanda Centang (Checkmark) */
+    .hazard-card-check {
+        display: none;
+        position: absolute;
+        top: 0.4rem;
+        right: 0.4rem;
+        width: 14px;
+        height: 14px;
+        background-color: var(--hc-color, #3b82f6);
+        border-radius: 50%;
         align-items: center;
-        gap: 8px;
-        font-size: 12px;
-        color: #9ca3af;
-        font-style: italic;
-        padding: 4px 0;
+        justify-center;
     }
-    .hazard-loading-icon {
-        width: 16px;
-        height: 16px;
-        animation: hazard-spin 0.8s linear infinite;
-        flex-shrink: 0;
-        color: #6366f1;
-    }
-    @keyframes hazard-spin {
-        to { transform: rotate(360deg); }
-    }
-    /* tambahan baru  */
-    [x-cloak] { 
-        display: none !important; 
+
+    .hazard-card-check svg {
+        stroke: #ffffff;
+        stroke-width: 2;
+        fill: none;
+        width: 8px;
+        height: 8px;
     }
 </style>
 @endpush

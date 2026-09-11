@@ -84,30 +84,37 @@
     // Klik card → aktifkan/nonaktifkan layer.
     // =====================================================================
 
-        document.addEventListener('DOMContentLoaded', () => {
-        // 🗺️ Toggle Batas Kecamatan
-        const mobileDistrictToggle = document.getElementById('toggle_district_boundaries');
-        if (mobileDistrictToggle) {
-            mobileDistrictToggle.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    map.addLayer(districtLayer); // Nama variabel layer kecamatan kamu
-                } else {
-                    map.removeLayer(districtLayer);
-                }
-            });
-        }
+    document.addEventListener('DOMContentLoaded', () => {
+    // 🗺️ Toggle Batas Kecamatan
+    const mobileDistrictToggle = document.getElementById('toggle_district_boundaries');
+    if (mobileDistrictToggle) {
+        mobileDistrictToggle.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                map.addLayer(districtLayer); // Nama variabel layer kecamatan kamu
+            } else {
+                map.removeLayer(districtLayer);
+            }
+        });
+    }
 
-        // 🏡 Toggle Batas Desa
-        const mobileVillageToggle = document.getElementById('toggle_village_boundaries');
-        if (mobileVillageToggle) {
-            mobileVillageToggle.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    map.addLayer(villageLayer); // Nama variabel layer desa kamu
-                } else {
-                    map.removeLayer(villageLayer);
-                }
-            });
-        }
+    // 🏡 Toggle Batas Desa
+    const mobileVillageToggle = document.getElementById('toggle_village_boundaries');
+    if (mobileVillageToggle) {
+        mobileVillageToggle.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                map.addLayer(villageLayer); // Nama variabel layer desa kamu
+            } else {
+                map.removeLayer(villageLayer);
+            }
+        });
+    }
+    });
+    // Memanggil fungsi inisialisasi saat peta selesai dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+    // Pastikan variabel 'map' Leaflet Anda sudah terinisialisasi sebelum memanggil fungsi ini
+    if (typeof map !== 'undefined') {
+        initHazardLayers();
+    }
     });
 
     /** Map: disaster_type -> { config, leafletLayer, loaded, visible } */
