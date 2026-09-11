@@ -497,6 +497,7 @@
             }
         }
     });
+    
 
     if (mapUiVariant === 'landing-fs') {
         window.addEventListener('resize', invalidateMapSize);
