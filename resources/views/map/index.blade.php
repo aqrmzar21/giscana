@@ -38,7 +38,7 @@
                    /* Mobile Styling (Bottom Sheet) */
                    bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl border-t border-slate-200 px-5 pt-3 pb-4 max-h-[80vh] overflow-y-auto
                    /* Desktop Styling (Always Open Top-Right Card) */
-                   md:top-4 md:right-4 md:bottom-auto md:left-auto md:w-80 md:rounded-2xl md:border md:shadow-xl md:translate-y-0"
+                   md:bottom-12 md:right-4 md:bottom-auto md:left-auto md:w-80 md:rounded-2xl md:border md:shadow-xl md:translate-y-0"
             x-cloak>
             
             <!-- 📐 Handle Bar / Strip Bawah (Klik/Tarik untuk Buka-Tutup di Mobile) -->
@@ -71,9 +71,12 @@
             </div>
 
             <!-- Watermark Footer -->
-            <div class="text-center pt-3 border-t border-slate-100">
+             <div class="text-center pt-3 border-t border-slate-100 block md:hidden">
                 <p class="text-[10px] text-slate-400 font-medium tracking-wide">©2026 Giscana</p>
             </div>
+            <!-- <div class="text-center pt-3 border-t border-slate-100">
+                <p class="text-[10px] text-slate-400 font-medium tracking-wide">©2026 Giscana</p>
+            </div> -->
         </div>
 
     </div>

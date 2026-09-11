@@ -53,17 +53,4 @@
         </button> -->
     </div>
 
-    {{-- Slider Opacity --}}
-    <div class="pt-2">
-        <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-semibold text-slate-700">Opacity</span>
-        </div>
-        <input 
-            type="range" 
-            id="hazard_opacity_slider"
-            min="0" 
-            max="100" 
-            value="80" 
-            class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-600 focus:outline-none">
-    </div>
 </div>
