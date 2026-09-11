@@ -1,32 +1,26 @@
+{{-- Toggle Batas Administrasi (Kecamatan & Desa) --}}
+<div class="space-y-2">
 
-<!-- <div class="flex flex-col gap-3">
-    <div class="flex flex-wrap gap-x-5 gap-y-2">
-        <label class="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
-            <input type="checkbox" id="toggle_district_boundaries" class="rounded border-gray-300 text-yellow-300 focus:ring-yellow-900" checked>
-            <span>Tampilkan Batas Kecamatan</span>
-        </label>
-        <label class="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
-            <input type="checkbox" id="toggle_village_boundaries" class="rounded border-gray-300 text-green-600 focus:ring-indigo-500">
-            <span>Tampilkan Batas Desa</span>
+    <!-- Baris 1: Batas Kecamatan -->
+    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100/80 hover:bg-slate-100/50 transition-colors">
+        <label class="flex items-center justify-between w-full cursor-pointer select-none">
+            <span class="text-xs font-semibold text-slate-700">Batas Kecamatan</span>
+            <div class="relative inline-flex items-center">
+                <input type="checkbox" id="toggle_district_boundaries" class="sr-only peer" checked>
+                <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+            </div>
         </label>
     </div>
-</div> -->
 
-{{-- Toggle batas wilayah --}}
-<div class="flex flex-wrap items-center gap-x-6 gap-y-3">
-    <label class="flex items-center cursor-pointer">
-        <input type="checkbox" id="toggle_district_boundaries" class="sr-only peer" checked>
-        <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-yellow-400 relative transition">
-            <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5"></div>
-        </div>
-        <span class="ml-3 text-sm text-gray-700">Batas Kecamatan</span>
-    </label>
+    <!-- Baris 2: Batas Desa -->
+    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100/80 hover:bg-slate-100/50 transition-colors">
+        <label class="flex items-center justify-between w-full cursor-pointer select-none">
+            <span class="text-xs font-semibold text-slate-700">Batas Desa</span>
+            <div class="relative inline-flex items-center">
+                <input type="checkbox" id="toggle_village_boundaries" class="sr-only peer">
+                <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+            </div>
+        </label>
+    </div>
 
-    <label class="flex items-center cursor-pointer">
-        <input type="checkbox" id="toggle_village_boundaries" class="sr-only peer">
-        <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-green-500 relative transition">
-            <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5"></div>
-        </div>
-        <span class="ml-3 text-sm text-gray-700">Batas Desa</span>
-    </label>
 </div>
