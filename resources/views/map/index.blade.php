@@ -41,8 +41,8 @@
             class="fixed z-50 transition-transform duration-300 ease-in-out
                    /* Mobile Styling (Bottom Sheet) */
                    bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl border-t border-slate-200 px-5 pt-3 pb-4 max-h-[80vh] overflow-y-auto
-                   /* Desktop Styling (Always Open Top-Right Card) */
-                   md:bottom-12 md:right-4 md:bottom-auto md:left-auto md:w-80 md:rounded-2xl md:border md:shadow-xl md:translate-y-0"
+                   /* Desktop Styling (Always Open Bawah-Kanan Card) */
+                   md:bottom-12 md:right-4 md:top-auto md:left-auto md:w-80 md:rounded-2xl md:border md:shadow-xl md:translate-y-0"
             x-cloak>
             
             <!-- 📐 Handle Bar / Strip Bawah (Klik/Tarik untuk Buka-Tutup di Mobile) -->
