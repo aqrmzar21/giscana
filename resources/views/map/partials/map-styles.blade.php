@@ -330,5 +330,9 @@
     @keyframes hazard-spin {
         to { transform: rotate(360deg); }
     }
+    /* tambahan baru  */
+    [x-cloak] { 
+        display: none !important; 
+    }
 </style>
 @endpush
