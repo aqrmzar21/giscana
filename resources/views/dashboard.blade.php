@@ -14,22 +14,22 @@
 
 @section('content')
     <!-- Welcome Card  -->
-    <div class="lg:col-span-2 bg-white shadow rounded-lg mb-6">
-        <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Selamat Datang!</h3>
+                    <p class="text-gray-500 text-sm mb-4">
+                        Halo <strong class="text-blue-800">{{ Auth::user()?->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
+                    </p>
+                </div>
             <div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">Selamat Datang!</h3>
-                <p class="text-gray-500 text-sm mb-4">
-                    Halo <strong class="text-blue-800">{{ Auth::user()?->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
-                </p>
-            </div>
-            <div>
-                
             </div>
         </div>
-    </div>
-
-    <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-6">
+                
+        </div>
         <div class="bg-white overflow-hidden shadow rounded-lg">
             <div class="p-5">
                 <div class="flex items-center">
@@ -101,7 +101,6 @@
         
     </div>
 
-    <!-- Welcome Card -->
     <!-- <div class="lg:col-span-2 bg-white shadow rounded-lg mb-6">
         <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-center gap-4">
             <div>
@@ -112,6 +111,7 @@
             </div>
         </div>
     </div> -->
+    <!-- Shorcut Distrbusi Card -->
     <div id="welcome-card" class="lg:col-span-1 bg-white shadow rounded-lg flex flex-col justify-center">
         <div class="px-4 py-6 sm:p-6 text-center">
             <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-400 mb-4">
