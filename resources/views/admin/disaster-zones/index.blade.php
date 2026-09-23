@@ -34,29 +34,34 @@
             </div>
         </div>
         
-        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4 justify-between">
-            <form action="{{ route('admin.disaster-zones.index') }}" method="GET" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-                <!-- ini buat rata kiri sendiri -->
-                <div class="flex items-center gap-2 flex-1">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari zona..." class="flex w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    <button type="submit" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        Filter
-                    </button>
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
+            <!-- Form Filter -->
+            <form action="{{ route('admin.disaster-zones.index') }}" method="GET" class="flex flex-col sm:flex-row sm:flex-wrap gap-2 w-full lg:w-auto">
+                
+                <!-- Search + Filter -->
+                <div class="flex flex-col sm:flex-row gap-2 flex-1">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari zona..." class="lg:w-full sm:w-100 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <button type="submit" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Filter</button>
                 </div>
-                <!-- ini tetap berada center di tengah -->
-                <div class="flex items-center gap-2 justify-center">
-                    <input type="date" name="start_date" value="{{ request('start_date') }}" class="block w-full sm:w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+
+                <!-- Date Range -->
+                <div class="flex flex-col sm:flex-row gap-2 items-center justify-center">
+                    <input type="date" name="start_date" value="{{ request('start_date') }}"
+                        class="w-full sm:w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                     <span class="text-sm text-gray-500">s/d</span>
-                    <input type="date" name="end_date" value="{{ request('end_date') }}" class="block w-full sm:w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <input type="date" name="end_date" value="{{ request('end_date') }}"
+                        class="w-full sm:w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+
                     @if(request()->anyFilled(['search', 'start_date', 'end_date']))
-                    <a href="{{ route('admin.disaster-zones.index') }}" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    <a href="{{ route('admin.disaster-zones.index') }}"
+                    class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Reset
                     </a>
                     @endif
                 </div>
             </form>
 
-            {{-- Tombol Cetak PDF --}}
+            <!-- Tombol Cetak PDF -->
             @php
                 $printUrl    = route('admin.disaster-zones.print');
                 $printParams = [];
@@ -66,15 +71,14 @@
                 if ($printParams)          $printUrl .= '?' . http_build_query($printParams);
             @endphp
             <a href="{{ $printUrl }}" target="_blank"
-               class="inline-flex items-center justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap sm:ml-auto">
+            class="inline-flex items-center justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap">
                 <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
                 Cetak PDF{{ request('search') || request('start_date') || request('end_date') ? ' (Filter)' : ' (Semua)' }}
             </a>
         </div>
-
 
         <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
             <table class="min-w-full divide-y divide-gray-300">
@@ -118,13 +122,6 @@
                             @endif
                         </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $zone->affected_population }}</td>
-                        <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            @if($zone->is_active)
-                            <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Aktif</span>
-                            @else
-                            <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Tidak Aktif</span>
-                            @endif
-                        </td> -->
                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                             <div class="flex items-center justify-end space-x-2">
                                 <a href="{{ route('admin.disaster-zones.show', $zone) }}" class="text-indigo-600 hover:text-indigo-900">

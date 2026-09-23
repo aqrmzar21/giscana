@@ -9,7 +9,7 @@
     <!-- Peta Utama -->
     <div id="map" class="absolute inset-0 h-screen w-screen z-0"></div>
 
-    <div class="absolute md:bottom-4 bottom-10 left-4 z-50 md:p-2 pb-6">
+    <div class="absolute md:bottom-4 bottom-10 left-4 z-50 md:p-2 pb-12">
         @include('map.partials.map-legend-content')
     </div>
     
@@ -66,6 +66,7 @@
             
             <!-- Section 1: Toggle Switch Batas Administrasi -->
             <div class="mb-4">
+                <h6 class="text-xs font-bold text-slate-800 uppercase tracking-wider py-2">FILTER BATAS ADMINITSRASI</h6>
                 @include('map.partials.map-district-checkbox')
             </div>
             
