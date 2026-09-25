@@ -66,113 +66,6 @@
 
     // =====================================================================
     // Ambil lokasi user
-    // if (navigator.geolocation) {
-    //     navigator.geolocation.getCurrentPosition(function(position) {
-    //         const lat = position.coords.latitude;
-    //         const lng = position.coords.longitude;
-
-    //         // Marker lokasi user
-    //         L.marker([lat, lng]).addTo(map).bindPopup("Lokasi saya").openPopup();
-    //         map.setView([lat, lng], 14);
-
-    //         // Ambil titik evakuasi dari backend
-    //         fetch('/api/evacuation-facilities')
-    //             .then(res => res.json())
-    //             .then(data => {
-    //                 if (data.length > 0) {
-    //                     // Ambil titik evakuasi pertama sebagai contoh
-    //                     let facility = data[0];
-    //                     let coords = JSON.parse(facility.point_coordinates); // pastikan format GeoJSON
-
-    //                     // Marker titik evakuasi
-    //                     L.marker([coords.lat, coords.lng]).addTo(map).bindPopup(facility.name);
-
-    //                     // Routing (Leaflet Routing Machine)
-    //                     L.Routing.control({
-    //                         waypoints: [
-    //                             L.latLng(lat, lng), // lokasi user
-    //                             L.latLng(coords.lat, coords.lng) // tujuan evakuasi
-    //                         ],
-    //                         routeWhileDragging: true
-    //                     }).addTo(map);
-    //                 }
-    //             });
-    //     });
-    // };
-
-    // cara 2
-    // let userMarker;
-    // document.getElementById('setLocation').addEventListener('click', function() {
-    //     const lat = parseFloat(document.getElementById('lat').value);
-    //     const lng = parseFloat(document.getElementById('lng').value);
-
-    //     if (userMarker) {
-    //         map.removeLayer(userMarker);
-    //     }
-
-    //     userMarker = L.marker([lat, lng]).addTo(map).bindPopup("Lokasi eksperimen").openPopup();
-    //     map.setView([lat, lng], 14);
-
-    //     // Panggil API nearest-evacuation
-    //     fetch(`/api/nearest-evacuation?lat=${lat}&lng=${lng}`)
-    //         .then(res => res.json())
-    //         .then(facility => {
-    //             if (facility) {
-    //                 let coords = JSON.parse(facility.point_coordinates);
-
-    //                 // Marker fasilitas evakuasi
-    //                 L.marker([coords.lat, coords.lng]).addTo(map).bindPopup(facility.name);
-
-    //                 // Routing
-    //                 L.Routing.control({
-    //                     waypoints: [
-    //                         L.latLng(lat, lng),
-    //                         L.latLng(coords.lat, coords.lng)
-    //                     ],
-    //                     routeWhileDragging: true
-    //                 }).addTo(map);
-    //             }
-    //         });
-    // });
-
-    // cara 3
-    // let userMarker;
-    // // Event tombol "Set Lokasi"
-    // document.getElementById('setLocation').addEventListener('click', function() {
-    //     const lat = parseFloat(document.getElementById('lat').value);
-    //     const lng = parseFloat(document.getElementById('lng').value);
-
-    //     // Tutup modal & tampilkan peta
-    //     document.getElementById('locationModal').style.display = 'none';
-    //     document.getElementById('map').style.display = 'block';
-
-    //     // Tambahkan marker lokasi user
-    //     userMarker = L.marker([lat, lng]).addTo(map).bindPopup("Lokasi saya").openPopup();
-    //     map.setView([lat, lng], 14);
-
-    //     // Panggil API nearest-evacuation
-    //     fetch(`/api/nearest-evacuation?lat=${lat}&lng=${lng}`)
-    //         .then(res => res.json())
-    //         .then(facility => {
-    //             if (facility) {
-    //                 let coords = JSON.parse(facility.point_coordinates);
-
-    //                 // Marker fasilitas evakuasi
-    //                 L.marker([coords.lat, coords.lng]).addTo(map).bindPopup(facility.name);
-
-    //                 // Routing
-    //                 L.Routing.control({
-    //                     waypoints: [
-    //                         L.latLng(lat, lng),
-    //                         L.latLng(coords.lat, coords.lng)
-    //                     ],
-    //                     routeWhileDragging: true
-    //                 }).addTo(map);
-    //             }
-    //         });
-    // });
-
-    // cara 4
     let userMarker;
 
     document.getElementById('setLocation').addEventListener('click', function() {
@@ -192,7 +85,7 @@
             .then(res => res.json())
             .then(facility => {
                 if (facility) {
-                    let coords = JSON.parse(facility.point_coordinates);
+                    let coords = facility.point_coordinates; // sudah object {lat, lng}
 
                     // Marker fasilitas evakuasi
                     L.marker([coords.lat, coords.lng]).addTo(map).bindPopup(facility.name);
@@ -207,6 +100,7 @@
                     }).addTo(map);
                 }
             });
+
     });
 
     // =====================================================================
@@ -523,11 +417,18 @@
                 }
 
                 const districtToggle = document.getElementById('toggle_district_boundaries');
-                if (districtToggle && !districtToggle.checked) {
-                    map.removeLayer(layers.districtBoundaries);
-                } else {
-                    layers.districtBoundaries.addTo(map);
+                // Default: boundaries tidak ditampilkan
+                map.removeLayer(layers.districtBoundaries);
+                if (districtToggle) {
+                    districtToggle.addEventListener('change', function() {
+                        if (this.checked) {
+                            layers.districtBoundaries.addTo(map);
+                        } else {
+                            map.removeLayer(layers.districtBoundaries);
+                        }
+                    });
                 }
+
 
                 if (!data.map_extent && !mapInitialExtentDone &&
                     (data.disaster_zones.features.length > 0 ||
