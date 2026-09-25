@@ -81,18 +81,32 @@
     <div x-data="{ openPanel: true }">
 
         <div 
-            :class="openPanel ? 'translate-y-0' : 'translate-y-[calc(100%-2.75rem)]'"
+            :class="openPanel ? 'translate-y-0 md:translate-x-0' : 'translate-y-[calc(100%-2.75rem)] md:translate-y-0 md:translate-x-[calc(100%+1rem)]'"
             class="fixed z-50 transition-transform duration-300 ease-in-out
+                   /* Mobile Styling (Bottom Sheet Slide Down) */
                    bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl border-t border-slate-200 px-5 pt-3 pb-4 max-h-[80vh] overflow-y-auto
-                   md:bottom-12 md:right-4 md:top-auto md:left-auto md:w-80 md:rounded-2xl md:border md:shadow-xl md:translate-y-0"
+                   /* Desktop Styling (Slide Right Floating Card) */
+                   md:bottom-12 md:right-4 md:top-auto md:left-auto md:w-80 md:rounded-2xl md:border md:shadow-xl md:overflow-visible"
             x-cloak>
             
+            <!-- 📐 Handle Bar / Strip Bawah (Mobile Only) -->
             <div 
                 @click="openPanel = !openPanel" 
                 class="w-full flex flex-col items-center cursor-pointer pb-2 pt-1 md:hidden group">
                 <div class="w-12 h-1.5 bg-slate-300 group-hover:bg-slate-400 rounded-full transition-colors"></div>
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1" x-text="openPanel ? 'Tutup Kontrol' : 'Tarik Kontrol Peta'"></span>
             </div>
+
+            <!-- 🗂️ Tombol Strip Geser Samping (Desktop Only) -->
+            <button 
+                @click="openPanel = !openPanel" 
+                type="button"
+                class="hidden md:flex absolute -left-8 top-1/2 -translate-y-1/2 w-8 h-12 bg-white hover:bg-slate-50 border-l border-y border-slate-200/90 shadow-md rounded-l-xl items-center justify-center text-slate-600 hover:text-indigo-600 transition-colors focus:outline-none cursor-pointer group"
+                :title="openPanel ? 'Sembunyikan Panel Kontrol' : 'Tampilkan Panel Kontrol'">
+                <svg class="w-5 h-5 transition-transform duration-300" :class="openPanel ? 'rotate-0' : 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
 
             <!-- Header Panel -->
             <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
