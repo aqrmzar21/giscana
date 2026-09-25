@@ -81,22 +81,36 @@
         map.setView([lat, lng], 14);
 
         // Panggil API nearest-evacuation
-        fetch(`/api/nearest-evacuation?lat=${lat}&lng=${lng}`)
+        fetch(`/api/nearest-evacuation-with-route?lat=${lat}&lng=${lng}`)
             .then(res => res.json())
-            .then(facility => {
-                if (facility) {
-                    let coords = facility.point_coordinates; // sudah object {lat, lng}
+            .then(data => {
+                const facility = data.facility;
+                const routes = data.routes;
 
-                    // Marker fasilitas evakuasi
-                    L.marker([coords.lat, coords.lng]).addTo(map).bindPopup(facility.name);
+                // Marker facility
+                L.marker([facility.point_coordinates.lat, facility.point_coordinates.lng])
+                .addTo(map).bindPopup(facility.name);
 
-                    // Routing
+                // Kalau ada route resmi → gambar polyline
+                if (routes.length > 0) {
+                    routes.forEach(route => {
+                        const coords = route.line_coordinates.map(c => [c[1], c[0]]); // [lat,lng]
+                        L.polyline(coords, {
+                            color: 'blue',
+                            weight: 3,
+                            dashArray: '5,10'
+                        }).addTo(map).bindPopup(route.name);
+                    });
+                } else {
+                    // fallback: Routing Machine ke facility
                     L.Routing.control({
                         waypoints: [
                             L.latLng(lat, lng),
-                            L.latLng(coords.lat, coords.lng)
+                            L.latLng(facility.point_coordinates.lat, facility.point_coordinates.lng)
                         ],
-                        routeWhileDragging: true
+                        lineOptions: {
+                            styles: [{color: 'red', dashArray: '5, 10'}]
+                        }
                     }).addTo(map);
                 }
             });

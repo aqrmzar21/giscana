@@ -43,7 +43,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     });
 });
 
-Route::get('/api/nearest-evacuation', function (\Illuminate\Http\Request $request) {
+// Mengmabil jaur terdekat berdasarkan lokasi
+Route::get('/api/nearest-evacuation-with-route', function (\Illuminate\Http\Request $request) {
     $lat = $request->query('lat');
     $lng = $request->query('lng');
 
@@ -58,9 +59,12 @@ Route::get('/api/nearest-evacuation', function (\Illuminate\Http\Request $reques
     ->orderBy('distance', 'asc')
     ->first();
 
-    return response()->json($facility);
+    $routes = \App\Models\EvacuationRoute::where('evacuation_facility_id', $facility->id)->get();
+
+    return response()->json([
+        'facility' => $facility,
+        'routes' => $routes
+    ]);
 });
-
-
 
 require __DIR__.'/auth.php';
