@@ -91,60 +91,94 @@ Giscana is a comprehensive disaster management system that focuses on natural di
    php artisan serve
    ```
 
-## Database Schema
+# GISCANA_PROJECT_FRAMEWORK.md
 
-### Core Tables
+Dokumen panduan arsitektur, skema basis data, logika bisnis, dan standar UI/UX untuk proyek **GIScana (Sistem Informasi Geografis & Manajemen Bantuan Bencana Bone Bolango)**. Dokumen ini dapat digunakan sebagai berkas patokan (*context standard*) untuk pengembang maupun kolaborator AI (seperti Claude, ChatGPT, atau Gemini).
 
-#### disaster_zones
-- Stores polygon data for banjir and longsor risk areas
-- Includes risk levels, affected population, and area calculations
+---
 
-#### evacuation_routes
-- Contains linestring data for evacuation paths
-- Supports different route types (primary, secondary, emergency)
+## 1. Ringkasan Proyek & Teknologi
 
-#### evacuation_facilities
-- Point data for evacuation centers and shelters
-- Includes capacity, contact information, and facility types
+* **Nama Sistem:** GIScana (WebGIS & SIMBA - Sistem Informasi Manajemen Bantuan)
 
-#### aid_disasters
-- `id` (Primary Key)
-- `district_name` (string)
-- `total_recipients` (integer)
-- `distributed_aid` (integer)
-- `is_active` (boolean)
-- `last_synced_at` (timestamp)
-- `timestamps`
 
-## API Endpoints
+* **Wilayah Studi:** Kabupaten Bone Bolango (5 Kecamatan Fokus: Bone Raya, Bulawa, Bone, Bonepantai, Kabila Bone)
 
-### Disaster Zones
-- `GET /api/disaster-zones` - List all disaster zones
-- `POST /api/disaster-zones` - Create new disaster zone
-- `GET /api/disaster-zones/{id}` - Get specific disaster zone
-- `PUT /api/disaster-zones/{id}` - Update disaster zone
-- `DELETE /api/disaster-zones/{id}` - Delete disaster zone
 
-### Evacuation Routes
-- `GET /api/evacuation-routes` - List all evacuation routes
-- `POST /api/evacuation-routes` - Create new evacuation route
-- `GET /api/evacuation-routes/{id}` - Get specific evacuation route
-- `PUT /api/evacuation-routes/{id}` - Update evacuation route
-- `DELETE /api/evacuation-routes/{id}` - Delete evacuation route
+* **Teknologi Utama:**
+* **Backend:** Laravel (Eloquent ORM, Blade Templating)
+* **Frontend & UI:** Tailwind CSS, Alpine.js
+* **Sistem Peta Spasial:** Leaflet.js, Leaflet Routing Machine, HTML5 Geolocation API
 
-### Evacuation Facilities
-- `GET /api/evacuation-facilities` - List all evacuation facilities
-- `POST /api/evacuation-facilities` - Create new evacuation facility
-- `GET /api/evacuation-facilities/{id}` - Get specific evacuation facility
-- `PUT /api/evacuation-facilities/{id}` - Update evacuation facility
-- `DELETE /api/evacuation-facilities/{id}` - Delete evacuation facility
 
-### Aid Distribution Points
-- `GET /api/aid-disasters` - List all aid disasters data
-- `POST /api/aid-disasters` - Create new aid disaster record
-- `GET /api/aid-disasters/{id}` - Get specific aid disaster data
-- `PUT /api/aid-disasters/{id}` - Update aid disaster record
-- `DELETE /api/aid-disasters/{id}` - Delete aid disaster record
+
+---
+
+## 2. Refactoring Skema Basis Data (Laravel Migration)
+
+Skema basis data mengalami pemisahan antara **Master Stok Logistik**, **Master Target Penerima (Warga Terdampak)**, dan **Transaksi Penyaluran** untuk mencegah *double claim* serta menghitung progres per wilayah secara dinamis.
+
+```
+                ┌───────────────────────────┐
+                │         districts         │ (Master Kecamatan)
+                └─────────────┬─────────────┘
+                              │ 1:N
+                ┌─────────────┴───────────┐
+                │         villages        │ (Master Desa)
+                └─────────────┬───────────┘
+                              │ 1:N
+                ┌─────────────┴───────────┐
+                │      beneficiaries      │ (Master Target KK/Warga)
+                └─────────────┬───────────┘
+                              │ 1:N
+┌──────────────────────────┐  │  ┌──────────────────────────┐
+│     aid_inventories      │──┴──│     aid_distributions    │
+│  (Master Stok Logistik)  │ 1:N │  (Transaksi Penyaluran)  │
+└──────────────────────────┘     └──────────────────────────┘
+
+```
+
+
+## 5. Standar Visual Peta Interaktif & UI/UX
+
+### A. Skema Warna Batas Kecamatan (Warm Colors)
+
+* **Garis Batas (Border/Stroke):** Seragam Kuning (`#facc15`) untuk menjaga kesesuaian legenda peta tanpa mengubah UI legenda.
+* **Isi Area (Fill Color):** Ditingkatkan kekentalannya (`fillOpacity: 0.5`) sesuai ID/Nama Kecamatan:
+
+
+
+| ID Kecamatan | Nama Kecamatan
+
+ | Border Color | Fill Color | Visual Style |
+| --- | --- | --- | --- | --- |
+| **1** | Bone Raya | `#facc15` | `#f59e0b` | Amber / Emas Pekat |
+| **2** | Bulawa | `#facc15` | `#f97316` | Oranye Jingga |
+| **3** | Bone | `#facc15` | `#ef4444` | Merah |
+| **4** | Bonepantai | `#facc15` | `#f43f5e` | Rose / Merah Muda Pekat |
+| **5** | Kabila Bone | `#facc15` | `#b45309` | Cokelat Terakota |
+
+### B. Animasi Marker Titik Kumpul Terdekat
+
+* **Perhitungan Terdekat:** Dilakukan via pencocokan koordinat Haversine di backend atau fungsi `userLatLng.distanceTo(marker.getLatLng())` pada seluruh layer fasilitas di frontend.
+* **Animasi:** Menambahkan class CSS `.is-blinking` (`facilityPulse 1.2s infinite ease-in-out`).
+* **Timer Otomatis:** Menggunakan `setTimeout` JavaScript sebesar **60.000 ms (1 menit)** untuk mematikan kedipan secara otomatis setelah diaktifkan.
+
+### C. Komponen Panel Kontrol & Modal Lokasi
+
+* **Pintas Navigasi 2-Arah:**
+1. *Quick-Tool Floating Button* (Ikon Pin melayang di kiri atas canvas peta di bawah tombol Zoom).
+2. *Action Panel Card* (Tombol "Atur Lokasi" & "Reset" di panel kontrol kanan bawah).
+
+
+* **Modal Input Lokasi:**
+* Didukung tombol **"Gunakan Lokasi GPS Saya Saat Ini"** (*Geolocation API*).
+* Opsi input manual (Latitude & Longitude).
+
+
+* **Responsivitas Layar:**
+* **Desktop (`md:`):** Memiliki tombol *strip handle* di sisi kiri panel untuk menggeser (*slide-out*) panel kontrol ke kanan layar (`translate-x-full`).
+* **Mobile:** *Bottom sheet* melayang yang dapat ditarik/ditutup dengan *handle bar* atas.
 
 ## Usage
 
