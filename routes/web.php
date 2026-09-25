@@ -43,4 +43,22 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     });
 });
 
+// web.php
+Route::get('/api/nearest-evacuation', function (\Illuminate\Http\Request $request) {
+    $lat = $request->query('lat');
+    $lng = $request->query('lng');
+
+    $facility = \App\Models\EvacuationFacility::selectRaw("
+        id, name, point_coordinates,
+        (6371 * acos(cos(radians(?)) * cos(radians(JSON_EXTRACT(point_coordinates, '$.lat')))
+        * cos(radians(JSON_EXTRACT(point_coordinates, '$.lng')) - radians(?))
+        + sin(radians(?)) * sin(radians(JSON_EXTRACT(point_coordinates, '$.lat'))))) AS distance
+    ", [$lat, $lng, $lat])
+    ->orderBy('distance', 'asc')
+    ->first();
+
+    return response()->json($facility);
+});
+
+
 require __DIR__.'/auth.php';

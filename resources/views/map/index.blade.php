@@ -6,6 +6,22 @@
 
 @section('content')
 
+    <!-- Modal -->
+    <div id="locationModal" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+            <h2 class="text-lg font-bold mb-4">Masukkan Lokasi Anda</h2>
+            <div class="mb-4">
+                <label for="lat" class="block text-sm font-medium text-gray-700">Latitude</label>
+                <input type="text" id="lat" class="w-full border rounded px-2 py-1" value="-7.25">
+            </div>
+            <div class="mb-4">
+                <label for="lng" class="block text-sm font-medium text-gray-700">Longitude</label>
+                <input type="text" id="lng" class="w-full border rounded px-2 py-1" value="112.75">
+            </div>
+            <button id="setLocation" class="bg-indigo-600 text-white px-4 py-2 rounded">Set Lokasi</button>
+        </div>
+    </div>
+
     <!-- Peta Utama -->
     <div id="map" class="absolute inset-0 h-screen w-screen z-0"></div>
 
