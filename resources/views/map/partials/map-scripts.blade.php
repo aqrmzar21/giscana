@@ -65,63 +65,210 @@
     }).addTo(map);
 
     // =====================================================================
-    // Ambil lokasi user
-    let userMarker;
+    // MANAJEMEN MODAL & KONTROL LOKASI USER
+    // =====================================================================
+    let userMarker = null;
+    let userRouteLayerGroup = L.layerGroup().addTo(map); // Layer khusus rute user
+    let userRoutingControl = null;
+    let blinkingTimer = null;
 
-    document.getElementById('setLocation').addEventListener('click', function() {
+    // Fungsi Buka Modal
+    function openLocationModal() {
+        const modal = document.getElementById('locationModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    // Fungsi Tutup Modal
+    function closeLocationModal() {
+        const modal = document.getElementById('locationModal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+        invalidateMapSize();
+    }
+
+    // Fungsi Reset Lokasi User (Kembalikan Peta ke Tampilan Awal)
+    function resetUserLocation() {
+        // 1. Hapus Marker User
+        if (userMarker) {
+            map.removeLayer(userMarker);
+            userMarker = null;
+        }
+
+        // 2. Hapus Garis Rute Khusus User
+        userRouteLayerGroup.clearLayers();
+        if (userRoutingControl) {
+            map.removeControl(userRoutingControl);
+            userRoutingControl = null;
+        }
+
+        // 3. Matikan Efek Kedip pada Marker Fasilitas
+        if (blinkingTimer) {
+            clearTimeout(blinkingTimer);
+            blinkingTimer = null;
+        }
+
+        layers.evacuationFacilities.eachLayer(marker => {
+            const el = marker.getElement();
+            if (el) el.classList.remove('is-blinking');
+        });
+
+        // 4. Update UI Status
+        const statusElem = document.getElementById('userLocationStatus');
+        const resetBtn = document.getElementById('btnResetLocation');
+
+        if (statusElem) {
+            statusElem.textContent = 'Belum Diatur';
+            statusElem.className = 'text-[10px] font-semibold text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded-full';
+        }
+
+        if (resetBtn) {
+            resetBtn.disabled = true;
+            resetBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+
+        invalidateMapSize();
+    }
+
+    // Event Listener Modal & Reset
+    document.getElementById('btnMapLocationTool')?.addEventListener('click', openLocationModal);
+    document.getElementById('btnOpenLocationModal')?.addEventListener('click', openLocationModal);
+    document.getElementById('closeLocationModal')?.addEventListener('click', closeLocationModal);
+    document.getElementById('btnResetLocation')?.addEventListener('click', resetUserLocation);
+
+    document.getElementById('locationModal')?.addEventListener('click', function (e) {
+        if (e.target.id === 'locationModal') closeLocationModal();
+    });
+
+    // =====================================================================
+    // DETEKSI LOKASI OTOMATIS VIA GPS BROWSER
+    // =====================================================================
+    document.getElementById('btnGetCurrentLocation')?.addEventListener('click', function() {
+        if (!navigator.geolocation) {
+            alert('Fitur Geolocation/GPS tidak didukung oleh browser Anda.');
+            return;
+        }
+
+        const btn = this;
+        const originalContent = btn.innerHTML;
+
+        // Ubah tampilan tombol jadi loading
+        btn.disabled = true;
+        btn.innerHTML = `
+            <svg class="animate-spin h-4 w-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>Mendeteksi Lokasi GPS...</span>
+        `;
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                // Isi otomatis ke input form
+                document.getElementById('lat').value = lat.toFixed(6);
+                document.getElementById('lng').value = lng.toFixed(6);
+
+                // Kembalikan tombol ke kondisi normal
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+
+                // Langsung jalankan proses Set Lokasi
+                document.getElementById('setLocation').click();
+            },
+            (error) => {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        alert("Izin akses GPS ditolak. Silakan izinkan akses lokasi pada browser Anda.");
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        alert("Informasi lokasi GPS tidak tersedia.");
+                        break;
+                    case error.TIMEOUT:
+                        alert("Waktu permintaan lokasi habis (Timeout).");
+                        break;
+                    default:
+                        alert("Gagal mendeteksi lokasi GPS.");
+                        break;
+                }
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    });
+
+    // Proses "Set Lokasi"
+    document.getElementById('setLocation')?.addEventListener('click', function() {
         const lat = parseFloat(document.getElementById('lat').value);
         const lng = parseFloat(document.getElementById('lng').value);
 
-        // Tutup modal & tampilkan peta
-        document.getElementById('locationModal').style.display = 'none';
-        document.getElementById('map').style.display = 'block';
+        if (isNaN(lat) || isNaN(lng)) {
+            alert('Silakan masukkan nilai Latitude dan Longitude yang valid.');
+            return;
+        }
 
-        // Set Marker Lokasi User
-        if (userMarker) map.removeLayer(userMarker);
+        // 1. Bersihkan state lokasi lama sebelum set baru
+        resetUserLocation();
+
+        // 2. Tutup modal
+        closeLocationModal();
+
+        // 3. Tambahkan Marker Lokasi User
         userMarker = L.marker([lat, lng]).addTo(map).bindPopup("Lokasi Saya").openPopup();
         map.setView([lat, lng], 14);
 
-        
         const userLatLng = L.latLng(lat, lng);
 
-        // =========================================================================
-        // 1. AKUMULASI PETA: Hitung jarak dari lokasi user ke SEMUA marker titik kumpul
-        // =========================================================================
+        // 4. Update UI Status ke "Aktif"
+        const statusElem = document.getElementById('userLocationStatus');
+        const resetBtn = document.getElementById('btnResetLocation');
+
+        if (statusElem) {
+            statusElem.textContent = 'Aktif ✓';
+            statusElem.className = 'text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full';
+        }
+
+        if (resetBtn) {
+            resetBtn.disabled = false;
+            resetBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        // 5. Hitung & Aktifkan Efek Kedip Marker Terdekat
         let nearestMarker = null;
         let minDistance = Infinity;
 
         layers.evacuationFacilities.eachLayer(marker => {
-            // Reset/matikan kedipan dari semua marker
-            const el = marker.getElement();
-            if (el) el.classList.remove('is-blinking');
-
-            // Hitung jarak langsung pada objek Leaflet (dalam meter)
             const dist = userLatLng.distanceTo(marker.getLatLng());
             if (dist < minDistance) {
                 minDistance = dist;
-                nearestMarker = marker; // Simpan marker yang paling dekat
+                nearestMarker = marker;
             }
         });
 
-        // Nyalakan kedipan HANYA pada marker yang paling dekat
         if (nearestMarker) {
             const el = nearestMarker.getElement();
             if (el) {
                 el.classList.add('is-blinking');
                 nearestMarker.openPopup();
 
-                // ⏱️ SET WAKTU: Mati Otomatis Setelah 1 Menit (60.000 milidetik)
+                // Timer 1 Menit Mati Otomatis
                 blinkingTimer = setTimeout(() => {
-                    if (el) {
-                        el.classList.remove('is-blinking');
-                    }
-                }, 30000); // 60000 ms = 1 menit
+                    if (el) el.classList.remove('is-blinking');
+                }, 60000);
             }
         }
 
-        // =========================================================================
-        // 2. PANGGIL API UNTUK GAMBAR JALUR/RUTE EVAKUASI
-        // =========================================================================
+        // 6. Panggil API Rute Evakuasi
         fetch(`/api/nearest-evacuation-with-route?lat=${lat}&lng=${lng}`)
             .then(res => res.json())
             .then(data => {
@@ -130,63 +277,36 @@
                 const facility = data.facility;
                 const routes = data.routes;
 
-                // Jika ada rute resmi di database
                 if (routes && routes.length > 0) {
                     routes.forEach(route => {
                         const coords = route.line_coordinates.map(c => [c[1], c[0]]);
                         L.polyline(coords, {
                             color: 'blue',
-                            weight: 4,
+                            weight: 5,
                             dashArray: '5,10'
-                        }).addTo(map).bindPopup(route.name);
+                        }).addTo(userRouteLayerGroup).bindPopup(route.name);
                     });
-                } else {
-                    // Fallback: Gunakan Routing Machine jika rute tidak ada di DB
+                } else if (facility && facility.point_coordinates) {
                     let fLat = facility.point_coordinates.lat;
                     let fLng = facility.point_coordinates.lng;
 
-                    L.Routing.control({
-                        waypoints: [
-                            L.latLng(lat, lng),
-                            L.latLng(fLat, fLng)
-                        ],
-                        lineOptions: {
-                            styles: [{color: 'red', weight: 4, dashArray: '5, 10'}]
-                        }
-                    }).addTo(map);
+                    if (typeof L.Routing !== 'undefined') {
+                        userRoutingControl = L.Routing.control({
+                            waypoints: [
+                                L.latLng(lat, lng),
+                                L.latLng(fLat, fLng)
+                            ],
+                            lineOptions: {
+                                styles: [{color: 'red', weight: 4, dashArray: '5, 10'}]
+                            }
+                        }).addTo(map);
+                    }
                 }
             })
             .catch(err => console.error('Error fetching route:', err));
     });
-
     // =====================================================================
     
-    // =====================================================================
-    // Modal bUTTON
-    const openBtn = document.getElementById('openLocationModal');
-    const modal = document.getElementById('locationModal');
-    const closeBtn = document.getElementById('closeLocationModal');
-    const setBtn = document.getElementById('setLocation');
-
-    openBtn.addEventListener('click', () => {
-        modal.classList.remove('hidden');
-    });
-
-    closeBtn.addEventListener('click', () => {
-        modal.classList.add('hidden');
-    });
-
-    setBtn.addEventListener('click', () => {
-        const lat = parseFloat(document.getElementById('lat').value);
-        const lng = parseFloat(document.getElementById('lng').value);
-
-        modal.classList.add('hidden');
-
-        // panggil fungsi untuk nearest facility + jalur
-        showNearestAndRoutes(lat, lng);
-    });
-
-    // =====================================================================
 
     // =====================================================================
     // HAZARD LAYERS (GeoJSON dari public/geojson/)
