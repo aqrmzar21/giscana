@@ -81,6 +81,7 @@
         userMarker = L.marker([lat, lng]).addTo(map).bindPopup("Lokasi Saya").openPopup();
         map.setView([lat, lng], 14);
 
+        
         const userLatLng = L.latLng(lat, lng);
 
         // =========================================================================
@@ -108,6 +109,13 @@
             if (el) {
                 el.classList.add('is-blinking');
                 nearestMarker.openPopup();
+
+                // ⏱️ SET WAKTU: Mati Otomatis Setelah 1 Menit (60.000 milidetik)
+                blinkingTimer = setTimeout(() => {
+                    if (el) {
+                        el.classList.remove('is-blinking');
+                    }
+                }, 30000); // 60000 ms = 1 menit
             }
         }
 
@@ -153,6 +161,32 @@
 
     // =====================================================================
     
+    // =====================================================================
+    // Modal bUTTON
+    const openBtn = document.getElementById('openLocationModal');
+    const modal = document.getElementById('locationModal');
+    const closeBtn = document.getElementById('closeLocationModal');
+    const setBtn = document.getElementById('setLocation');
+
+    openBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    setBtn.addEventListener('click', () => {
+        const lat = parseFloat(document.getElementById('lat').value);
+        const lng = parseFloat(document.getElementById('lng').value);
+
+        modal.classList.add('hidden');
+
+        // panggil fungsi untuk nearest facility + jalur
+        showNearestAndRoutes(lat, lng);
+    });
+
+    // =====================================================================
 
     // =====================================================================
     // HAZARD LAYERS (GeoJSON dari public/geojson/)
@@ -597,6 +631,7 @@
                 villageToggle.dispatchEvent(new Event('change'));
             }
         }
+
     });
     
 
