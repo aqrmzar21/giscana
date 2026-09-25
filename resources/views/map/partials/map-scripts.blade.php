@@ -580,6 +580,32 @@
                     `);
                 });
 
+                // Helper Fungsi Penentu Warna Hangat Berdasarkan ID/Nama Kecamatan
+                function getDistrictStyle(props) {
+                    const name = String(props.district_name || props.nama || props.name || '').toLowerCase().trim();
+                    const id = String(props.id || props.district_id || '');
+
+                    if (name.includes('bone raya') || id === '1') {
+                        return { color: '#d97706', fillColor: '#fef3c7' }; // Amber / Emas
+                    }
+                    if (name.includes('bulawa') || id === '2') {
+                        return { color: '#ea580c', fillColor: '#ffedd5' }; // Oranye
+                    }
+                    if (name.includes('bonepantai') || name.includes('bone pantai') || id === '4') {
+                        return { color: '#e11d48', fillColor: '#ffe4e6' }; // Coral / Rose
+                    }
+                    if (name.includes('kabila bone') || id === '5') {
+                        return { color: '#c2410c', fillColor: '#fed7aa' }; // Terakota
+                    }
+                    if (name.includes('bone') || id === '3') { // Pengecekan 'bone' ditaruh setelah kecamatan lain yang mengandung kata 'bone'
+                        return { color: '#dc2626', fillColor: '#fee2e2' }; // Merah
+                    }
+
+                    // Fallback jika tidak terdeteksi
+                    return { color: '#facc15', fillColor: '#fde68a' };
+                }
+
+                // Render Batas Administrasi Kecamatan dengan Warna Berbeda
                 if (data.district_boundaries && data.district_boundaries.features.length > 0) {
                     data.district_boundaries.features.forEach(feature => {
                         const geom = feature.geometry;
@@ -596,18 +622,20 @@
                             polys.push(coords);
                         }
 
+                        const p = feature.properties || {};
+                        const dStyle = getDistrictStyle(p); // Ambil gaya warna sesuai kecamatan
+
                         polys.forEach(coords => {
                             const polygon = L.polygon(coords, {
-                                color: '#facc15',
-                                fillColor: '#fde68a',
-                                fillOpacity: 0.15,
-                                weight: 2,
+                                color: dStyle.color,
+                                fillColor: dStyle.fillColor,
+                                fillOpacity: 0.35, // Transparansi isi warna
+                                weight: 2.5,
                                 dashArray: '4 2'
                             }).addTo(layers.districtBoundaries);
 
-                            const p = feature.properties;
                             polygon.bindPopup(`
-                                <strong>${p.district_name}</strong><br>
+                                <strong>${p.district_name || p.nama || 'Kecamatan'}</strong><br>
                                 Penerima Bantuan: ${p.total_recipients ?? '-'}<br>
                                 Terdistribusi: ${p.distributed_aid ?? '-'}<br>
                                 Persentase: ${p.distribution_percentage ?? '-'}%
