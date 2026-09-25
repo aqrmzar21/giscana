@@ -76,45 +76,79 @@
         document.getElementById('locationModal').style.display = 'none';
         document.getElementById('map').style.display = 'block';
 
-        // Marker lokasi user
-        userMarker = L.marker([lat, lng]).addTo(map).bindPopup("Lokasi saya").openPopup();
+        // Set Marker Lokasi User
+        if (userMarker) map.removeLayer(userMarker);
+        userMarker = L.marker([lat, lng]).addTo(map).bindPopup("Lokasi Saya").openPopup();
         map.setView([lat, lng], 14);
 
-        // Panggil API nearest-evacuation
+        const userLatLng = L.latLng(lat, lng);
+
+        // =========================================================================
+        // 1. AKUMULASI PETA: Hitung jarak dari lokasi user ke SEMUA marker titik kumpul
+        // =========================================================================
+        let nearestMarker = null;
+        let minDistance = Infinity;
+
+        layers.evacuationFacilities.eachLayer(marker => {
+            // Reset/matikan kedipan dari semua marker
+            const el = marker.getElement();
+            if (el) el.classList.remove('is-blinking');
+
+            // Hitung jarak langsung pada objek Leaflet (dalam meter)
+            const dist = userLatLng.distanceTo(marker.getLatLng());
+            if (dist < minDistance) {
+                minDistance = dist;
+                nearestMarker = marker; // Simpan marker yang paling dekat
+            }
+        });
+
+        // Nyalakan kedipan HANYA pada marker yang paling dekat
+        if (nearestMarker) {
+            const el = nearestMarker.getElement();
+            if (el) {
+                el.classList.add('is-blinking');
+                nearestMarker.openPopup();
+            }
+        }
+
+        // =========================================================================
+        // 2. PANGGIL API UNTUK GAMBAR JALUR/RUTE EVAKUASI
+        // =========================================================================
         fetch(`/api/nearest-evacuation-with-route?lat=${lat}&lng=${lng}`)
             .then(res => res.json())
             .then(data => {
+                if (!data.success) return;
+
                 const facility = data.facility;
                 const routes = data.routes;
 
-                // Marker facility
-                L.marker([facility.point_coordinates.lat, facility.point_coordinates.lng])
-                .addTo(map).bindPopup(facility.name);
-
-                // Kalau ada route resmi → gambar polyline
-                if (routes.length > 0) {
+                // Jika ada rute resmi di database
+                if (routes && routes.length > 0) {
                     routes.forEach(route => {
-                        const coords = route.line_coordinates.map(c => [c[1], c[0]]); // [lat,lng]
+                        const coords = route.line_coordinates.map(c => [c[1], c[0]]);
                         L.polyline(coords, {
                             color: 'blue',
-                            weight: 3,
+                            weight: 4,
                             dashArray: '5,10'
                         }).addTo(map).bindPopup(route.name);
                     });
                 } else {
-                    // fallback: Routing Machine ke facility
+                    // Fallback: Gunakan Routing Machine jika rute tidak ada di DB
+                    let fLat = facility.point_coordinates.lat;
+                    let fLng = facility.point_coordinates.lng;
+
                     L.Routing.control({
                         waypoints: [
                             L.latLng(lat, lng),
-                            L.latLng(facility.point_coordinates.lat, facility.point_coordinates.lng)
+                            L.latLng(fLat, fLng)
                         ],
                         lineOptions: {
-                            styles: [{color: 'red', dashArray: '5, 10'}]
+                            styles: [{color: 'red', weight: 4, dashArray: '5, 10'}]
                         }
                     }).addTo(map);
                 }
-            });
-
+            })
+            .catch(err => console.error('Error fetching route:', err));
     });
 
     // =====================================================================
@@ -374,13 +408,17 @@
                 data.evacuation_facilities.features.forEach(feature => {
                     if (!feature.geometry || !feature.geometry.coordinates) return;
                     const [lng, lat] = feature.geometry.coordinates;
+                    
                     const marker = L.marker([lat, lng], {
                         icon: L.divIcon({
                             className: 'evacuation-facility-marker',
-                            html: '<div style="background-color: #3b82f6; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;"></div>',
+                            html: '<div style="background-color: #3b82f6; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; transition: all 0.3s ease;"></div>',
                             iconSize: [20, 20]
                         })
                     }).addTo(layers.evacuationFacilities);
+
+                    // 🔹 SIMPAN ID FASIUTAS KE DALAM MARKER (Penting untuk pencarian nanti)
+                    marker.facilityId = feature.id || feature.properties.id || feature.properties.name;
 
                     marker.bindPopup(`
                         <strong>${feature.properties.name}</strong><br>

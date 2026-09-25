@@ -32,7 +32,7 @@
     <!-- <footer class="text-sm font-medium inline-flex justify-center text-center py-2 bg-white relative z-50 xs:hidden">copyright v1.0 ©2026 || aqrmlhdytllh</footer> -->
     <footer class="text-sm font-medium inline-flex justify-center text-center py-2 bg-white relative z-50 hidden md:flex">
          <!-- @yield('map-toolbar') -->
-        copyright v1.0 ©2026 || aqrmlhdytllh
+        ©2026 All right reserved 1.1 || aqrmlhdytllh
     </footer>
     @stack('scripts')
     

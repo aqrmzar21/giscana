@@ -4,6 +4,72 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MapController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use App\Models\EvacuationFacility;
+use App\Models\EvacuationRoute;
+
+// Mengambil fasilitas dan jalur terdekat berdasarkan lokasi
+Route::get('/api/nearest-evacuation-with-route', function (Request $request) {
+    $lat = (float) $request->query('lat');
+    $lng = (float) $request->query('lng');
+
+    if (!$lat || !$lng) {
+        return response()->json(['success' => false, 'message' => 'Koordinat tidak valid'], 400);
+    }
+
+    // 1. Ambil semua data fasilitas titik kumpul
+    $facilities = EvacuationFacility::all();
+
+    $closestFacility = null;
+    $minDistance = INF; // Set awal ke tak hingga
+
+    // 2. Akumulasi & hitung jarak ke setiap titik di DB
+    foreach ($facilities as $facility) {
+        $coords = is_string($facility->point_coordinates) 
+            ? json_decode($facility->point_coordinates, true) 
+            : $facility->point_coordinates;
+
+        if (!$coords) continue;
+
+        // Ambil lat & lng dengan fleksibilitas nama key
+        $fLat = (float) ($coords['lat'] ?? $coords['latitude'] ?? $coords[1] ?? 0);
+        $fLng = (float) ($coords['lng'] ?? $coords['longitude'] ?? $coords[0] ?? 0);
+
+        if ($fLat == 0 || $fLng == 0) continue;
+
+        // Rumus Haversine (menghitung jarak dalam meter)
+        $earthRadius = 6371000; // Jari-jari bumi (meter)
+        $dLat = deg2rad($fLat - $lat);
+        $dLng = deg2rad($fLng - $lng);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+             cos(deg2rad($lat)) * cos(deg2rad($fLat)) *
+             sin($dLng / 2) * sin($dLng / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        $distance = $earthRadius * $c;
+
+        // Cari jarak yang paling minimal
+        if ($distance < $minDistance) {
+            $minDistance = $distance;
+            $closestFacility = $facility;
+        }
+    }
+
+    if (!$closestFacility) {
+        return response()->json(['success' => false, 'message' => 'Fasilitas tidak ditemukan'], 404);
+    }
+
+    // 3. Ambil rute evakuasi dari fasilitas terdekat yang ditemukan
+    $routes = EvacuationRoute::where('evacuation_facility_id', $closestFacility->id)->get();
+
+    return response()->json([
+        'success' => true,
+        'facility' => $closestFacility,
+        'routes' => $routes,
+        'distance_meters' => round($minDistance, 2)
+    ]);
+});
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/admin', function () { return redirect()->route('dashboard'); });
@@ -41,30 +107,6 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::middleware(['role:admin'])->group(function () {
         Route::resource('staff', \App\Http\Controllers\Admin\StaffController::class);
     });
-});
-
-// Mengmabil jaur terdekat berdasarkan lokasi
-Route::get('/api/nearest-evacuation-with-route', function (\Illuminate\Http\Request $request) {
-    $lat = $request->query('lat');
-    $lng = $request->query('lng');
-
-    $facility = \App\Models\EvacuationFacility::selectRaw("
-        id, name, point_coordinates,
-        (6371 * acos(
-            cos(radians(?)) * cos(radians(JSON_EXTRACT(point_coordinates, '$.lat')))
-            * cos(radians(JSON_EXTRACT(point_coordinates, '$.lng')) - radians(?))
-            + sin(radians(?)) * sin(radians(JSON_EXTRACT(point_coordinates, '$.lat')))
-        )) AS distance
-    ", [$lat, $lng, $lat])
-    ->orderBy('distance', 'asc')
-    ->first();
-
-    $routes = \App\Models\EvacuationRoute::where('evacuation_facility_id', $facility->id)->get();
-
-    return response()->json([
-        'facility' => $facility,
-        'routes' => $routes
-    ]);
 });
 
 require __DIR__.'/auth.php';

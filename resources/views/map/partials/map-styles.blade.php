@@ -272,6 +272,42 @@
         font-weight: 600;
     }
 
+    /* Animasi Kedip (Checkmark) */
+    /* Efek Marker Berkedip untuk Fasilitas Evakuasi */
+    .blinking-evac-marker {
+        animation: blinker 1s linear infinite;
+        filter: drop-shadow(0px 0px 8px rgba(255, 0, 0, 0.8)); /* Efek glow merah/kuning, bisa disesuaikan */
+    }
+
+    @keyframes blinker {
+        0% { opacity: 1; }
+        50% { opacity: 0.2; }
+        100% { opacity: 1; }
+    }
+    /* Animasi Pulsing / Kedip untuk Marker Terdekat */
+    @keyframes facilityPulse {
+        0% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(173, 239, 68, 0.8);
+        }
+        70% {
+            transform: scale(1.4);
+            box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+        }
+        100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+        }
+    }
+
+    /* Class dinamis yang dipasang lewat JS */
+    .evacuation-facility-marker.is-blinking div {
+        background-color: #44ef7dff !important; /* Berubah jadi merah agar mencolok */
+        animation: facilityPulse 1.2s infinite ease-in-out;
+        border-color: #ffffff !important;
+        z-index: 999;
+    }
+
     /* Tanda Centang (Checkmark) */
     .hazard-card-check {
         display: none;
