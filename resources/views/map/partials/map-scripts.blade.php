@@ -585,24 +585,27 @@
                     const name = String(props.district_name || props.nama || props.name || '').toLowerCase().trim();
                     const id = String(props.id || props.district_id || '');
 
+                    // Border Tetap Hitam untuk SEMUA Kecamatan
+                    const borderColor = '#000000ff'; 
+
+                    // Pembeda Warna Isi (Fill Color) Warm & Kental
                     if (name.includes('bone raya') || id === '1') {
-                        return { color: '#d97706', fillColor: '#fef3c7' }; // Amber / Emas
+                        return { color: borderColor, fillColor: '#f59e0b' }; // Amber / Emas Pekat
                     }
                     if (name.includes('bulawa') || id === '2') {
-                        return { color: '#ea580c', fillColor: '#ffedd5' }; // Oranye
+                        return { color: borderColor, fillColor: '#f97316' }; // Oranye Jingga
                     }
                     if (name.includes('bonepantai') || name.includes('bone pantai') || id === '4') {
-                        return { color: '#e11d48', fillColor: '#ffe4e6' }; // Coral / Rose
+                        return { color: borderColor, fillColor: '#f43f5e' }; // Rose / Merah Muda Pekat
                     }
                     if (name.includes('kabila bone') || id === '5') {
-                        return { color: '#c2410c', fillColor: '#fed7aa' }; // Terakota
+                        return { color: borderColor, fillColor: '#b45309' }; // Cokelat Terakota
                     }
-                    if (name.includes('bone') || id === '3') { // Pengecekan 'bone' ditaruh setelah kecamatan lain yang mengandung kata 'bone'
-                        return { color: '#dc2626', fillColor: '#fee2e2' }; // Merah
+                    if (name.includes('bone') || id === '3') {
+                        return { color: borderColor, fillColor: '#ef4444' }; // Merah
                     }
 
-                    // Fallback jika tidak terdeteksi
-                    return { color: '#facc15', fillColor: '#fde68a' };
+                    return { color: borderColor, fillColor: '#eab308' };
                 }
 
                 // Render Batas Administrasi Kecamatan dengan Warna Berbeda
@@ -732,9 +735,9 @@
                                 .then(data => {
                                     L.geoJSON(data, {
                                         style: {
-                                            color: '#00ff37ff',
+                                            color: '#000000ff',
                                             weight: 1,
-                                            fillColor: '#e3fa60ff',
+                                            fillColor: '#facc15',
                                             fillOpacity: 0.1,
                                             dashArray: '3 3'
                                         },
