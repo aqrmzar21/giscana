@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Traits\HasUuid;
+use App\Models\AidBeneficiary;
+use App\Models\AidDistribution;
+use App\Models\District;
+use App\Models\EvacuationFacility;
 
 class AidDisaster extends Model
 {
@@ -13,6 +17,7 @@ class AidDisaster extends Model
     protected $table = 'aid_disasters';
 
     protected $fillable = [
+        'district_id',
         'district_name',
         'total_recipients',
         'distributed_aid',
@@ -27,57 +32,72 @@ class AidDisaster extends Model
         'last_synced_at'   => 'datetime',
     ];
 
-    /**
-     * Relation: one aid_disaster has many evacuation facilities.
-     */
+    public function district()
+    {
+        return $this->belongsTo(District::class);
+    }
+
     public function evacuationFacilities()
     {
         return $this->hasMany(EvacuationFacility::class, 'aid_disaster_id');
     }
 
-    /**
-     * Relation: one aid_disaster has many aid recipients.
-     */
-    public function aidRecipients()
+    public function distributions()
     {
-        return $this->hasMany(AidRecipient::class, 'aid_disaster_id');
+        return $this->hasMany(AidDistribution::class, 'aid_disaster_id');
     }
 
     /**
-     * Recalculate distributed aid based on aid recipients.
+     * Alias method untuk kompatibilitas dengan observer/seeder lama
      */
     public function recalculateDistributedAid()
     {
-        $this->distributed_aid = $this->aidRecipients()->sum('amount');
-        $this->save();
+        $this->recalculate();
     }
 
     /**
-     * Scope for active data.
+     * Hitung ulang akumulasi target warga dan bantuan tersalur secara otomatis
      */
+    public function recalculate()
+    {
+        if ($this->district_id) {
+            // Hitung dari relasi district_id langsung
+            $this->total_recipients = AidBeneficiary::where('district_id', $this->district_id)->count();
+
+            $this->distributed_aid = AidDistribution::whereHas('beneficiary', function ($q) {
+                $q->where('district_id', $this->district_id);
+            })->sum('quantity_received');
+        } else {
+            // Fallback: Hitung berdasarkan district_name menggunakan kolom 'name' pada tabel districts
+            $this->total_recipients = AidBeneficiary::whereHas('district', function ($q) {
+                $q->where('name', $this->district_name);
+            })->count();
+
+            $this->distributed_aid = AidDistribution::whereHas('beneficiary.district', function ($q) {
+                $q->where('name', $this->district_name);
+            })->sum('quantity_received');
+        }
+
+        $this->save();
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
 
-    /**
-     * Calculate distribution percentage.
-     */
     public function getDistributionPercentageAttribute(): float|null
     {
         if (!$this->total_recipients || $this->total_recipients === 0) {
-            return null;
+            return 0.0;
         }
         return round(($this->distributed_aid / $this->total_recipients) * 100, 2);
     }
 
-    /**
-     * Remaining aid not yet distributed.
-     */
     public function getRemainingAidAttribute(): int|null
     {
         if (is_null($this->total_recipients) || is_null($this->distributed_aid)) {
-            return null;
+            return 0;
         }
         return max(0, $this->total_recipients - $this->distributed_aid);
     }

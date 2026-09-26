@@ -6,12 +6,15 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use App\Models\User;
+use App\Models\District;
+use App\Models\Village;
 use App\Models\DisasterZone;
 use App\Models\EvacuationRoute;
 use App\Models\EvacuationFacility;
 use App\Models\AidDisaster;
-use App\Models\User;
-use App\Models\District;
+use App\Models\AidInventory;
+use App\Models\AidBeneficiary;
 
 class GiscanaDataSeeder extends Seeder
 {
@@ -244,14 +247,13 @@ class GiscanaDataSeeder extends Seeder
         $facilityBalai = EvacuationFacility::where('name', 'Balai Desa Bone')->first();
         $facilityGedung = EvacuationFacility::where('name', 'Gedung Pertemuan')->first();
 
-        // Sample evacuation routes (terkait fasilitas via evacuation_facility_id + nama_fasilitas dari evacuation_facilities.name)
+        // Sample evacuation routes (terkait fasilitas via evacuation_facility_id + facility_name dari evacuation_facilities.name)
         EvacuationRoute::create([
             'uuid' => (string) Str::uuid(),
             'evacuation_facility_id' => $facilitySmk->id,
-            'nama_fasilitas' => $facilitySmk->name,
+            'facility_name' => $facilitySmk->name,
             'name' => 'Secondary Route - Village Path',
             'description' => 'Secondary evacuation route through village paths.',
-            'disaster_type' => 'banjir',
             'line_coordinates' => [
                 [123.30000216080441,0.32138895529709544],
                 [123.29920593791996,0.31983634498158153],
@@ -269,10 +271,9 @@ class GiscanaDataSeeder extends Seeder
         EvacuationRoute::create([
             'uuid' => (string) Str::uuid(),
             'evacuation_facility_id' => $facilityGedung->id,
-            'nama_fasilitas' => $facilityGedung->name,
+            'facility_name' => $facilityGedung->name,
             'name' => 'Primary Evacuation Route - Main Road',
             'description' => 'Main evacuation route connecting high-risk areas to evacuation centers.',
-            'disaster_type' => 'banjir',
             'line_coordinates' => [
                 [123.28008744958447, 0.32173069129049736],
                 [123.28015140297714, 0.3216027865242239],
@@ -301,10 +302,9 @@ class GiscanaDataSeeder extends Seeder
         EvacuationRoute::create([
             'uuid' => (string) Str::uuid(),
             'evacuation_facility_id' => $facilityMasjid->id,
-            'nama_fasilitas' => $facilityMasjid->name,
+            'facility_name' => $facilityMasjid->name,
             'name' => 'Emergency Route - Hillside',
             'description' => 'Emergency evacuation route for longsor-prone areas.',
-            'disaster_type' => 'longsor',
             'line_coordinates' => [
                 [123.24333913601816, 0.3519398498250865],
                 [123.24432902864044, 0.3518498612835259],
@@ -332,5 +332,11 @@ class GiscanaDataSeeder extends Seeder
             'is_accessible' => true,
             'is_active' => true,
         ]);
+        // Stok Logistik Awal
+        // $inventories = [
+        //     ['item_name' => 'Paket Sembako Bencana', 'category' => 'sembako', 'source' => 'BPBD Provinsi', 'initial_stock' => 2000, 'remaining_stock' => 2000],
+        //     ['item_name' => 'Obat-obatan & Kit Medis', 'category' => 'obat', 'source' => 'Dinkes Bone Bolango', 'initial_stock' => 800, 'remaining_stock' => 800],
+        //     ['item_name' => 'Selimut & Pakaian Layak Pakai', 'category' => 'pakaian', 'source' => 'Donasi Tagana', 'initial_stock' => 1200, 'remaining_stock' => 1200],
+        // ];
     }
 }

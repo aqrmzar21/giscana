@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->string('name');
+            $table->foreignId('district_id')->nullable()->constrained('districts')->nullOnDelete();
             $table->enum('disaster_type', ['longsor', 'banjir', 'other']);
             $table->text('description')->nullable();
             $table->enum('risk_level', ['low', 'medium', 'high', 'critical']);
@@ -25,7 +26,6 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
-            $table->foreignId('district_id')->nullable()->constrained('districts')->nullOnDelete();
         });
     }
 

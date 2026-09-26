@@ -27,6 +27,11 @@ class Village extends Model
         return $this->belongsTo(District::class);
     }
 
+    public function beneficiaries()
+    {
+        return $this->hasMany(AidBeneficiary::class);
+    }
+
     /**
      * Get GeoJSON representation.
      */

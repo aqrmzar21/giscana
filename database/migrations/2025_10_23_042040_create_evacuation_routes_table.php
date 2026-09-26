@@ -14,9 +14,9 @@ return new class extends Migration
     {
         Schema::create('evacuation_routes', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->foreignId('evacuation_facility_id')->nullable()->constrained('evacuation_facilities')->nullOnDelete();
             $table->string('facility_name')->nullable();
-            $table->uuid('uuid')->unique();
             $table->string('name');
             $table->text('description')->nullable();
             $table->json('line_coordinates'); // Store GeoJSON linestring coordinates

@@ -17,8 +17,6 @@ return new class extends Migration
             $table->string('remark', 255)->nullable();       // REMARK (opsional)
             $table->geometry('geom');
             $table->timestamps();
-
-            $table->spatialIndex('geom');
         });
     }
 

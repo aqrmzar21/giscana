@@ -38,7 +38,7 @@
             </div>
 
             <button id="setLocation" type="button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl shadow-md transition-all text-sm flex items-center justify-center gap-2">
-                <span>📍 Set Lokasi & Cari Titik Kumpul</span>
+                <span>📍 Cari Titik Kumpul</span>
             </button>
         </div>
     </div>
@@ -47,9 +47,9 @@
     <div id="map" class="absolute inset-0 h-screen w-screen z-0"></div>
 
     <!-- Tombol Pintas Quick Tool (Melayang di Kiri Atas Peta) -->
-    <div class="absolute top-20 left-3.5 z-40">
+    <div class="absolute top-20 right-5 z-50">
         <button id="btnMapLocationTool" title="Input Lokasi Saat Ini" type="button" class="w-9 h-9 bg-white hover:bg-slate-50 text-slate-700 rounded-xl shadow-md border border-slate-200 flex items-center justify-center transition-all hover:scale-105 active:scale-95 group">
-            <svg class="w-5 h-5 text-indigo-600 group-hover:text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-7 h-7 text-indigo-600 group-hover:text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
@@ -58,23 +58,6 @@
 
     <div class="absolute md:bottom-4 bottom-10 left-4 z-50 md:p-2 pb-12">
         @include('map.partials.map-legend-content')
-    </div>
-    
-    <!-- Header Bar Melayang -->
-    <div class="fixed top-4 left-4 right-4 z-40 flex items-center justify-between bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-md border border-slate-200/80 md:w-auto md:right-auto">
-        <div class="flex items-center gap-3">
-            <button class="text-slate-600 hover:text-slate-900 focus:outline-none" aria-label="Menu Utama">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
-            </button>
-            <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
-                <div class="w-6 h-6 rounded-md bg-indigo-600 flex items-center justify-center text-white text-xs font-black shadow-sm">
-                    G
-                </div>
-                <span>Giscana - Bone Bolango</span>
-            </div>
-        </div>
     </div>
 
     <!-- Wrapper Kontrol Peta (Alpine.js) -->
@@ -127,11 +110,8 @@
 
                 <div class="grid grid-cols-2 gap-2">
                     <!-- 🎯 TOMBOL BARU: Deteksi GPS Otomatis -->
-                    <button id="btnGetCurrentLocation" type="button" class="w-full bg-emerald-50 hover:bg-emerald-100 active:scale-[0.98] text-emerald-700 font-bold py-2.5 px-3 rounded-xl border border-emerald-200 shadow-xs transition-all text-xs flex items-center justify-center gap-1">
-                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
-                        </svg>
+                    <button id="btnGetCurrentLocation" type="button" class="w-full bg-emerald-50 hover:bg-emerald-100 active:scale-[0.98] text-emerald-700 font-bold py-2.5 px-3 rounded-xl border border-emerald-200 shadow-xs transition-all text-xs flex items-center justify-center gap-1"><svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
                         <span>Set Lokasi</span>
-                        <!-- <span>Gunakan Lokasi GPS Saya Saat Ini</span> -->
                     </button>
                     <!-- <button id="btnOpenLocationModal" type="button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1">
                         <span>📍 Atur Lokasi</span>

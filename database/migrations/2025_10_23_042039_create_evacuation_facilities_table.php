@@ -14,9 +14,9 @@ return new class extends Migration
     {
         Schema::create('evacuation_facilities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('aid_disaster_id')->nullable()->constrained('aid_disasters')->nullOnDelete();
-            $table->string('district_name')->nullable()->after('aid_disaster_id');
             $table->uuid('uuid')->unique();
+            $table->foreignId('aid_disaster_id')->nullable()->constrained('aid_disasters')->nullOnDelete();
+            $table->string('district_name')->nullable();
             $table->string('name');
             $table->text('description')->nullable();
             $table->json('point_coordinates'); // Store GeoJSON point coordinates

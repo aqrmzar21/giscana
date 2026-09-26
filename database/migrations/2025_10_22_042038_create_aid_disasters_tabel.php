@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 return new class extends Migration
 {
@@ -11,14 +12,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Buat tabel baru aid_disasters
+        // Create new table aid_disasters
         Schema::create('aid_disasters', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_kecamatan');
-            $table->integer('jumlah_penerima_bantuan')->nullable();
-            $table->integer('bantuan_terdistribusi')->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->timestamp('last_synced_at')->nullable();
+            $table->uuid('uuid')->unique();
+            $table->foreignId('district_id')->nullable()->constrained('districts')->onDelete('cascade');
+            $table->string('district_name'); // nama_kecamatan
+            $table->integer('total_recipients')->nullable(); // jumlah_penerima_bantuan
+            $table->integer('distributed_aid')->nullable(); // bantuan_terdistribusi
+            $table->boolean('is_active')->default(true); // is_active
             $table->timestamps();
         });
     }

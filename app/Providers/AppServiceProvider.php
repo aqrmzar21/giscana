@@ -20,5 +20,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+        // Memberikan hak akses penuh (Super Power) untuk role 'admin'
+        //     Gate::before(function ($user, $ability) {
+        //         if ($user->role === 'admin') {
+        //             return true; // Bypass semua pengecekan izin
+        //         }
+        //     });
     }
 }
