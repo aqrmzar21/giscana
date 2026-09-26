@@ -33,7 +33,7 @@ class RolePermissionSeeder extends Seeder
         $roleAdmin->givePermissionTo(\Spatie\Permission\Models\Permission::all());
 
         $roleStaff = \Spatie\Permission\Models\Role::create(['name' => 'staff']);
-        $roleStaff->givePermissionTo(['create data', 'read data']);
+        $roleStaff->givePermissionTo(['create data', 'read data', 'update data', 'delete data']);
 
         // Sync existing users
         $users = \App\Models\User::all();

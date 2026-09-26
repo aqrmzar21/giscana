@@ -107,7 +107,7 @@
                             <span x-show="!sidebarCollapsed" class="ml-3 truncate">Peta Admin</span>
                         </a>
                         
-                        @role('admin')
+                        @hasanyrole('admin|staff')
                         <a href="{{ route('admin.aid-disasters.index') }}" 
                            :title="sidebarCollapsed ? 'Distribusi' : ''"
                            class="flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-disasters.index') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
@@ -117,7 +117,7 @@
                             </svg>
                             <span x-show="!sidebarCollapsed" class="ml-3 truncate">Distribusi</span>
                         </a>
-                        @endrole
+                        @endhasanyrole
                     </div>
 
                     @if (Auth::user()?->isAdmin() || Auth::user()?->isStaff())
