@@ -25,15 +25,15 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            \Spatie\Permission\Models\Permission::create(['name' => $permission]);
+            \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $permission]);
         }
 
         // create roles and assign created permissions
-        $roleAdmin = \Spatie\Permission\Models\Role::create(['name' => 'admin']);
+        $roleAdmin = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
         $roleAdmin->givePermissionTo(\Spatie\Permission\Models\Permission::all());
 
-        $roleStaff = \Spatie\Permission\Models\Role::create(['name' => 'staff']);
-        $roleStaff->givePermissionTo(['create data', 'read data', 'update data', 'delete data']);
+        $roleStaff = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'staff']);
+        $roleStaff->syncPermissions(['create data', 'read data']);
 
         // Sync existing users
         $users = \App\Models\User::all();

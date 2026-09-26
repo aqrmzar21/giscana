@@ -138,7 +138,7 @@
                                 </a>
                                 @endcan
                                 @can('delete data')
-                                <form action="{{ route('admin.disaster-zones.destroy', $zone) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus zona ini?');">
+                                <form action="{{ route('admin.disaster-zones.destroy', $zone) }}" method="POST" class="inline form-delete">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900">

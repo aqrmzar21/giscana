@@ -58,4 +58,9 @@ class AidDistribution extends Model
     {
         return $this->belongsTo(AidDisaster::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

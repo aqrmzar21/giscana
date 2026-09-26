@@ -107,7 +107,7 @@
                             <span x-show="!sidebarCollapsed" class="ml-3 truncate">Peta Admin</span>
                         </a>
                         
-                        @hasanyrole('admin|staff')
+                        @hasanyrole('admin')
                         <a href="{{ route('admin.aid-disasters.index') }}" 
                            :title="sidebarCollapsed ? 'Distribusi' : ''"
                            class="flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-disasters.index') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
@@ -406,6 +406,29 @@
 
     @stack('styles')
     @stack('scripts')
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('submit', function (e) {
+            if (e.target && e.target.classList.contains('form-delete')) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Data yang dihapus tidak dapat dikembalikan!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        e.target.submit();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
 @else

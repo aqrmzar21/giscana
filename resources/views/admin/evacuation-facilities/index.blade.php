@@ -130,7 +130,7 @@
                                 </a>
                                 @endcan
                                 @can('delete data')
-                                <form action="{{ route('admin.evacuation-facilities.destroy', $facility) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus fasilitas ini?');">
+                                <form action="{{ route('admin.evacuation-facilities.destroy', $facility) }}" method="POST" class="inline form-delete">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900">
