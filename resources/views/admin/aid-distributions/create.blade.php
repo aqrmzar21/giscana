@@ -21,27 +21,47 @@
 <div class="bg-white shadow rounded-lg">
     <div class="px-4 py-5 sm:p-6">
         <h3 class="text-lg font-medium leading-6 text-gray-900 mb-6">Form Pencatatan Distribusi Bantuan</h3>
-
+        
         <form action="{{ route('admin.aid-distributions.store') }}" method="POST">
             @csrf
             <div class="space-y-6">
-
-                {{-- Kecamatan/Bencana --}}
-                <div>
-                    <label for="aid_disaster_id" class="block text-sm font-medium text-gray-700">Kecamatan / Wilayah Bencana <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <select id="aid_disaster_id" name="aid_disaster_id" required
-                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_disaster_id') border-red-300 @enderror">
-                            <option value="">-- Pilih Kecamatan --</option>
-                            @foreach($aidDisasters as $disaster)
-                                <option value="{{ $disaster->id }}" {{ old('aid_disaster_id') == $disaster->id ? 'selected' : '' }}>
-                                    {{ $disaster->district_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('aid_disaster_id')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    {{-- Kecamatan/Bencana --}}
+                    <div>
+                        <label for="aid_disaster_id" class="block text-sm font-medium text-gray-700">Kecamatan / Wilayah Bencana <span class="text-red-500">*</span></label>
+                        <div class="mt-1">
+                            <select id="aid_disaster_id" name="aid_disaster_id" required
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_disaster_id') border-red-300 @enderror">
+                                <option value="" hidden>-- Pilih Kecamatan --</option>
+                                @foreach($aidDisasters as $disaster)
+                                    <option value="{{ $disaster->id }}" {{ old('aid_disaster_id') == $disaster->id ? 'selected' : '' }}>
+                                        {{ $disaster->district_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('aid_disaster_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    {{-- Desa/Bencana --}}
+                    <div>
+                        <!-- <label for="village_id" class="block text-sm font-medium text-gray-700">Desa / Wilayah Bencana <span class="text-red-500">*</span></label>
+                        <div class="mt-1">
+                            <select id="village_id" name="village_id" required
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('village_id') border-red-300 @enderror">
+                                <option value="" hidden>-- Pilih Desa --</option>
+                                @foreach($aidDisasters as $disaster)
+                                    <option value="{{ $disaster->id }}" {{ old('village_id') == $disaster->id ? 'selected' : '' }}>
+                                        {{ $disaster->zone }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('village_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div> -->
                     </div>
                 </div>
 
@@ -51,49 +71,52 @@
                     <div class="mt-1">
                         <select id="beneficiary_id" name="beneficiary_id" required
                                 class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('beneficiary_id') border-red-300 @enderror">
-                            <option value="">-- Pilih Warga --</option>
+                            <option value="" hidden>-- Pilih Warga --</option>
                             @foreach($beneficiaries as $beneficiary)
                                 <option value="{{ $beneficiary->id }}"
                                         data-status="{{ $beneficiary->aid_status }}"
+                                        data-village="{{ $beneficiary->village?->full_name ?? '-' }}"
+                                        data-district="{{ $beneficiary->district?->name ?? '-' }}"
                                         {{ old('beneficiary_id') == $beneficiary->id ? 'selected' : '' }}>
                                     {{ $beneficiary->recipient_name }}
-                                    ({{ $beneficiary->village?->full_name ?? '-' }}, {{ $beneficiary->district?->name ?? '-' }})
-                                    @if($beneficiary->aid_status === 'received') ✅ @endif
                                 </option>
+
                             @endforeach
                         </select>
+                        <p id="beneficiary-info" class="mt-1 text-sm text-gray-600"></p>
                         @error('beneficiary_id')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
 
-                {{-- Barang Logistik --}}
-                <div>
-                    <label for="aid_inventory_id" class="block text-sm font-medium text-gray-700">Barang Logistik <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <select id="aid_inventory_id" name="aid_inventory_id" required
-                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_inventory_id') border-red-300 @enderror"
-                                onchange="updateStockInfo(this)">
-                            <option value="">-- Pilih Barang --</option>
-                            @foreach($inventories as $inventory)
-                                <option value="{{ $inventory->id }}"
-                                        data-stock="{{ $inventory->remaining_stock }}"
-                                        data-category="{{ $inventory->category }}"
-                                        {{ old('aid_inventory_id') == $inventory->id ? 'selected' : '' }}>
-                                    {{ $inventory->item_name }} ({{ $inventory->category }}) — Sisa: {{ number_format($inventory->remaining_stock) }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <p id="stock-info" class="mt-1 text-sm text-gray-500"></p>
-                        @error('aid_inventory_id')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                    {{-- Barang Logistik --}}
+                    <div>
+                        <label for="aid_inventory_id" class="block text-sm font-medium text-gray-700">Barang Logistik <span class="text-red-500">*</span></label>
+                        <div class="mt-1">
+                            <select id="aid_inventory_id" name="aid_inventory_id" required
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_inventory_id') border-red-300 @enderror"
+                                    onchange="updateStockInfo(this)">
+                                <option value="" hidden>-- Pilih Barang --</option>
+                                @foreach($inventories as $inventory)
+                                    <option value="{{ $inventory->id }}"
+                                            data-stock="{{ $inventory->remaining_stock }}"
+                                            data-category="{{ $inventory->category }}"
+                                            {{ old('aid_inventory_id') == $inventory->id ? 'selected' : '' }}>
+                                        {{ $inventory->item_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p id="stock-info" class="mt-1 text-sm text-gray-500"></p>
+                            @error('aid_inventory_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
-                </div>
 
-                {{-- Jumlah & Tanggal --}}
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    {{-- Jumlah & Tanggal --}}
                     <div>
                         <label for="quantity_received" class="block text-sm font-medium text-gray-700">Jumlah Diterima <span class="text-red-500">*</span></label>
                         <div class="mt-1">
@@ -148,22 +171,32 @@
 
 @push('scripts')
 <script>
-function updateStockInfo(select) {
+function updateBeneficiaryInfo(select) {
     const option = select.options[select.selectedIndex];
-    const stockInfo = document.getElementById('stock-info');
-    if (option && option.dataset.stock !== undefined) {
-        const stock = parseInt(option.dataset.stock);
-        stockInfo.textContent = 'Sisa stok tersedia: ' + stock.toLocaleString('id-ID') + ' unit';
-        stockInfo.className = stock > 0 ? 'mt-1 text-sm text-green-600 font-medium' : 'mt-1 text-sm text-red-600 font-medium';
+    const info = document.getElementById('beneficiary-info');
+    if (option && option.dataset.status !== undefined) {
+        const status = option.dataset.status;
+        const village = option.dataset.village;
+        const district = option.dataset.district;
+        let text = `Desa: ${village}, Kecamatan: ${district}`;
+        if (status === 'received') {
+            text += " | Status: ✅ Sudah menerima bantuan";
+        }
+        info.textContent = text;
+        info.className = 'mt-1 text-sm text-gray-600 font-medium';
     } else {
-        stockInfo.textContent = '';
+        info.textContent = '';
     }
 }
-// Inisialisasi saat halaman load
+
 document.addEventListener('DOMContentLoaded', function() {
-    const sel = document.getElementById('aid_inventory_id');
-    if (sel) updateStockInfo(sel);
+    const sel = document.getElementById('beneficiary_id');
+    if (sel) {
+        sel.addEventListener('change', () => updateBeneficiaryInfo(sel));
+        updateBeneficiaryInfo(sel);
+    }
 });
+
 </script>
 @endpush
 @endsection

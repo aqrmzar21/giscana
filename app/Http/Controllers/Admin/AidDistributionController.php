@@ -24,11 +24,10 @@ class AidDistributionController extends Controller
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->whereHas('beneficiary', function ($q2) use ($search) {
-                    $q2->where('recipient_name', 'like', "%{$search}%")
-                       ->orWhere('identity_card_number', 'like', "%{$search}%");
+                    $q2->where('recipient_name', 'like', "%{$search}%")->orWhere('identity_card_number', 'like', "%{$search}%");
                 })->orWhereHas('aidInventory', function ($q2) use ($search) {
                     $q2->where('item_name', 'like', "%{$search}%");
-                });
+                })->orWhereHas('district', fn ($dq) => $dq->where('name', 'like', "%{$search}%"));
             });
         }
 

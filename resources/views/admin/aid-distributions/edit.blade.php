@@ -33,7 +33,7 @@
                     <div class="mt-1">
                         <select id="aid_disaster_id" name="aid_disaster_id" required
                                 class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_disaster_id') border-red-300 @enderror">
-                            <option value="">-- Pilih Kecamatan --</option>
+                            <option value="" hidden>-- Pilih Kecamatan --</option>
                             @foreach($aidDisasters as $disaster)
                                 <option value="{{ $disaster->id }}"
                                     {{ old('aid_disaster_id', $aidDistribution->aid_disaster_id) == $disaster->id ? 'selected' : '' }}>
@@ -53,7 +53,7 @@
                     <div class="mt-1">
                         <select id="beneficiary_id" name="beneficiary_id" required
                                 class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('beneficiary_id') border-red-300 @enderror">
-                            <option value="">-- Pilih Warga --</option>
+                            <option value="" hidden>-- Pilih Warga --</option>
                             @foreach($beneficiaries as $beneficiary)
                                 <option value="{{ $beneficiary->id }}"
                                     {{ old('beneficiary_id', $aidDistribution->beneficiary_id) == $beneficiary->id ? 'selected' : '' }}>
@@ -75,7 +75,7 @@
                         <select id="aid_inventory_id" name="aid_inventory_id" required
                                 class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_inventory_id') border-red-300 @enderror"
                                 onchange="updateStockInfo(this)">
-                            <option value="">-- Pilih Barang --</option>
+                            <option value="" hidden>-- Pilih Barang --</option>
                             @foreach($inventories as $inventory)
                                 <option value="{{ $inventory->id }}"
                                         data-stock="{{ $inventory->remaining_stock }}"
