@@ -154,8 +154,10 @@
                     <select name="per_page" onchange="this.form.submit()"
                             class="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-1 pl-3 pr-8">
                         <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
-                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
                         <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                        <option value="250" {{ request('per_page') == 250 ? 'selected' : '' }}>250</option>
+                        <option value="500" {{ request('per_page') == 500 ? 'selected' : '' }}>500</option>
                     </select>
                 </form>
                 <span class="text-sm text-gray-700">data</span>

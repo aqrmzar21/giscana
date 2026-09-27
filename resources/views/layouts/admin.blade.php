@@ -181,8 +181,8 @@
                                 <!-- Distribusi Bantuan -->
                                 <div x-data="{ open: {{ request()->routeIs('admin.aid-beneficiaries.*') || request()->routeIs('admin.aid-inventories.*') ? 'true' : 'false' }} }">
                                     <button @click="open = !open" 
-                                            :title="sidebarCollapsed ? 'Master Bantuan' : ''"
-                                            class="w-full flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-distributions.*') || request()->routeIs('admin.aid-beneficiaries.*') || request()->routeIs('admin.aid-inventories.*') || request()->routeIs('admin.aid-disasters.*') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
+                                            :title="sidebarCollapsed ? 'Bantuan Bencana' : ''"
+                                            class="w-full flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-beneficiaries.*') || request()->routeIs('admin.aid-inventories.*') || request()->routeIs('admin.aid-disasters.*') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
                                             :class="{ 'justify-center px-2': sidebarCollapsed }">
                                         <div class="flex items-center min-w-0">
                                             <!-- <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg> -->
@@ -208,7 +208,7 @@
                                 <div x-data="{ open: {{ request()->routeIs('admin.aid-distributions.*') || request()->routeIs('admin.aid-disasters.*') ? 'true' : 'false' }} }">
                                     <button @click="open = !open" 
                                     :title="sidebarCollapsed ? 'Distribusi Bantuan' : ''"
-                                            class="w-full flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-distributions.*') || request()->routeIs('admin.aid-beneficiaries.*') || request()->routeIs('admin.aid-inventories.*') || request()->routeIs('admin.aid-disasters.*') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
+                                            class="w-full flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-distributions.*') || request()->routeIs('admin.aid-disasters.*') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
                                             :class="{ 'justify-center px-2': sidebarCollapsed }">
                                         <div class="flex items-center min-w-0">
                                             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
@@ -222,10 +222,10 @@
                                         <!-- <a href="{{ route('admin.aid-disasters.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg  {{ request()->routeIs('admin.aid-disasters.index') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}">
                                             Statistik Distribusi
                                         </a> -->
-                                        <a href="{{ route('admin.aid-distributions.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-distributions.*') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
-                                            Catatan Distribusi
+                                        <a href="{{ route('admin.aid-distributions.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-distributions.index*') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
+                                            Daftar Catatan Distribusi
                                         </a>
-                                        <a href="{{ route('admin.aid-distributions.create') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-distributions.*') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
+                                        <a href="{{ route('admin.aid-distributions.create') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-distributions.create*') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
                                             Tambah Distribusi Baru
                                         </a>
 
