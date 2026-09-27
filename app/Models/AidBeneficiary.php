@@ -53,6 +53,6 @@ class AidBeneficiary extends Model
 
     public function distributions()
     {
-        return $this->hasMany(AidDistribution::class);
+        return $this->hasMany(AidDistribution::class, 'beneficiary_id');
     }
 }
