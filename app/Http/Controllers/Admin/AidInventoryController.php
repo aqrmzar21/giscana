@@ -44,7 +44,7 @@ class AidInventoryController extends Controller
             'category'        => 'required|string|max:100',
             'source'          => 'required|string|max:255',
             'initial_stock'   => 'required|integer|min:0',
-            'remaining_stock' => 'nullable|integer|min:0',
+            // 'remaining_stock' => 'nullable|integer|min:0',
             'is_active'       => 'boolean',
         ]);
 
@@ -81,7 +81,7 @@ class AidInventoryController extends Controller
             'category'        => 'required|string|max:100',
             'source'          => 'required|string|max:255',
             'initial_stock'   => 'required|integer|min:0',
-            'remaining_stock' => 'required|integer|min:0',
+            'remaining_stock' => 'integer|min:0',
             'is_active'       => 'boolean',
         ]);
 

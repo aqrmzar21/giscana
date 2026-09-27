@@ -76,10 +76,10 @@
                             @enderror
                         </div>
                     </div>
-                    <div>
+                    <div class=hidden>
                         <label for="remaining_stock" class="block text-sm font-medium text-gray-700">Sisa Stok <span class="text-red-500">*</span></label>
                         <div class="mt-1">
-                            <input type="number" name="remaining_stock" id="remaining_stock" value="{{ old('remaining_stock', $aidInventory->remaining_stock) }}" min="0" required
+                            <input type="number" name="remaining_stock" id="remaining_stock" value="{{ old('remaining_stock', $aidInventory->remaining_stock) }}" min="0" disabled
                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('remaining_stock') border-red-300 @enderror">
                             @error('remaining_stock')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

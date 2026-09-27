@@ -65,35 +65,33 @@
                         </div> 
                     </div>
                     -->
+                     
+                </div>
+                
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     {{-- Warga Penerima --}}
                     <div>
                         <label for="beneficiary_id" class="block text-sm font-medium text-gray-700">Warga Penerima Bantuan <span class="text-red-500">*</span></label>
                         <div class="mt-1">
                             <select id="beneficiary_id" name="beneficiary_id" required
-                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('beneficiary_id') border-red-300 @enderror">
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('beneficiary_id') border-red-300 @enderror">
                                 <option value="" hidden>-- Pilih Warga --</option>
                                 @foreach($beneficiaries as $beneficiary)
                                     <option value="{{ $beneficiary->id }}"
-                                            data-status="{{ $beneficiary->aid_status }}"
-                                            data-village="{{ $beneficiary->village?->full_name ?? '-' }}"
-                                            data-district="{{ $beneficiary->district?->name ?? '-' }}"
-                                            {{ old('beneficiary_id') == $beneficiary->id ? 'selected' : '' }}>
-                                        {{ $beneficiary->recipient_name }}
-                                    </option>
-    
+                                    data-status="{{ $beneficiary->aid_status }}"
+                                    data-village="{{ $beneficiary->village?->yard ?? '-' }}"
+                                    data-district="{{ $beneficiary->district?->name ?? '-' }}"
+                                    {{ old('beneficiary_id') == $beneficiary->id ? 'selected' : '' }}>
+                                    {{ $beneficiary->recipient_name }}
+                                    </option>                        
                                 @endforeach
                             </select>
                             <p id="beneficiary-info" class="mt-1 text-sm text-gray-600"></p>
                             @error('beneficiary_id')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p class="text-xs text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
-                </div>
-
-
-                
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     {{-- Barang Logistik --}}
                     <div>
                         <label for="aid_inventory_id" class="block text-sm font-medium text-gray-700">Barang Logistik <span class="text-red-500">*</span></label>
@@ -111,7 +109,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <p id="stock-info" class="mt-1 text-sm text-gray-500"></p>
+                            <p id="stock-info" class="text-xs text-gray-500"></p>
                             @error('aid_inventory_id')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -141,6 +139,7 @@
                             @enderror
                         </div>
                     </div>
+                    
                 </div>
 
                 {{-- Deskripsi --}}
@@ -173,6 +172,30 @@
 
 @push('scripts')
 <script>
+function updateStockInfo(select) {
+    const option = select.options[select.selectedIndex];
+    const stockInfo = document.getElementById('stock-info');
+    if (option && option.dataset.stock !== undefined) {
+        const stock = parseInt(option.dataset.stock);
+        const category = option.dataset.category;
+
+        // tampilkan kategori dengan warna hitam
+        let text = `<span class="text-black">Kategori: ${category}</span>`;
+
+        // tambahkan info stok dengan warna fleksibel
+        if (stock > 0) {
+            text += ` | <span class="text-green-600 font-medium">Sisa stok: ${stock.toLocaleString('id-ID')} unit</span>`;
+        } else {
+            text += ` | <span class="text-red-600 font-medium">Sisa stok: ${stock.toLocaleString('id-ID')} unit</span>`;
+        }
+
+        stockInfo.innerHTML = text;
+        stockInfo.className = 'text-xs';
+    } else {
+        stockInfo.textContent = '';
+    }
+}
+
 function updateBeneficiaryInfo(select) {
     const option = select.options[select.selectedIndex];
     const info = document.getElementById('beneficiary-info');
@@ -182,23 +205,28 @@ function updateBeneficiaryInfo(select) {
         const district = option.dataset.district;
         let text = `Desa: ${village}, Kecamatan: ${district}`;
         if (status === 'received') {
-            text += " | Status: ✅ Sudah menerima bantuan";
+            text += ` | <span class="text-green-600 font-medium">Sudah menerima bantuan</span>`;
         }
-        info.textContent = text;
-        info.className = 'mt-1 text-sm text-gray-600 font-medium';
+        info.innerHTML = text;
+        info.className = 'text-xs text-gray-600 font-medium';
     } else {
         info.textContent = '';
     }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const sel = document.getElementById('beneficiary_id');
-    if (sel) {
-        sel.addEventListener('change', () => updateBeneficiaryInfo(sel));
-        updateBeneficiaryInfo(sel);
+    const selBeneficiary = document.getElementById('beneficiary_id');
+    if (selBeneficiary) {
+        selBeneficiary.addEventListener('change', () => updateBeneficiaryInfo(selBeneficiary));
+        updateBeneficiaryInfo(selBeneficiary);
+    }
+
+    const selStock = document.getElementById('aid_inventory_id');
+    if (selStock) {
+        selStock.addEventListener('change', () => updateStockInfo(selStock));
+        updateStockInfo(selStock);
     }
 });
-
 </script>
 @endpush
 @endsection

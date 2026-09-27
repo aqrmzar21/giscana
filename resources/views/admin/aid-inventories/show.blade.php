@@ -117,7 +117,7 @@
         <div class="mt-8">
             <h4 class="text-base font-semibold text-gray-900 mb-3">Riwayat Penyaluran</h4>
             <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                <table class="min-w-full divide-y divide-gray-300">
+                <table id="distributions-table" class="min-w-full divide-y divide-gray-300">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="py-3 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Tanggal</th>
@@ -141,6 +141,7 @@
                         @endforelse
                     </tbody>
                 </table>
+
             </div>
         </div>
 
@@ -153,3 +154,20 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#distributions-table').DataTable({
+        pageLength: 5, // jumlah data per halaman
+        lengthMenu: [5, 10, 25, 50], // opsi jumlah per halaman
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json' // bahasa Indonesia
+        }
+    });
+});
+</script>
+@endpush
