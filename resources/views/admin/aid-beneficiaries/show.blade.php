@@ -42,6 +42,10 @@
                     Edit
                 </a>
                 @endcan
+                <a href="{{ route('admin.aid-beneficiaries.index') }}"
+                class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    Kembali
+                </a>
             </div>
         </div>
 
@@ -70,9 +74,7 @@
             </div>
             <div class="sm:col-span-2">
                 <dt class="text-sm font-medium text-gray-500">Alamat Detail</dt>
-                <dd class="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-md border border-gray-100">
-                    {{ $aidBeneficiary->address_detail ?: 'Tidak ada alamat detail.' }}
-                </dd>
+                <dd class="mt-1 text-sm text-gray-900">{{ $aidBeneficiary->address_detail ?: 'Tidak ada alamat detail.' }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-gray-500">Dibuat Pada</dt>
@@ -120,12 +122,6 @@
             </div>
         </div>
 
-        <div class="mt-6 flex items-center justify-end">
-            <a href="{{ route('admin.aid-beneficiaries.index') }}"
-               class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
-                Kembali
-            </a>
-        </div>
     </div>
 </div>
 @endsection
