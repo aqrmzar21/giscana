@@ -46,8 +46,9 @@
                         </div>
                     </div>
                     {{-- Desa/Bencana --}}
+                    <!-- <
                     <div>
-                        <!-- <label for="village_id" class="block text-sm font-medium text-gray-700">Desa / Wilayah Bencana <span class="text-red-500">*</span></label>
+                         label for="village_id" class="block text-sm font-medium text-gray-700">Desa / Wilayah Bencana <span class="text-red-500">*</span></label>
                         <div class="mt-1">
                             <select id="village_id" name="village_id" required
                                     class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('village_id') border-red-300 @enderror">
@@ -61,34 +62,35 @@
                             @error('village_id')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
-                        </div> -->
+                        </div> 
+                    </div>
+                    -->
+                    {{-- Warga Penerima --}}
+                    <div>
+                        <label for="beneficiary_id" class="block text-sm font-medium text-gray-700">Warga Penerima Bantuan <span class="text-red-500">*</span></label>
+                        <div class="mt-1">
+                            <select id="beneficiary_id" name="beneficiary_id" required
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('beneficiary_id') border-red-300 @enderror">
+                                <option value="" hidden>-- Pilih Warga --</option>
+                                @foreach($beneficiaries as $beneficiary)
+                                    <option value="{{ $beneficiary->id }}"
+                                            data-status="{{ $beneficiary->aid_status }}"
+                                            data-village="{{ $beneficiary->village?->full_name ?? '-' }}"
+                                            data-district="{{ $beneficiary->district?->name ?? '-' }}"
+                                            {{ old('beneficiary_id') == $beneficiary->id ? 'selected' : '' }}>
+                                        {{ $beneficiary->recipient_name }}
+                                    </option>
+    
+                                @endforeach
+                            </select>
+                            <p id="beneficiary-info" class="mt-1 text-sm text-gray-600"></p>
+                            @error('beneficiary_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
                 </div>
 
-                {{-- Warga Penerima --}}
-                <div>
-                    <label for="beneficiary_id" class="block text-sm font-medium text-gray-700">Warga Penerima Bantuan <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <select id="beneficiary_id" name="beneficiary_id" required
-                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('beneficiary_id') border-red-300 @enderror">
-                            <option value="" hidden>-- Pilih Warga --</option>
-                            @foreach($beneficiaries as $beneficiary)
-                                <option value="{{ $beneficiary->id }}"
-                                        data-status="{{ $beneficiary->aid_status }}"
-                                        data-village="{{ $beneficiary->village?->full_name ?? '-' }}"
-                                        data-district="{{ $beneficiary->district?->name ?? '-' }}"
-                                        {{ old('beneficiary_id') == $beneficiary->id ? 'selected' : '' }}>
-                                    {{ $beneficiary->recipient_name }}
-                                </option>
-
-                            @endforeach
-                        </select>
-                        <p id="beneficiary-info" class="mt-1 text-sm text-gray-600"></p>
-                        @error('beneficiary_id')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
 
                 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
