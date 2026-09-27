@@ -125,7 +125,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
 
         {{-- Pie Chart Card --}}
-        <div class="lg:col-span-1 bg-white shadow rounded-lg">
+        <!-- <div class="lg:col-span-1 bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex items-center justify-between">
                 <div>
                     <h3 class="text-base font-semibold text-gray-900">Distribusi Bantuan per Kecamatan</h3>
@@ -193,40 +193,48 @@
                     </div>
                 </div>
             @endif
-        </div>
+        </div> -->
 
-        {{-- Bar Chart Card --}}
+        {{-- Presentase Chart Card --}}
         <div class="lg:col-span-1 bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex items-center justify-between">
                 <div>
                     <h3 class="text-base font-semibold text-gray-900">Distribusi Bantuan per Kecamatan</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Top 5 kecamatan berdasarkan jumlah bantuan tersalur</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Top 5 kecamatan berdasarkan jumlah KK penerima bantuan</p>
                 </div>
-                
+                <span class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+                    <!-- <a href="{{ route('admin.aid-disasters.index') }}">Detail</a> -->
+                    <a href="{{ route('admin.aid-disasters.index') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Details</a>
+                </span>
             </div>
             <div class="px-2 py-2">
                 <table class="min-w-full table-fixed divide-y divide-gray-300 rounded-lg mb-6">
                     <thead class="bg-white-50">
                         <tr>
                             <th scope="col" class="w-1/3 px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kecamatan</th>
-                            <th scope="col" class="w-2/3 px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Progres</th>
+                            <th scope="col" class="w-2/3 px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Progres KK</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white">
                         @forelse($aidDisasters as $aid)
                         <tr>
                             <td class="w-1/3 whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                {{ $aid->district_name }}
+                                <div class="flex justify-between items-center">
+                                    <span>{{ $aid->district_name }}</span>
+                                    <strong class="text-indigo-900 font-bold">
+                                        {{ $aid->received_percentage }}%
+                                    </strong>
+                                </div>
                             </td>
                             <td class="w-2/3 whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                @php
-                                    $percentage = $aid->total_recipients > 0 ? ($aid->distributed_aid / $aid->total_recipients) * 100 : 0;
-                                @endphp
-                                <div class="flex items-center">
-                                    <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                                        <div class="bg-green-400 h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
+                                <div class="flex items-center">                                    
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5 mx-2">
+                                        <div 
+                                            class="{{ $aid->received_percentage <= 20 ? 'bg-red-400' : ($aid->received_percentage <= 50 ? 'bg-yellow-400' : 'bg-green-400') }} h-2.5 rounded-full" 
+                                            style="width: {{ $aid->received_percentage }}%">
+                                        </div>
                                     </div>
-                                    <span>{{ round($percentage, 1) }}%</span>
+                                    <span>{{ $aid->total_received }} / {{ $aid->total_recipients }}</span>
                                 </div>
                             </td>
                         </tr>
@@ -239,8 +247,83 @@
                         @endforelse
                     </tbody>
                 </table>
-
             </div>
+        </div>
+
+        {{-- Pie Chart Card untuk Logistik --}}
+        <div class="lg:col-span-1 bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900">Distribusi Logistik</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">Top 5 barang berdasarkan stok tersisa</p>
+                </div>
+                <span class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+                    Top 5
+                </span>
+            </div>
+
+            @if($inventories->isEmpty())
+                <div class="flex flex-col items-center justify-center py-16 text-gray-400">
+                    <svg class="h-12 w-12 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                    </svg>
+                    <p class="text-sm">Belum ada data logistik.</p>
+                </div>
+            @else
+                <div class="p-5 flex flex-col sm:flex-row items-center gap-6">
+                    {{-- Canvas --}}
+                    <div class="flex-shrink-0" style="width:220px; height:220px;">
+                        <canvas id="logisticPieChart"></canvas>
+                    </div>
+
+                    {{-- Legend + Detail --}}
+                    <div class="flex-1 w-full">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="text-xs text-gray-500 border-b border-gray-100">
+                                    <th class="pb-2 text-left font-medium">Barang</th>
+                                    <th class="pb-2 text-right font-medium">Stok Masuk</th>
+                                    <th class="pb-2 text-right font-medium">Sisa Stok</th>
+                                    <th class="pb-2 text-right font-medium">%</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                @php
+                                    $colors = ['#6366f1','#22c55e','#f59e0b','#ef4444','#14b8a6'];
+                                    $totalStock = $inventories->sum('initial_stock') ?: 1;
+                                @endphp
+                                @foreach($inventories->take(5) as $i => $inventory)
+                                @php
+                                    $stockPercent = $inventory->initial_stock > 0
+                                        ? round(($inventory->remaining_stock / $inventory->initial_stock) * 100, 1)
+                                        : 0;
+                                @endphp
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-2 pr-3">
+                                        <div class="flex items-center gap-2">
+                                            <span class="inline-block w-3 h-3 rounded-full flex-shrink-0"
+                                                style="background:{{ $colors[$i] ?? '#9ca3af' }}"></span>
+                                            <span class="font-medium text-gray-800 truncate max-w-[130px]">{{ $inventory->item_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-2 text-right text-gray-600">{{ number_format($inventory->initial_stock) }}</td>
+                                    <td class="py-2 text-right text-gray-600">{{ number_format($inventory->remaining_stock) }}</td>
+                                    <td class="py-2 text-right">
+                                        <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold"
+                                            style="background:{{ $colors[$i] ?? '#9ca3af' }}22; color:{{ $colors[$i] ?? '#9ca3af' }}">
+                                            {{ $stockPercent }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
         </div>
 
     </div>
@@ -298,5 +381,59 @@
     })();
 </script>
 @endif
+@if($inventories->isNotEmpty())
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+    (function () {
+        const ctx = document.getElementById('logisticPieChart');
+        if (!ctx) return;
+
+        // Ambil label dan data dari koleksi inventories
+        const labels  = @json($inventories->take(5)->pluck('item_name'));
+        const data    = @json($inventories->take(5)->pluck('remaining_stock'));
+        const colors  = ['#6366f1','#22c55e','#f59e0b','#ef4444','#14b8a6'];
+        const hovers  = ['#4f46e5','#16a34a','#d97706','#dc2626','#0d9488'];
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors,
+                    hoverBackgroundColor: hovers,
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                    hoverOffset: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                cutout: '62%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const pct   = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                return ` ${context.label}: ${context.parsed.toLocaleString()} (${pct}%)`;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true,
+                    duration: 800,
+                    easing: 'easeInOutQuart',
+                }
+            }
+        });
+    })();
+</script>
+@endif
+
 @endsection
 

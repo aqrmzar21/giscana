@@ -46,8 +46,9 @@
                         <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">NO</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kecamatan</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Jumlah KK</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Bantuan Tersalur</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">KK Menerima</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Bantuan Tersalur</th>
                         <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">Aksi</th>
                     </tr>
                 </thead>
@@ -57,8 +58,19 @@
                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ $loop->iteration }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $aid->district_name }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($aid->total_recipients) }}</td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($aid->distributed_aid) }}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-green-600 font-semibold">
+                            {{ number_format($aid->total_received) }}
+                        </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            <div class="flex items-center">
+                                <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
+                                    <div class="bg-green-400 h-2.5 rounded-full" style="width: {{ $aid->received_percentage }}%"></div>
+                                </div>
+                                <span>{{ $aid->received_percentage }}%</span>
+                            </div>
+                        </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($aid->distributed_aid) }}</td>
+                        <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @php
                                 $percentage = $aid->total_recipients > 0 ? ($aid->distributed_aid / $aid->total_recipients) * 100 : 0;
                             @endphp
@@ -68,7 +80,7 @@
                                 </div>
                                 <span>{{ round($percentage, 1) }}%</span>
                             </div>
-                        </td>
+                        </td> -->
                         <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($aid->is_active)
                             <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Aktif</span>

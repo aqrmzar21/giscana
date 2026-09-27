@@ -7,6 +7,7 @@ use App\Models\DisasterZone;
 use App\Models\EvacuationRoute;
 use App\Models\EvacuationFacility;
 use App\Models\AidDisaster;
+use App\Models\AidInventory;
 
 class DashboardController extends Controller
 {
@@ -27,6 +28,14 @@ class DashboardController extends Controller
         // Semua data bantuan kecamatan untuk tabel
         $aidDisasters = AidDisaster::orderBy('district_name')->get();
 
-        return $this->partialView('dashboard', compact('aidByDistrict', 'aidDisasters'));
+        // Top 5 barang logistik berdasarkan stok tersisa untuk pie chart
+        $inventories = AidInventory::select('item_name', 'category', 'initial_stock', 'remaining_stock')
+            ->where('is_active', true)
+            ->orderByDesc('remaining_stock')
+            ->limit(5)
+            ->get();
+
+        
+        return $this->partialView('dashboard', compact('inventories', 'aidByDistrict', 'aidDisasters'));
     }
 }

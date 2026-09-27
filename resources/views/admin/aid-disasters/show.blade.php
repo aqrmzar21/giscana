@@ -1,7 +1,6 @@
 @extends('layouts.admin')
 
 @section('title', 'Detail Data Bantuan Bencana - Admin')
-
 @section('page-title', 'Detail Data Bantuan Bencana')
 
 @section('breadcrumb')
@@ -35,80 +34,84 @@
                     Edit
                 </a>
                 @endcan
+                <a href="{{ route('admin.aid-disasters.index') }}"
+                   class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    Kembali
+                </a>
             </div>
         </div>
 
         {{-- Progress distribusi --}}
-        @if(!is_null($aidDisaster->distribution_percentage))
+        @if(!is_null($aidDisaster->received_percentage))
             <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-                <p class="text-sm font-medium text-gray-700 mb-2">Progress</p>
+                <p class="text-sm font-medium text-gray-700 mb-2">Progress Distribusi KK</p>
                 <div class="flex items-center gap-3">
                     <div class="flex-1 bg-gray-200 rounded-full h-4">
-                        <div class="h-4 rounded-full transition-all duration-500 {{ $aidDisaster->distribution_percentage >= 100 ? 'bg-green-500' : ($aidDisaster->distribution_percentage >= 50 ? 'bg-yellow-500' : 'bg-red-500') }}"
-                            style="width: {{ min($aidDisaster->distribution_percentage, 100) }}%"></div>
+                        <div class="h-4 rounded-full transition-all duration-500 
+                            {{ $aidDisaster->received_percentage >= 100 ? 'bg-green-500' : ($aidDisaster->received_percentage >= 50 ? 'bg-yellow-500' : 'bg-red-500') }}"
+                            style="width: {{ min($aidDisaster->received_percentage, 100) }}%">
+                        </div>
                     </div>
-                    <span class="text-sm font-bold text-gray-700 w-12 text-right">{{ $aidDisaster->distribution_percentage }}%</span>
+                    <span class="text-sm font-bold text-gray-700 w-12 text-right">{{ $aidDisaster->received_percentage }}%</span>
                 </div>
             </div>
         @endif
-
-        <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Kecamatan</dt>
-                <dd class="mt-1 text-sm font-semibold text-gray-900">{{ $aidDisaster->district_name }}</dd>
-            </div>
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Total Penerima</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{ number_format($aidDisaster->total_recipients ?? 0) }} people</dd>
-            </div>
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Bantuan Terdistribusi</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{ number_format($aidDisaster->distributed_aid ?? 0) }} people</dd>
-            </div>
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Sisa Bantuan</dt>
-                <dd class="mt-1 text-sm text-gray-900">
-                    @if(!is_null($aidDisaster->remaining_aid))
-                        <span class="{{ $aidDisaster->remaining_aid > 0 ? 'text-orange-600 font-semibold' : 'text-green-600 font-semibold' }}">
-                            {{ number_format($aidDisaster->remaining_aid) }} orang
-                        </span>
-                    @else
-                        -
-                    @endif
-                </dd>
-            </div>
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Status</dt>
-                <dd class="mt-1 text-sm text-gray-900">
+        
+        {{-- Card Grid --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {{-- Kecamatan --}}
+            <div class="bg-white shadow rounded-lg p-5">
+                <div class="flex items-center justify-between">
+                    <dt class="text-sm font-medium text-gray-500">Kecamatan</dt>
                     @if($aidDisaster->is_active)
-                        <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Active</span>
+                    <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-800">Aktif</span>
                     @else
-                        <span class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">Inactive</span>
+                        <span class="inline-flex rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold text-gray-800">Nonaktif</span>
                     @endif
+                </div>
+                <dd class="mt-2 text-lg font-semibold text-gray-900">{{ $aidDisaster->district_name }}</dd>
+            </div>
+
+            {{-- Total Penerima --}}
+            <div class="bg-white shadow rounded-lg p-5">
+                <div class="flex items-center justify-between">
+                    <dt class="text-sm font-medium text-gray-500">Total Penerima</dt>
+                    <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5V4H2v16h5" />
+                    </svg>
+                </div>
+                <dd class="mt-2 text-lg font-semibold text-gray-900">{{ number_format($aidDisaster->total_recipients ?? 0) }} orang</dd>
+            </div>
+
+            {{-- KK Menerima --}}
+            <div class="bg-white shadow rounded-lg p-5">
+                <div class="flex items-center justify-between">
+                    <dt class="text-sm font-medium text-gray-500">KK Menerima</dt>
+                    <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <dd class="mt-2 text-lg font-semibold text-green-600">
+                    {{ number_format($aidDisaster->total_received ?? 0) }} orang
+                </dd>
+                <p class="text-xs text-gray-500">({{ $aidDisaster->received_percentage }}%)</p>
+            </div>
+
+            {{-- Sisa Bantuan --}}
+            <div class="bg-white shadow rounded-lg p-5">
+                <div class="flex items-center justify-between">
+                    <dt class="text-sm font-medium text-gray-500">Sisa Bantuan</dt>
+                    <svg class="h-5 w-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3" />
+                    </svg>
+                </div>
+                <dd class="mt-2 text-lg font-semibold {{ $aidDisaster->remaining_aid > 0 ? 'text-orange-600' : 'text-green-600' }}">
+                    {{ number_format($aidDisaster->remaining_aid) }} orang
                 </dd>
             </div>
-            <!-- <div>
-                <dt class="text-sm font-medium text-gray-500">Last API Sync</dt>
-                <dd class="mt-1 text-sm text-gray-900">
-                    {{ $aidDisaster->last_synced_at ? $aidDisaster->last_synced_at->format('d/m/Y H:i:s') : 'Never synced' }}
-                </dd>
-            </div> -->
-            <!-- <div>
-                <dt class="text-sm font-medium text-gray-500">Created At</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{ $aidDisaster->created_at->format('d/m/Y H:i:s') }}</dd>
-            </div> -->
-            <!-- <div>
-                <dt class="text-sm font-medium text-gray-500">Updated At</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{ $aidDisaster->updated_at->format('d/m/Y H:i:s') }}</dd>
-            </div> -->
-        </dl>
-
-        <div class="mt-6 flex items-center justify-end">
-            <a href="{{ route('admin.aid-disasters.index') }}"
-               class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Kembali
-            </a>
         </div>
+
+        
     </div>
 </div>
 @endsection
