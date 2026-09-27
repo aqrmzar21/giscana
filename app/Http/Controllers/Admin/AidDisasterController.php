@@ -19,12 +19,14 @@ class AidDisasterController extends Controller
 
     public function create()
     {
-        return $this->partialView('admin.aid-disasters.create');
+        $districts = \App\Models\District::orderBy('name')->get();
+        return $this->partialView('admin.aid-disasters.create', compact('districts'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'district_id'       => 'nullable|exists:districts,id',
             'district_name'     => 'required|string|max:255',
             'total_recipients'  => 'nullable|integer|min:0',
             'distributed_aid'   => 'nullable|integer|min:0',
@@ -32,6 +34,18 @@ class AidDisasterController extends Controller
         ]);
 
         $validated['is_active'] = $request->has('is_active');
+
+        // Auto-link district_id dari District jika belum disediakan
+        if (empty($validated['district_id'])) {
+            $district = \App\Models\District::where('name', $validated['district_name'])->first();
+            $validated['district_id'] = $district?->id;
+        } else {
+            // Sinkronkan district_name dari District yang dipilih
+            $district = \App\Models\District::find($validated['district_id']);
+            if ($district) {
+                $validated['district_name'] = $district->name;
+            }
+        }
 
         AidDisaster::create($validated);
 

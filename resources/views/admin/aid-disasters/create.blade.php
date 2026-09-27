@@ -38,15 +38,24 @@
             <div class="space-y-6">
 
                 <div>
-                    <label for="district_name" class="block text-sm font-medium text-gray-700">
-                        District Name <span class="text-red-500">*</span>
+                    <label for="district_id" class="block text-sm font-medium text-gray-700">
+                        Kecamatan <span class="text-red-500">*</span>
                     </label>
                     <div class="mt-1">
-                        <input type="text" name="district_name" id="district_name"
-                            value="{{ old('district_name') }}" required
-                            placeholder="Example: Sukajadi District"
-                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('district_name') border-red-300 @enderror">
-                        @error('district_name')
+                        <select id="district_id" name="district_id" required
+                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('district_id') border-red-300 @enderror"
+                                onchange="syncDistrictName(this)">
+                            <option value="">-- Pilih Kecamatan --</option>
+                            @foreach($districts as $district)
+                                <option value="{{ $district->id }}"
+                                        data-name="{{ $district->name }}"
+                                        {{ old('district_id') == $district->id ? 'selected' : '' }}>
+                                    {{ $district->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <input type="hidden" name="district_name" id="district_name" value="{{ old('district_name') }}">
+                        @error('district_id')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>

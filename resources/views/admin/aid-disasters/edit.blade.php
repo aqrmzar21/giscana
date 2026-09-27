@@ -73,7 +73,7 @@
                             Jumlah KK Penerima
                         </label>
                             <input type="number" name="total_recipients" id="total_recipients"
-                                value="{{ old('total_recipients', $aidDisaster->total_recipients) }}" min="0"
+                                value="{{ old('total_recipients', $aidDisaster->total_recipients) }}" min="0" disabled
                                 class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('total_recipients') border-red-300 @enderror">
                             @error('total_recipients')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

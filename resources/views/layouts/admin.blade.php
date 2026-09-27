@@ -204,32 +204,37 @@
                                 </div>
                             </div>
 
-                            <!-- Data Bantuan Bencana -->
-                            <!-- <div x-data="{ open: {{ request()->routeIs('admin.aid-disasters.*') || request()->routeIs('admin.aid-recipients.*') ? 'true' : 'false' }} }"> -->
-                            <div x-data="{ open: {{ request()->routeIs('admin.aid-recipients.*') ? 'true' : 'false' }} }">
+                            {{-- Distribusi Bantuan (Modul Baru) --}}
+                            <div x-data="{ open: {{ request()->routeIs('admin.aid-distributions.*') || request()->routeIs('admin.aid-beneficiaries.*') || request()->routeIs('admin.aid-inventories.*') || request()->routeIs('admin.aid-disasters.*') ? 'true' : 'false' }} }">
                                 <button @click="open = !open" 
-                                        :title="sidebarCollapsed ? 'Bantuan Bencana' : ''"
-                                        class="w-full flex items-center justify-between py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-recipients.*') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
+                                        :title="sidebarCollapsed ? 'Distribusi Bantuan' : ''"
+                                        class="w-full flex items-center justify-between py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-distributions.*') || request()->routeIs('admin.aid-beneficiaries.*') || request()->routeIs('admin.aid-inventories.*') || request()->routeIs('admin.aid-disasters.*') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
                                         :class="{ 'justify-center px-2': sidebarCollapsed }">
                                     <div class="flex items-center min-w-0">
                                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                                        <span x-show="!sidebarCollapsed" class="ml-3 truncate">Bantuan Bencana</span>
+                                        <span x-show="!sidebarCollapsed" class="ml-3 truncate">Distribusi Bantuan</span>
                                     </div>
                                     <svg x-show="!sidebarCollapsed" class="w-4 h-4 transition-transform shrink-0" :class="{ 'rotate-90': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                     </svg>
                                 </button>
                                 <div x-show="open && !sidebarCollapsed" x-collapse class="ml-4 mt-1 space-y-1">
-                                    <a href="{{ route('admin.aid-recipients.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-recipients.index') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
-                                        Daftar Penerima
+                                    <a href="{{ route('admin.aid-disasters.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-disasters.*') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
+                                        Statistik Kecamatan
                                     </a>
-                                    <a href="{{ route('admin.aid-recipients.create') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-recipients.create') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
-                                        Tambah Penerima Baru
+                                    <a href="{{ route('admin.aid-distributions.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-distributions.*') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
+                                        Catatan Distribusi
+                                    </a>
+                                    <a href="{{ route('admin.aid-beneficiaries.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-beneficiaries.*') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
+                                        Data Warga Penerima
+                                    </a>
+                                    <a href="{{ route('admin.aid-inventories.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-inventories.*') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
+                                        Logistik Bantuan
                                     </a>
                                 </div>
                             </div>
 
-                        </div>
+
                     </div>
                     @endif
 
