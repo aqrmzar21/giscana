@@ -160,7 +160,7 @@
                                 </button>
                                 <div x-show="open && !sidebarCollapsed" x-collapse class="ml-4 mt-1 space-y-1">
                                     <a href="{{ route('admin.evacuation-routes.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.evacuation-routes.index') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
-                                        Daftar Rute
+                                        Daftar Rute Alternatif
                                     </a>
                                 </div>
                                 <div x-show="open && !sidebarCollapsed" x-collapse class="ml-4 mt-1 space-y-1">

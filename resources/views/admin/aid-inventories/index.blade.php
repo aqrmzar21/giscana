@@ -44,19 +44,14 @@
         <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
             <form action="{{ route('admin.aid-inventories.index') }}" method="GET" class="flex flex-col sm:flex-row gap-2">
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari barang, kategori, sumber..."
-                       class="block w-full sm:w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                <label class="inline-flex items-center gap-2 text-sm text-gray-700 px-2">
-                    <input type="checkbox" name="active_only" value="1" {{ request('active_only') ? 'checked' : '' }}
-                           class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                    Hanya stok aktif
-                </label>
+                    class="block w-full sm:w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                 <button type="submit"
                         class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
                     Filter
                 </button>
                 @if(request()->anyFilled(['search', 'active_only']))
                     <a href="{{ route('admin.aid-inventories.index') }}"
-                       class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+                    class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
                         Reset
                     </a>
                 @endif

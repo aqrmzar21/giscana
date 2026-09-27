@@ -86,6 +86,16 @@
                             @enderror
                         </div>
                     </div>
+                    <div>
+                        <label for="date_stock" class="block text-sm font-medium text-gray-700">Tanggal Masuk <span class="text-red-500">*</span></label>
+                        <div class="mt-1">
+                            <input type="date" name="date_stock" id="date_stock" value="{{ old('date_stock') }}" min="0" required
+                                   class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('date_stock') border-red-300 @enderror">
+                            @error('date_stock')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
                 <label class="inline-flex items-center gap-2 text-sm text-gray-700">
