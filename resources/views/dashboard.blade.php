@@ -13,23 +13,10 @@
 @endsection
 
 @section('content')
-    <!-- Welcome Card  -->
-    
+
+<!-- Welcome Card  -->
+<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-6">
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Selamat Datang!</h3>
-                    <p class="text-gray-500 text-sm mb-4">
-                        Halo <strong class="text-blue-800">{{ Auth::user()?->name }}</strong>, selamat datang di sistem informasi geografis untuk tanggap darurat bencana alam.
-                    </p>
-                </div>
-            <div>
-            </div>
-        </div>
-                
-        </div>
         <div class="bg-white overflow-hidden shadow rounded-lg">
             <div class="p-5">
                 <div class="flex items-center">
@@ -99,9 +86,31 @@
             </div>
         </div>
         
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+                        <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Inventory Bantuan</dt>
+                            <dd class="text-lg font-semibold text-gray-900">{{ \App\Models\AidInventory::count() }}</dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{{ route('admin.aid-inventories.index') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        Lihat Detail <span aria-hidden="true">&rarr;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- <div class="lg:col-span-2 bg-white shadow rounded-lg mb-6">
+    <div class="lg:col-span-2 bg-white shadow rounded-lg mb-6">
         <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-center gap-4">
             <div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Selamat Datang!</h3>
@@ -110,11 +119,10 @@
                 </p>
             </div>
         </div>
-    </div> -->
+    </div>
     
     <!-- Chart Progress Row -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-
 
         {{-- Pie Chart Card --}}
         <div class="lg:col-span-1 bg-white shadow rounded-lg">
