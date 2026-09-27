@@ -111,39 +111,7 @@
             </div>
         </div>
     </div> -->
-    <!-- Shorcut Distrbusi Card -->
-    <div id="welcome-card" class="lg:col-span-1 bg-white shadow rounded-lg flex flex-col justify-center">
-        <div class="px-4 py-6 sm:p-6 text-center">
-            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-400 mb-4">
-                <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 576 512"><path d="M288-32c8 0 15.4 4 19.9 10.6l58.8 87.4 103.4-20.2c7.8-1.5 15.9 .9 21.6 6.6s8.1 13.8 6.6 21.6L478 177.3 565.4 236.1C572 240.5 576 248 576 256s-4 15.4-10.6 19.9L478 334.7 498.2 438c1.5 7.8-.9 15.9-6.6 21.6s-13.8 8.1-21.6 6.6L366.7 446 307.9 533.4C303.4 540 296 544 288 544s-15.4-4-19.9-10.6L209.3 446 105.9 466.2c-7.8 1.5-15.9-.9-21.6-6.6s-8.1-13.8-6.6-21.6L98 334.7 10.6 275.9C4 271.4 0 264 0 256s4-15.4 10.6-19.9L98 177.3 77.8 73.9c-1.5-7.8 .9-15.9 6.6-21.6s13.8-8.1 21.6-6.6l103.3 20.2 58.8-87.4 1.8-2.3C274.4-29 281-32 288-32zm-47.8 138c-5.4 8-15 12-24.5 10.2l-84-16.4 16.4 84c1.8 9.5-2.2 19.1-10.2 24.5L67 256 138 303.8c8 5.4 12 15 10.2 24.5l-16.4 84 84-16.4 3.5-.4c8.3-.4 16.3 3.6 21 10.6l47.8 71 47.8-71 2.2-2.8c5.6-6.1 14-9 22.3-7.3l84 16.4-16.4-84c-1.8-9.5 2.2-19.1 10.2-24.5l71-47.8-71-47.8c-8-5.4-12-15-10.2-24.5l16.4-84-84 16.4c-9.5 1.8-19.1-2.2-24.5-10.2l-47.8-71-47.8 71zM288 376a120 120 0 1 1 0-240 120 120 0 1 1 0 240zm0-192a72 72 0 1 0 0 144 72 72 0 1 0 0-144z"/></svg>
-                <!-- <svg class="w-8 h-8 text-yellow-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" fill-rule="evenodd" stroke-width="2" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg> -->
-            </div>
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Daftar Bantuan Kecamatan</h3>
-            <p class="mt-1 text-sm text-gray-500">Ringkasan penyaluran bantuan di tiap kecamatan.</p>
-            <a href="{{ route('admin.aid-disasters.index') }}"
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-400 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
-                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                Data Bantuan Bencana
-            </a>
-            <a href="{{ route('admin.aid-recipients.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-400 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
-                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                Data Penerima Bantuan
-            </a>
-        </div>
-
-        {{-- Mini stats --}}
-        <div class="border-t border-gray-100 px-4 py-4 sm:px-6 grid grid-cols-2 gap-3 text-center">
-            <div>
-                <p class="text-2xl font-bold text-green-600">{{ \App\Models\AidDisaster::sum('distributed_aid') }}</p>
-                <p class="text-xs text-gray-500 mt-0.5">Total Bantuan Tersalur</p>
-            </div>
-            <div>
-                <p class="text-2xl font-bold text-yellow-400">{{ \App\Models\AidDisaster::sum('total_recipients') }}</p>
-                <p class="text-xs text-gray-500 mt-0.5">Total KK</p>
-            </div>
-        </div>
-    </div>
-
+    
     <!-- Chart Progress Row -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
 
