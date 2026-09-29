@@ -40,21 +40,22 @@
         </div>
 
         {{-- Bantuan Tersalurkan --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-5">
+        <!-- <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-5">
             @foreach($aidDisasters as $aid)
             <div class="bg-white shadow rounded-lg p-5">
-                    <div class="flex items-center justify-between">
-                        <dt class="text-sm font-medium text-gray-500">{{ ($aid->district_name) }}</dt>
-                        <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5V4H2v16h5" />
-                        </svg>
-                    </div>
-                    <dd class="mt-2 text-lg font-semibold text-indigo-900">{{ number_format($aid->distributed_aid ?? 0) }}
-                        <span class="text-xs ">Bantuan Tersalurkan</span>
-                    </dd>
+                <div class="flex items-center justify-between">
+                    <dt class="text-sm font-medium text-gray-500">{{ $aid->district_name }}</dt>
+                    <button 
+                        class="toggle-btn text-xs text-indigo-600 hover:text-indigo-900">
+                        Lihat Desa
+                    </button>
+                </div>
+                <dd class="mt-2 text-lg font-semibold text-indigo-900">{{ number_format($aid->distributed_aid ?? 0) }}
+                    <span class="text-xs ">Bantuan Tersalurkan</span>
+                </dd>
             </div>
             @endforeach
-        </div>
+        </div> -->
 
         <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
             <table class="min-w-full divide-y divide-gray-300">
@@ -85,19 +86,7 @@
                                 </div>
                                 <span>{{ $aid->received_percentage }}%</span>
                             </div>
-                        </td>
-                        <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($aid->distributed_aid) }} Bantuan</td> -->
-                        <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            @php
-                                $percentage = $aid->total_recipients > 0 ? ($aid->distributed_aid / $aid->total_recipients) * 100 : 0;
-                            @endphp
-                            <div class="flex items-center">
-                                <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                                    <div class="bg-green-400 h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
-                                </div>
-                                <span>{{ round($percentage, 1) }}%</span>
-                            </div>
-                        </td> -->
+                        </td>                        
                         <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($aid->is_active)
                             <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">Aktif</span>
@@ -123,7 +112,6 @@
                             </div>
                         </td>
                     </tr>
-                    {{-- Tabel breakdown desa --}}
                     
                     @empty
                     <tr>
@@ -135,6 +123,57 @@
                 </tbody>
             </table>
         </div>
+        
+        {{-- Breakdown per desa --}}
+        {{-- Tabel desa per kecamatan --}}
+       <div class="space-y-6">
+            @foreach($aidDisasters as $aid)
+                <div class="border rounded-lg shadow bg-white p-4 my-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-semibold text-gray-700">
+                            {{ $aid->district_name }}
+                        </h3>
+                        <button class="toggle-btn text-xs text-indigo-600 hover:text-indigo-900">
+                            Lihat Desa
+                        </button>
+                    </div>
+                    <p class="mt-2 text-lg font-semibold text-indigo-900">
+                        {{ number_format($aid->distributed_aid ?? 0) }} Bantuan Tersalurkan
+                        <span class="text-sm text-gray-500">
+                            | {{ $villageBreakdown[$aid->id]['total_villages'] ?? 0  }} Desa
+                        </span>
+                    </p>
+
+                    {{-- Breakdown desa --}}
+                    <div class="village-table hidden mt-3">
+                        <table class="min-w-full divide-y divide-gray-200 bg-white shadow rounded-lg">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">No</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Desa</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Total Penerima</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Total Barang</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Jenis Bantuan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                @foreach(($villageBreakdown[$aid->id]['villages'] ?? []) as $villageName => $records)
+                                    <tr>
+                                        <td class="px-3 py-2 text-sm text-gray-900">{{ $loop->iteration }}</td>
+                                        <td class="px-3 py-2 text-sm text-gray-900">{{ $villageName }}</td>
+                                        <td class="px-3 py-2 text-sm text-gray-900">{{ $records->count() }}</td>
+                                        <td class="px-3 py-2 text-sm text-gray-900">{{ $records->sum('quantity_received') }}</td>
+                                        <td class="px-3 py-2 text-sm text-gray-500">
+                                            {{ implode(', ', $records->pluck('aidInventory.item_name')->unique()->toArray()) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endforeach
+        </div>
 
         @if($aidDisasters->hasPages())
         <div class="mt-4">
@@ -143,4 +182,17 @@
         @endif
     </div>
 </div>
+
+<script>
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const container = this.closest('.bg-white'); // ambil card terdekat
+        const table = container.querySelector('.village-table'); // cari tabel di dalam card
+        table.classList.toggle('hidden');
+    });
+});
+</script>
+
 @endsection
+@push('script')
+@endpush

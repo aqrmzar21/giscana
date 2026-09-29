@@ -18,18 +18,26 @@ class AidDistributionController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', 10);
-        $query = AidDistribution::with(['beneficiary.village.district', 'aidInventory', 'aidDisaster'])
-            ->latest('distribution_date');
+        $query = AidDistribution::with(['beneficiary.village.district', 'aidInventory', 'aidDisaster'])->latest('distribution_date');
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->whereHas('beneficiary', function ($q2) use ($search) {
-                    $q2->where('recipient_name', 'like', "%{$search}%")->orWhere('identity_card_number', 'like', "%{$search}%");
-                })->orWhereHas('aidInventory', function ($q2) use ($search) {
+                    $q2->where('recipient_name', 'like', "%{$search}%")
+                    ->orWhere('identity_card_number', 'like', "%{$search}%");
+                })
+                ->orWhereHas('aidInventory', function ($q2) use ($search) {
                     $q2->where('item_name', 'like', "%{$search}%");
-                })->orWhereHas('district', fn ($dq) => $dq->where('name', 'like', "%{$search}%"));
+                })
+                ->orWhereHas('beneficiary.village', function ($vq) use ($search) {
+                    $vq->where('full_name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('beneficiary.village.district', function ($dq) use ($search) {
+                    $dq->where('name', 'like', "%{$search}%");
+                });
             });
         }
+
 
         if ($startDate = $request->input('start_date')) {
             $query->whereDate('distribution_date', '>=', $startDate);
@@ -39,7 +47,6 @@ class AidDistributionController extends Controller
         }
 
         $distributions = $query->paginate($perPage)->withQueryString();
-        
         return $this->partialView('admin.aid-distributions.index', compact('distributions'));
     }
 

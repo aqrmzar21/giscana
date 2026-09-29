@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\PartialRenderable;
 use App\Models\AidDisaster;
+use App\Models\AidBeneficiary;
+use App\Models\AidInventory;
+use App\Models\AidDistribution;
 use Illuminate\Http\Request;
 
 class AidDisasterController extends Controller
@@ -14,7 +17,21 @@ class AidDisasterController extends Controller
     public function index()
     {
         $aidDisasters = AidDisaster::latest()->paginate(15);
-        return $this->partialView('admin.aid-disasters.index', compact('aidDisasters'));
+
+        $villageBreakdown = [];
+        foreach ($aidDisasters as $disaster) {
+            $records = AidDistribution::with(['beneficiary.village','aidInventory'])
+                ->where('aid_disaster_id', $disaster->id)
+                ->get()
+                ->groupBy(fn($d) => $d->village?->full_name ?? 'Unknown');
+
+            $villageBreakdown[$disaster->id] = [
+                'villages' => $records,
+                'total_villages' => $records->count(), // jumlah desa unik
+            ];
+        }
+
+        return $this->partialView('admin.aid-disasters.index', compact('aidDisasters','villageBreakdown'));
     }
 
     public function create()

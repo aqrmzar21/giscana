@@ -27,7 +27,7 @@
                     <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Tambah Warga
+                    Tambah Warga Baru
                 </a>
             </div>
         </div>
@@ -48,7 +48,7 @@
                 </button>
                 @if(request()->anyFilled(['search', 'aid_status']))
                     <a href="{{ route('admin.aid-beneficiaries.index') }}"
-                       class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+                       class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
                         Reset
                     </a>
                 @endif

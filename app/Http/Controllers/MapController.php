@@ -179,7 +179,7 @@ class MapController extends Controller
 
             $villageAids[$key]['total_quantity'] += (int) $dist->quantity_received;
 
-            $itemName = $dist->aidInventory?->item_name;
+            $itemName = $dist->aidInventory?->category;
             if ($itemName && !in_array($itemName, $villageAids[$key]['aid_items'])) {
                 $villageAids[$key]['aid_items'][] = $itemName;
             }
