@@ -8,6 +8,7 @@ use App\Models\EvacuationRoute;
 use App\Models\EvacuationFacility;
 use App\Models\AidDisaster;
 use App\Models\DisasterHazardLayer;
+use App\Models\AidDistribution;
 use Illuminate\Http\Request;
 
 class MapController extends Controller
@@ -153,36 +154,34 @@ class MapController extends Controller
         $aidDisastersFiltered = $aidDisasters->filter(fn (AidDisaster $a) => in_array($a->id, $matchedAidIds, true))->values();
 
         // Calculate village aids menggunakan tabel aid_distributions yang baru
-        $distributions = \App\Models\AidDistribution::with(['village', 'aidInventory'])->get();
+        $distributions = \App\Models\AidDistribution::with(['beneficiary.village','aidInventory'])->get();
+
         $villageAids = [];
 
         foreach ($distributions as $dist) {
-            $village = $dist->village;
+            $village = $dist->beneficiary?->village;
             if (!$village) continue;
 
-            // Normalisasi nama desa
-            $name = $village->full_name ?? $village->yard ?? '';
-            $key = trim(str_replace(['desa ', 'kelurahan '], '', strtolower($name)));
+            $name = $village->full_name ?? $village->name ?? '';
+            $key = strtolower(trim(preg_replace('/^(desa|kelurahan)\s+/i', '', $name)));
 
-            if (!$key) continue;
-
-            // Inisialisasi wadah data desa jika belum ada
             if (!isset($villageAids[$key])) {
                 $villageAids[$key] = [
-                    'total_amount' => 0,
-                    'aid_items' => [], // Disesuaikan dengan skrip JS peta
+                    'total_beneficiaries' => 0,
+                    'total_quantity'      => 0,
+                    'aid_items'           => [],
                 ];
             }
 
-            // Tambahkan jumlah yang diterima berdasarkan kolom quantity_received
-            $villageAids[$key]['total_amount'] += (float) $dist->quantity_received;
-            
-            // Masukkan nama barang dari tabel aid_inventories
-            if ($dist->aidInventory && $dist->aidInventory->item_name) {
-                $itemName = $dist->aidInventory->item_name;
-                if (!in_array($itemName, $villageAids[$key]['aid_items'])) {
-                    $villageAids[$key]['aid_items'][] = $itemName;
-                }
+            if ($dist->beneficiary?->aid_status === 'received') {
+                $villageAids[$key]['total_beneficiaries']++;
+            }
+
+            $villageAids[$key]['total_quantity'] += (int) $dist->quantity_received;
+
+            $itemName = $dist->aidInventory?->item_name;
+            if ($itemName && !in_array($itemName, $villageAids[$key]['aid_items'])) {
+                $villageAids[$key]['aid_items'][] = $itemName;
             }
         }
 

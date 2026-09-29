@@ -324,7 +324,7 @@
             'banjir':    'rgba(59,130,246,0.25)',
             'gempa':     'rgba(249,115,22,0.25)',
             'gelombang': 'rgba(6,182,212,0.25)',
-            'longsor':   'rgba(132,204,22,0.25)',
+            'longsor':   'rgba(229, 245, 205, 0.25)',
         };
         const bgMap = {
             'banjir':    '#eff6ff',
@@ -759,16 +759,22 @@
                                             if (feature.properties) {
                                                 const name = feature.properties.nama || feature.properties.kel_desa || feature.properties.NAMOBJ || 'Tidak diketahui';
                                                 const key = name.toLowerCase().replace(/desa |kelurahan /g, '').trim();
-                                                const aidInfo =  [key];
+                                                // const aidInfo =  [key];
+                                                const aidInfo = villageAidsData[key];
+
                                                 
                                                 let aidHtml = '';
-                                                if (aidInfo && aidInfo.total_amount > 0) {
-                                                    const types = aidInfo.aid_types && aidInfo.aid_types.length > 0 ? aidInfo.aid_types.join(', ') : '-';
+                                                if (aidInfo) {
+                                                    const types = aidInfo.aid_items.length > 0 ? aidInfo.aid_items.join(', ') : '-';
                                                     aidHtml = `
-                                                        Jenis Bantuan: ${types}<br>
-                                                        Total Disalurkan: ${aidInfo.total_amount}
+                                                        Total Penerima: ${aidInfo.total_beneficiaries}<br>
+                                                        Total Barang Tersalur: ${aidInfo.total_quantity}<br>
+                                                        Jenis Bantuan: ${types}
                                                     `;
+                                                } else {
+                                                    aidHtml = `<em>Belum ada data distribusi</em>`;
                                                 }
+
                                                 
                                                 layer.bindPopup(`
                                                     <strong>${name}</strong><br>

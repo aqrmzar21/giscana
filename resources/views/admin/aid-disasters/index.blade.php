@@ -124,37 +124,7 @@
                         </td>
                     </tr>
                     {{-- Tabel breakdown desa --}}
-                    <!-- <tr>
-                        <td colspan="6">
-                            <div class="mt-2">
-                                <h4 class="text-sm font-semibold text-gray-700">
-                                    Detail Desa di {{ $aid->district_name }}
-                                </h4>
-                                <table class="min-w-full divide-y divide-gray-200 mt-2">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Desa</th>
-                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Jumlah Tersalur</th>
-                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Jenis Bantuan</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-100 bg-white">
-                                        @foreach(($distributionsByDistrict[$aid->district_name] ?? []) as $villageName => $records)
-                                            <tr>
-                                                <td class="px-3 py-2 text-sm text-gray-900">{{ $villageName }}</td>
-                                                <td class="px-3 py-2 text-sm text-gray-900">
-                                                    {{ $records->sum('quantity_received') }}
-                                                </td>
-                                                <td class="px-3 py-2 text-sm text-gray-500">
-                                                    {{ implode(', ', $records->pluck('aidInventory.item_name')->unique()->toArray()) }}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </td>
-                    </tr> -->
+                    
                     @empty
                     <tr>
                         <td colspan="7" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 text-center sm:pl-6">
