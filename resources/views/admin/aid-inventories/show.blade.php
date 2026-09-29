@@ -93,20 +93,13 @@
                 </dd>
             </div>
             <div>
+                <dt class="text-sm font-medium text-gray-500">Bantuan Masuk</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ $aidInventory->date_stock }}</dd>
+            </div>            
+            <div>
                 <dt class="text-sm font-medium text-gray-500">Sumber Bantuan</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $aidInventory->source ?: '-' }}</dd>
-            </div>
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Persentase Sisa</dt>
-                <dd class="mt-2">
-                    <div class="flex items-center">
-                        <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                            <div class="{{ $stockPercent <= 20 ? 'bg-red-400' : ($stockPercent <= 50 ? 'bg-yellow-400' : 'bg-green-400') }} h-2.5 rounded-full" style="width: {{ $stockPercent }}%"></div>
-                        </div>
-                        <span class="text-sm text-gray-700">{{ $stockPercent }}%</span>
-                    </div>
-                </dd>
-            </div>
+            </div>            
             <div>
                 <dt class="text-sm font-medium text-gray-500">Dibuat Pada</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $aidInventory->created_at?->format('d/m/Y H:i') }}</dd>
@@ -119,6 +112,22 @@
     </div>
 </div>
 
+<div class="bg-white shadow rounded-lg">
+    <div class="mt-8 p-6 border-t border-gray-200">
+        <div>
+            <dt class="text-sm font-medium text-gray-500">Persentase Sisa</dt>
+            <dd class="mt-2">
+                <div class="flex items-center">
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
+                        <div class="{{ $stockPercent <= 20 ? 'bg-red-400' : ($stockPercent <= 50 ? 'bg-yellow-400' : 'bg-green-400') }} h-2.5 rounded-full" style="width: {{ $stockPercent }}%"></div>
+                    </div>
+                    <span class="text-sm text-gray-700">{{ $stockPercent }}%</span>
+                </div>
+            </dd>
+        </div>
+    
+    </div>
+</div>
 
 <div class="bg-white shadow rounded-lg">
     <div class="mt-8 p-6 border-t border-gray-200">

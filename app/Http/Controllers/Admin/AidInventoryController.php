@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Traits\PartialRenderable;
 use App\Models\AidInventory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AidInventoryController extends Controller
 {
@@ -42,6 +43,7 @@ class AidInventoryController extends Controller
         $validated = $request->validate([
             'item_name'       => 'required|string|max:255',
             'category'        => 'required|string|max:100',
+            'date_stock'      => 'date',
             'source'          => 'required|string|max:255',
             'initial_stock'   => 'required|integer|min:0',
             // 'remaining_stock' => 'nullable|integer|min:0',
@@ -79,6 +81,7 @@ class AidInventoryController extends Controller
         $validated = $request->validate([
             'item_name'       => 'required|string|max:255',
             'category'        => 'required|string|max:100',
+            'date_stock'      => 'date',
             'source'          => 'required|string|max:255',
             'initial_stock'   => 'required|integer|min:0',
             'remaining_stock' => 'integer|min:0',
