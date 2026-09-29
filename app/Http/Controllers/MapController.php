@@ -152,30 +152,37 @@ class MapController extends Controller
         $matchedAidIds = collect($districtFeatures)->pluck('properties.id')->filter()->all();
         $aidDisastersFiltered = $aidDisasters->filter(fn (AidDisaster $a) => in_array($a->id, $matchedAidIds, true))->values();
 
-        // Calculate village aids
-        $aidRecipients = \App\Models\AidRecipient::with('village')->get();
+        // Calculate village aids menggunakan tabel aid_distributions yang baru
+        $distributions = \App\Models\AidDistribution::with(['village', 'aidInventory'])->get();
         $villageAids = [];
 
-        foreach ($aidRecipients as $recipient) {
-            $village = $recipient->village;
+        foreach ($distributions as $dist) {
+            $village = $dist->village;
             if (!$village) continue;
 
+            // Normalisasi nama desa
             $name = $village->full_name ?? $village->yard ?? '';
             $key = trim(str_replace(['desa ', 'kelurahan '], '', strtolower($name)));
 
             if (!$key) continue;
 
+            // Inisialisasi wadah data desa jika belum ada
             if (!isset($villageAids[$key])) {
                 $villageAids[$key] = [
                     'total_amount' => 0,
-                    'aid_types' => [],
+                    'aid_items' => [], // Disesuaikan dengan skrip JS peta
                 ];
             }
 
-            $villageAids[$key]['total_amount'] += (float) $recipient->amount;
+            // Tambahkan jumlah yang diterima berdasarkan kolom quantity_received
+            $villageAids[$key]['total_amount'] += (float) $dist->quantity_received;
             
-            if ($recipient->aid_type && !in_array($recipient->aid_type, $villageAids[$key]['aid_types'])) {
-                $villageAids[$key]['aid_types'][] = $recipient->aid_type;
+            // Masukkan nama barang dari tabel aid_inventories
+            if ($dist->aidInventory && $dist->aidInventory->item_name) {
+                $itemName = $dist->aidInventory->item_name;
+                if (!in_array($itemName, $villageAids[$key]['aid_items'])) {
+                    $villageAids[$key]['aid_items'][] = $itemName;
+                }
             }
         }
 
@@ -197,11 +204,10 @@ class MapController extends Controller
                 'features' => $aidDisastersFiltered->map(fn ($item) => [
                     'type' => 'Feature',
                     'properties' => [
-                        'id'                      => $item->id,
-                        'district_name'          => $item->district_name,
+                        'id'               => $item->id,
+                        'district_name'    => $item->district_name,
                         'total_recipients' => $item->total_recipients,
-                        'distributed_aid'   => $item->distributed_aid,
-                        'distribution_percentage'   => $item->distribution_percentage,
+                        'distributed_aid'  => $item->distributed_aid,
                     ],
                     'geometry' => null,
                 ]),
@@ -210,7 +216,7 @@ class MapController extends Controller
                 'type' => 'FeatureCollection',
                 'features' => $districtFeatures,
             ],
-            'village_aids' => $villageAids,
+            'village_aids' => $villageAids, // JSON ini yang akan dibaca oleh Leaflet JS
         ]);
     }
 

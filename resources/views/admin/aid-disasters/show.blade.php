@@ -100,7 +100,7 @@
             {{-- Sisa Bantuan --}}
             <div class="bg-white shadow rounded-lg p-5">
                 <div class="flex items-center justify-between">
-                    <dt class="text-sm font-medium text-gray-500">Sisa Bantuan</dt>
+                    <dt class="text-sm font-medium text-gray-500">Belum Menerima</dt>
                     <svg class="h-5 w-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3" />
                     </svg>

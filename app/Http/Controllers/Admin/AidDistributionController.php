@@ -39,6 +39,7 @@ class AidDistributionController extends Controller
         }
 
         $distributions = $query->paginate($perPage)->withQueryString();
+        
         return $this->partialView('admin.aid-distributions.index', compact('distributions'));
     }
 

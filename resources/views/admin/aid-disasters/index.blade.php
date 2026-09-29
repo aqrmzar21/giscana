@@ -39,16 +39,33 @@
             </div> -->
         </div>
 
+        {{-- Bantuan Tersalurkan --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-5">
+            @foreach($aidDisasters as $aid)
+            <div class="bg-white shadow rounded-lg p-5">
+                    <div class="flex items-center justify-between">
+                        <dt class="text-sm font-medium text-gray-500">{{ ($aid->district_name) }}</dt>
+                        <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5V4H2v16h5" />
+                        </svg>
+                    </div>
+                    <dd class="mt-2 text-lg font-semibold text-indigo-900">{{ number_format($aid->distributed_aid ?? 0) }}
+                        <span class="text-xs ">Bantuan Tersalurkan</span>
+                    </dd>
+            </div>
+            @endforeach
+        </div>
+
         <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
             <table class="min-w-full divide-y divide-gray-300">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">NO</th>
+                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold textrt-gray-900 sm:pl-6">NO</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kecamatan</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Jumlah KK</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">KK Menerima</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Bantuan Tersalur</th>
+                        <!-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Bantuan Tersalur</th> -->
                         <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">Aksi</th>
                     </tr>
                 </thead>
@@ -59,7 +76,7 @@
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $aid->district_name }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($aid->total_recipients) }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-green-600 font-semibold">
-                            {{ number_format($aid->total_received) }}
+                            {{ number_format($aid->total_received) }} orang
                         </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             <div class="flex items-center">
@@ -69,7 +86,7 @@
                                 <span>{{ $aid->received_percentage }}%</span>
                             </div>
                         </td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($aid->distributed_aid) }}</td>
+                        <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($aid->distributed_aid) }} Bantuan</td> -->
                         <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @php
                                 $percentage = $aid->total_recipients > 0 ? ($aid->distributed_aid / $aid->total_recipients) * 100 : 0;
@@ -106,6 +123,38 @@
                             </div>
                         </td>
                     </tr>
+                    {{-- Tabel breakdown desa --}}
+                    <!-- <tr>
+                        <td colspan="6">
+                            <div class="mt-2">
+                                <h4 class="text-sm font-semibold text-gray-700">
+                                    Detail Desa di {{ $aid->district_name }}
+                                </h4>
+                                <table class="min-w-full divide-y divide-gray-200 mt-2">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Desa</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Jumlah Tersalur</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Jenis Bantuan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 bg-white">
+                                        @foreach(($distributionsByDistrict[$aid->district_name] ?? []) as $villageName => $records)
+                                            <tr>
+                                                <td class="px-3 py-2 text-sm text-gray-900">{{ $villageName }}</td>
+                                                <td class="px-3 py-2 text-sm text-gray-900">
+                                                    {{ $records->sum('quantity_received') }}
+                                                </td>
+                                                <td class="px-3 py-2 text-sm text-gray-500">
+                                                    {{ implode(', ', $records->pluck('aidInventory.item_name')->unique()->toArray()) }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr> -->
                     @empty
                     <tr>
                         <td colspan="7" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 text-center sm:pl-6">
