@@ -154,7 +154,6 @@
                                 </div>
                             </div>
 
-                            
                             <!-- Fasilitas dan Rute Evakuasi -->
                             <div x-data="{ open: {{ request()->routeIs('admin.evacuation-facilities.*') ? 'true' : 'false' }} }">
                                 <button @click="open = !open" 

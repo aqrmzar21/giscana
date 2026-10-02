@@ -65,7 +65,7 @@ class DashboardController extends Controller
 
         // Stok logistik bantuan (diurutkan stok tersisa paling sedikit)
         $aidInventories = AidInventory::orderBy('remaining_stock', 'asc')
-            ->limit(6)
+            ->limit(5)
             ->get();
 
         // Riwayat distribusi bantuan terbaru
