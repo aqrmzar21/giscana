@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\PartialRenderable;
 use App\Models\AidDisaster;
-use App\Models\AidBeneficiary;
-use App\Models\AidInventory;
 use App\Models\AidDistribution;
 use Illuminate\Http\Request;
 
@@ -14,24 +12,41 @@ class AidDisasterController extends Controller
 {
     use PartialRenderable;
 
-    public function index()
+    public function index(Request $request)
     {
-        $aidDisasters = AidDisaster::latest()->paginate(15);
+        $query = AidDisaster::query();
+
+        if ($request->filled('search')) {
+            $query->where('district_name', 'like', '%' . $request->search . '%');
+        }
+
+        $aidDisasters = $query->orderBy('district_name')->paginate(15)->withQueryString();
+
+        // Overall statistics
+        $totalRecipientsSum  = AidDisaster::sum('total_recipients');
+        $totalDistributedSum = AidDisaster::sum('distributed_aid');
+        $overallPercentage   = $totalRecipientsSum > 0 ? round(($totalDistributedSum / $totalRecipientsSum) * 100, 1) : 0;
 
         $villageBreakdown = [];
         foreach ($aidDisasters as $disaster) {
-            $records = AidDistribution::with(['beneficiary.village','aidInventory'])
+            $records = AidDistribution::with(['beneficiary.village', 'aidInventory'])
                 ->where('aid_disaster_id', $disaster->id)
                 ->get()
-                ->groupBy(fn($d) => $d->village?->yard ?? 'Unknown');
+                ->groupBy(fn($d) => $d->village?->yard ?? $d->village?->full_name ?? 'Desa Lainnya');
 
             $villageBreakdown[$disaster->id] = [
-                'villages' => $records,
-                'total_villages' => $records->count(), // jumlah desa unik
+                'villages'       => $records,
+                'total_villages' => $records->count(),
             ];
         }
 
-        return $this->partialView('admin.aid-disasters.index', compact('aidDisasters','villageBreakdown'));
+        return $this->partialView('admin.aid-disasters.index', compact(
+            'aidDisasters',
+            'villageBreakdown',
+            'totalRecipientsSum',
+            'totalDistributedSum',
+            'overallPercentage'
+        ));
     }
 
     public function create()
@@ -52,12 +67,10 @@ class AidDisasterController extends Controller
 
         $validated['is_active'] = $request->has('is_active');
 
-        // Auto-link district_id dari District jika belum disediakan
         if (empty($validated['district_id'])) {
             $district = \App\Models\District::where('name', $validated['district_name'])->first();
             $validated['district_id'] = $district?->id;
         } else {
-            // Sinkronkan district_name dari District yang dipilih
             $district = \App\Models\District::find($validated['district_id']);
             if ($district) {
                 $validated['district_name'] = $district->name;
@@ -67,12 +80,20 @@ class AidDisasterController extends Controller
         AidDisaster::create($validated);
 
         return redirect()->route('admin.aid-disasters.index')
-            ->with('success', 'Aid disaster data successfully added.');
+            ->with('success', 'Data bantuan bencana kecamatan berhasil ditambahkan.');
     }
 
     public function show(AidDisaster $aidDisaster)
     {
-        return $this->partialView('admin.aid-disasters.show', compact('aidDisaster'));
+        // Fetch distributions & village grouping for this disaster
+        $distributions = AidDistribution::with(['beneficiary', 'aidInventory', 'village', 'user'])
+            ->where('aid_disaster_id', $aidDisaster->id)
+            ->latest('distribution_date')
+            ->get();
+
+        $villageStats = $distributions->groupBy(fn($d) => $d->village?->yard ?? $d->village?->full_name ?? 'Desa Lainnya');
+
+        return $this->partialView('admin.aid-disasters.show', compact('aidDisaster', 'distributions', 'villageStats'));
     }
 
     public function edit(AidDisaster $aidDisaster)
@@ -97,7 +118,7 @@ class AidDisasterController extends Controller
         $aidDisaster->update($validated);
 
         return redirect()->route('admin.aid-disasters.index')
-            ->with('success', 'Aid disaster data successfully updated.');
+            ->with('success', 'Data bantuan bencana kecamatan berhasil diperbarui.');
     }
 
     public function destroy(AidDisaster $aidDisaster)
@@ -106,6 +127,6 @@ class AidDisasterController extends Controller
         $aidDisaster->delete();
 
         return redirect()->route('admin.aid-disasters.index')
-            ->with('success', 'Aid disaster data successfully deleted.');
+            ->with('success', 'Data bantuan bencana kecamatan berhasil dihapus.');
     }
 }
