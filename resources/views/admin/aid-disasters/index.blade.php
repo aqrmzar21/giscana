@@ -126,23 +126,23 @@
         
         {{-- Breakdown per desa --}}
         {{-- Tabel desa per kecamatan --}}
-       <div class="space-y-6">
+       <div class="space-y-6 mt-6">
             @foreach($aidDisasters as $aid)
                 <div class="border rounded-lg shadow bg-white p-4 my-3">
                     <div class="flex items-center justify-between">
                         <h3 class="text-sm font-semibold text-gray-700">
                             {{ $aid->district_name }}
                         </h3>
+                        <p class="mt-2 text-lg font-semibold text-indigo-900">
+                            {{ number_format($aid->distributed_aid ?? 0) }} Bantuan Tersalurkan
+                            <span class="text-sm text-gray-500">
+                                | {{ $villageBreakdown[$aid->id]['total_villages'] ?? 0  }} Desa
+                            </span>
+                        </p>
                         <button class="toggle-btn text-xs text-indigo-600 hover:text-indigo-900">
                             Lihat Desa
                         </button>
                     </div>
-                    <p class="mt-2 text-lg font-semibold text-indigo-900">
-                        {{ number_format($aid->distributed_aid ?? 0) }} Bantuan Tersalurkan
-                        <span class="text-sm text-gray-500">
-                            | {{ $villageBreakdown[$aid->id]['total_villages'] ?? 0  }} Desa
-                        </span>
-                    </p>
 
                     {{-- Breakdown desa --}}
                     <div class="village-table hidden mt-3">

@@ -23,7 +23,7 @@ class AidDisasterController extends Controller
             $records = AidDistribution::with(['beneficiary.village','aidInventory'])
                 ->where('aid_disaster_id', $disaster->id)
                 ->get()
-                ->groupBy(fn($d) => $d->village?->full_name ?? 'Unknown');
+                ->groupBy(fn($d) => $d->village?->yard ?? 'Unknown');
 
             $villageBreakdown[$disaster->id] = [
                 'villages' => $records,

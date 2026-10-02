@@ -99,14 +99,27 @@
 
                         <!-- Peta Admin -->
                         <a href="{{ route('dashboard.map') }}" 
-                           :title="sidebarCollapsed ? 'Peta Admin' : ''"
-                           class="flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('dashboard.map') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
-                           :class="{ 'justify-center px-2': sidebarCollapsed }">
-                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                        :title="sidebarCollapsed ? 'Peta Admin' : ''"
+                        class="flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('dashboard.map') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
+                        :class="{ 'justify-center px-2': sidebarCollapsed }">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                             </svg>
-                            <span x-show="!sidebarCollapsed" class="ml-3 truncate">Peta Admin</span>
+                            <span x-show="!sidebarCollapsed" class="ml-3 truncate">Peta</span>
                         </a>
+
+                        <!-- Statistik Admin -->
+                        @role('admin')
+                        <a href="{{ route('admin.aid-disasters.index') }}" 
+                            :title="sidebarCollapsed ? 'Statistik' : ''"
+                            class="flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-disasters.index') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
+                            :class="{ 'justify-center px-2': sidebarCollapsed }">
+                            <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 512 512">
+                                <path d="M448 256a192 192 0 1 0 -384 0 192 192 0 1 0 384 0zM0 256a256 256 0 1 1 512 0 256 256 0 1 1 -512 0zm256 80a80 80 0 1 0 0-160 80 80 0 1 0 0 160zm0-224a144 144 0 1 1 0 288 144 144 0 1 1 0-288zM224 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/>
+                            </svg>
+                            <span x-show="!sidebarCollapsed" class="ml-3 truncate">Statistik</span>
+                        </a>
+                        @endrole
                     </div>
 
                     @if (Auth::user()?->isAdmin() || Auth::user()?->isStaff())
@@ -183,7 +196,7 @@
                                 <div x-data="{ open: {{ request()->routeIs('admin.aid-beneficiaries.*') || request()->routeIs('admin.aid-inventories.*') ? 'true' : 'false' }} }">
                                     <button @click="open = !open" 
                                             :title="sidebarCollapsed ? 'Bantuan Bencana' : ''"
-                                            class="w-full flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-beneficiaries.*') || request()->routeIs('admin.aid-inventories.*') || request()->routeIs('admin.aid-disasters.*') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
+                                            class="w-full flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-beneficiaries.*') || request()->routeIs('admin.aid-inventories.*') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
                                             :class="{ 'justify-center px-2': sidebarCollapsed }">
                                         <div class="flex items-center min-w-0">
                                             <!-- <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg> -->
@@ -206,10 +219,10 @@
 
                                 @hasanyrole('admin')
                                 <!-- Pengaturan Bantuan -->
-                                <div x-data="{ open: {{ request()->routeIs('admin.aid-distributions.*') || request()->routeIs('admin.aid-disasters.*') ? 'true' : 'false' }} }">
+                                <div x-data="{ open: {{ request()->routeIs('admin.aid-distributions.*') ? 'true' : 'false' }} }">
                                     <button @click="open = !open" 
                                     :title="sidebarCollapsed ? 'Distribusi Bantuan' : ''"
-                                            class="w-full flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-distributions.*') || request()->routeIs('admin.aid-disasters.*') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
+                                            class="w-full flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-distributions.*') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
                                             :class="{ 'justify-center px-2': sidebarCollapsed }">
                                         <div class="flex items-center min-w-0">
                                             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
@@ -219,17 +232,13 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                         </svg>
                                     </button>
-                                    <div x-show="open && !sidebarCollapsed" x-collapse class="ml-4 mt-1 space-y-1">
-                                        <!-- <a href="{{ route('admin.aid-disasters.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg  {{ request()->routeIs('admin.aid-disasters.index') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}">
-                                            Statistik Distribusi
-                                        </a> -->
+                                    <div x-show="open && !sidebarCollapsed" x-collapse class="ml-4 mt-1 space-y-1">                                        
                                         <a href="{{ route('admin.aid-distributions.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-distributions.index*') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
                                             Daftar Catatan Distribusi
                                         </a>
                                         <a href="{{ route('admin.aid-distributions.create') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.aid-distributions.create*') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
                                             Tambah Distribusi Baru
                                         </a>
-
                                     </div>
 
                                 </div>
