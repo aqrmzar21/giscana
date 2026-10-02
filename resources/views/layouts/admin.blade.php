@@ -114,6 +114,7 @@
                         <div x-show="sidebarCollapsed" class="my-2 border-t border-gray-200 dark:border-gray-700"></div>
 
                         <div class="mt-2 space-y-1">
+                            @role('admin')
                             <!-- Zona Bencana -->
                             <div x-data="{ open: {{ request()->routeIs('admin.disaster-zones.*') ? 'true' : 'false' }} }">
                                 <button @click="open = !open" 
@@ -139,6 +140,7 @@
                                     </a>
                                 </div>
                             </div>
+                            @endrole
 
                             
                             <!-- Fasilitas dan Rute Evakuasi -->
