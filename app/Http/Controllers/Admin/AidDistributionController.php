@@ -50,6 +50,37 @@ class AidDistributionController extends Controller
         return $this->partialView('admin.aid-distributions.index', compact('distributions'));
     }
 
+    public function print(Request $request)
+    {
+        abort_if(!auth()->user()->can('export data'), 403);
+        $query = AidDistribution::with(['beneficiary.village.district', 'aidInventory', 'aidDisaster', 'user'])->latest('distribution_date');
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('beneficiary', function ($q2) use ($search) {
+                    $q2->where('recipient_name', 'like', "%{$search}%")
+                    ->orWhere('identity_card_number', 'like', "%{$search}%");
+                })
+                ->orWhereHas('aidInventory', function ($q2) use ($search) {
+                    $q2->where('item_name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        if ($startDate = $request->input('start_date')) {
+            $query->whereDate('distribution_date', '>=', $startDate);
+        }
+        if ($endDate = $request->input('end_date')) {
+            $query->whereDate('distribution_date', '<=', $endDate);
+        }
+
+        $distributions = $query->get();
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.aid-distributions.pdf', compact('distributions'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->stream('laporan-distribusi-bantuan.pdf');
+    }
+
     public function create()
     {
         $beneficiaries = AidBeneficiary::with(['village.district'])

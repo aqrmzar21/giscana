@@ -1,8 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit Staff - Admin')
+@section('title', 'Edit User - Admin')
 
-@section('page-title', 'Edit Staff')
+@section('page-title', 'Edit User')
 
 @section('breadcrumb')
 <li class="inline-flex items-center">
@@ -25,7 +25,7 @@
 @section('content')
 <div class="bg-white shadow sm:rounded-lg">
     <div class="px-4 py-5 sm:p-6">
-        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-6">Form Edit Staff</h3>
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-6">Form Edit User</h3>
         <form action="{{ route('admin.staff.update', $staff) }}" method="POST">
             @csrf
             @method('PUT')
@@ -63,6 +63,22 @@
                     </div>
                 </div>
 
+                @php
+                    $currentRole = old('role', $staff->getRoleNames()->first(fn($r) => array_key_exists($r, $roles)) ?? $staff->role);
+                @endphp
+                <div class="sm:col-span-3">
+                    <label for="role" class="block text-sm font-medium text-gray-700">Role <span class="text-red-500">*</span></label>
+                    <div class="mt-1">
+                        <select name="role" id="role" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                            <option value="" disabled {{ $currentRole ? '' : 'selected' }}>-- Pilih Role --</option>
+                            @foreach($roles as $value => $label)
+                                <option value="{{ $value }}" {{ $currentRole === $value ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @error('role') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+
                 <div class="sm:col-span-3">
                     <label for="phone" class="block text-sm font-medium text-gray-700">Telepon</label>
                     <div class="mt-1">
@@ -86,7 +102,7 @@
                         </div>
                         <div class="ml-3 text-sm">
                             <label for="is_active" class="font-medium text-gray-700">Status Aktif</label>
-                            <p class="text-gray-500">Centang jika akun staff ini aktif dan dapat login.</p>
+                            <p class="text-gray-500">Centang jika akun user ini aktif dan dapat login.</p>
                         </div>
                     </div>
                     @error('is_active') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror

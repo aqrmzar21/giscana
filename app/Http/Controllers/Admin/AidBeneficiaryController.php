@@ -36,6 +36,29 @@ class AidBeneficiaryController extends Controller
         return $this->partialView('admin.aid-beneficiaries.index', compact('beneficiaries'));
     }
 
+    public function print(Request $request)
+    {
+        abort_if(!auth()->user()->can('export data'), 403);
+        $query = AidBeneficiary::with(['district', 'village'])->latest();
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('recipient_name', 'like', "%{$search}%")
+                  ->orWhere('identity_card_number', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status = $request->input('aid_status')) {
+            $query->where('aid_status', $status);
+        }
+
+        $beneficiaries = $query->get();
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.aid-beneficiaries.pdf', compact('beneficiaries'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->stream('laporan-penerima-bantuan.pdf');
+    }
+
     public function create()
     {
         $districts = District::with('villages')->orderBy('name')->get();

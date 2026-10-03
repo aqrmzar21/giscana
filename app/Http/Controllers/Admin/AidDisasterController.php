@@ -49,14 +49,32 @@ class AidDisasterController extends Controller
         ));
     }
 
+    public function print(Request $request)
+    {
+        abort_if(!auth()->user()->can('export data'), 403);
+        $query = AidDisaster::query();
+
+        if ($search = $request->input('search')) {
+            $query->where('district_name', 'like', "%{$search}%");
+        }
+
+        $aidDisasters = $query->orderBy('district_name')->get();
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.aid-disasters.pdf', compact('aidDisasters'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->stream('laporan-bantuan-bencana-kecamatan.pdf');
+    }
+
     public function create()
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         $districts = \App\Models\District::orderBy('name')->get();
         return $this->partialView('admin.aid-disasters.create', compact('districts'));
     }
 
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         $validated = $request->validate([
             'district_id'       => 'nullable|exists:districts,id',
             'district_name'     => 'required|string|max:255',

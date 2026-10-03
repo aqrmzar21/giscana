@@ -33,6 +33,26 @@ class AidInventoryController extends Controller
         return $this->partialView('admin.aid-inventories.index', compact('inventories'));
     }
 
+    public function print(Request $request)
+    {
+        abort_if(!auth()->user()->can('export data'), 403);
+        $query = AidInventory::latest();
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('item_name', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%")
+                  ->orWhere('source', 'like', "%{$search}%");
+            });
+        }
+
+        $inventories = $query->get();
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.aid-inventories.pdf', compact('inventories'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->stream('laporan-stok-logistik-bantuan.pdf');
+    }
+
     public function create()
     {
         return $this->partialView('admin.aid-inventories.create');

@@ -74,7 +74,7 @@ Route::get('/api/nearest-evacuation-with-route', function (Request $request) {
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/admin', function () { return redirect()->route('dashboard'); });
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/dashboard/map', [MapController::class, 'dashboard'])->name('dashboard.map');
@@ -92,17 +92,21 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Admin routes - hanya untuk admin
-Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+// Admin routes - untuk admin, staff, pimpinan
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('disaster-zones/print', [\App\Http\Controllers\Admin\DisasterZoneController::class, 'print'])->name('disaster-zones.print');
     Route::resource('disaster-zones', \App\Http\Controllers\Admin\DisasterZoneController::class);
     Route::get('evacuation-routes/print', [\App\Http\Controllers\Admin\EvacuationRouteController::class, 'print'])->name('evacuation-routes.print');
     Route::resource('evacuation-routes', \App\Http\Controllers\Admin\EvacuationRouteController::class);
     Route::get('evacuation-facilities/print', [\App\Http\Controllers\Admin\EvacuationFacilityController::class, 'print'])->name('evacuation-facilities.print');
     Route::resource('evacuation-facilities', \App\Http\Controllers\Admin\EvacuationFacilityController::class);
+    Route::get('aid-disasters/print', [\App\Http\Controllers\Admin\AidDisasterController::class, 'print'])->name('aid-disasters.print');
     Route::resource('aid-disasters', \App\Http\Controllers\Admin\AidDisasterController::class);
+    Route::get('aid-distributions/print', [\App\Http\Controllers\Admin\AidDistributionController::class, 'print'])->name('aid-distributions.print');
     Route::resource('aid-distributions', \App\Http\Controllers\Admin\AidDistributionController::class);
+    Route::get('aid-inventories/print', [\App\Http\Controllers\Admin\AidInventoryController::class, 'print'])->name('aid-inventories.print');
     Route::resource('aid-inventories', \App\Http\Controllers\Admin\AidInventoryController::class);
+    Route::get('aid-beneficiaries/print', [\App\Http\Controllers\Admin\AidBeneficiaryController::class, 'print'])->name('aid-beneficiaries.print');
     Route::resource('aid-beneficiaries', \App\Http\Controllers\Admin\AidBeneficiaryController::class);
     Route::get('aid-recipients/print', [\App\Http\Controllers\Admin\AidRecipientController::class, 'print'])->name('aid-recipients.print');
     Route::resource('aid-recipients', \App\Http\Controllers\Admin\AidRecipientController::class);
