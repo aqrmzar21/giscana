@@ -1,6 +1,6 @@
 @extends('layouts.landing-map')
 
-@section('title', 'Peta Interaktif - Giscana')
+@section('title', 'Peta Interaktif | Giscana')
 
 @include('map.partials.map-styles', ['mapUiVariant' => 'landing-fs'])
 

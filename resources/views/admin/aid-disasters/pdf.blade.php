@@ -97,7 +97,7 @@
 
     @php
         $totalTarget = $aidDisasters->sum('total_recipients');
-        $totalTersalur = $aidDisasters->sum('distributed_aid');
+        $totalTersalur = $aidDisasters->sum('total_received');
         $totalKecamatan = $aidDisasters->count();
         $overallPct = $totalTarget > 0 ? round(($totalTersalur / $totalTarget) * 100, 1) : 0;
     @endphp

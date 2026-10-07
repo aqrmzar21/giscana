@@ -8,10 +8,13 @@ use App\Models\DisasterZone;
 use App\Models\EvacuationRoute;
 use App\Models\EvacuationFacility;
 use App\Models\AidDisaster;
+use App\Models\AidBeneficiary;
+use App\Models\AidInventory;
 
 class HomeController extends Controller
 {
     use PartialRenderable;
+
     /**
      * Display the landing page
      */
@@ -23,6 +26,8 @@ class HomeController extends Controller
             'evacuation_routes' => EvacuationRoute::active()->count(),
             'evacuation_facilities' => EvacuationFacility::active()->count(),
             'aid_disasters' => AidDisaster::active()->count(),
+            'total_beneficiaries' => AidBeneficiary::count(),
+            'remaining_stock' => AidInventory::sum('remaining_stock'),
         ];
 
         // Get recent disaster zones for showcase
