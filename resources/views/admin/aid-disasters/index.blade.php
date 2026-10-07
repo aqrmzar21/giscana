@@ -1,8 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', 'Statistik & Laporan Bantuan Bencana - Admin')
+@section('title', 'Statistik Bantuan Bencana - Admin')
+@section('page-title', 'Statistik & Laporan Bantuan Bencana')
 
-@section('page-title', 'Statistik Bantuan Bencana per Kecamatan')
 
 @section('breadcrumb')
 <li class="inline-flex items-center">
@@ -123,7 +123,7 @@
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <span>🍩</span> Kategori Logistik
+                        <span>Kategori Logistik</span> 
                     </h3>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Proporsi jenis barang bantuan</p>
                 </div>
@@ -176,12 +176,12 @@
                 </form>
 
                 @can('export data')
-                <a href="{{ route('admin.aid-disasters.print', ['year' => $selectedYear]) }}" target="_blank" data-no-pjax
+                <a href="{{ route('admin.aid-disasters.print', ['type' => 'district', 'year' => $selectedYear]) }}" target="_blank" data-no-pjax
                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
-                    <span>Cetak Laporan PDF (Tahun {{ $selectedYear !== 'all' ? $selectedYear : 'Semua' }})</span>
+                    <span>Cetak PDF Rekap Kecamatan</span>
                 </a>
                 @endcan
             </div>
@@ -194,8 +194,10 @@
                     <tr>
                         <th scope="col" class="py-3.5 px-4 text-center w-12">No</th>
                         <th scope="col" class="py-3.5 px-4">Kecamatan</th>
-                        <th scope="col" class="py-3.5 px-4 text-center">Target Penerima (KK)</th>
                         <th scope="col" class="py-3.5 px-4 text-center">Bantuan Tersalur ({{ $selectedYear !== 'all' ? 'Tahun ' . $selectedYear : 'Total' }})</th>
+                        <!-- <th scope="col" class="py-3.5 px-4 text-center">Jumlah Warga (KK)</th> -->
+                        <th scope="col" class="py-3.5 px-4 text-center">Jumlah Penerima (KK)</th>
+                        <th scope="col" class="py-3.5 px-4 text-center">Jumlah Warga Belum Menerima (KK)</th>
                         <th scope="col" class="py-3.5 px-4">Progres Penyaluran</th>
                         <th scope="col" class="py-3.5 px-4 text-center">Aksi</th>
                     </tr>
@@ -203,10 +205,18 @@
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700/60 bg-white dark:bg-gray-800">
                     @forelse($aidDisasters as $aid)
                         @php
-                            $yearDistributed = isset($villageBreakdown[$aid->id]) ? $villageBreakdown[$aid->id]['year_received'] : $aid->total_received;
-                            $percentage = $aid->total_recipients > 0 ? min(100, round(($yearDistributed / $aid->total_recipients) * 100, 1)) : 0;
+                            // 1. Ambil jumlah KK yang sudah menerima (mendukung filter tahun jika dipilih)
+                            $receivedCount = isset($villageBreakdown[$aid->id]) ? $villageBreakdown[$aid->id]['year_recipients'] : $aid->total_received;
+
+                            // 2. Ambil total unit logistik tersalurkan
+                            $yearDistributed = isset($villageBreakdown[$aid->id]) ? $villageBreakdown[$aid->id]['year_received'] : $aid->distributed_aid;
+
+                            // 3. Hitung persentase: Total KK Menerima / Total Target KK Warga
+                            $percentage = $aid->total_recipients > 0 ? min(100, round(($receivedCount / $aid->total_recipients) * 100, 1)) : 0;
+
+                            // 4. Warna Progress Bar & Badge
                             $barColor   = $percentage >= 80 ? 'bg-emerald-500' : ($percentage >= 40 ? 'bg-indigo-500' : 'bg-amber-500');
-                            $badgeColor = $percentage >= 80 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : ($percentage >= 40 ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300');
+                            $badgeColor = $percentage >= 80 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : ($percentage >= 40 ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300': 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300');
                         @endphp
                         <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-700/30 transition-colors">
                             <td class="py-4 px-4 text-center font-medium text-gray-500 dark:text-gray-400">
@@ -218,11 +228,17 @@
                                     <span>Kecamatan {{ $aid->district_name }}</span>
                                 </div>
                             </td>
-                            <td class="py-4 px-4 text-center font-semibold text-gray-700 dark:text-gray-300">
-                                {{ number_format($aid->total_recipients) }} KK
-                            </td>
                             <td class="py-4 px-4 text-center font-extrabold text-emerald-600 dark:text-emerald-400">
                                 {{ number_format($yearDistributed) }} Unit
+                            </td>
+                            <!-- <td class="py-4 px-4 text-center font-semibold text-gray-700 dark:text-gray-300">
+                                {{ number_format($aid->total_recipients) }} KK
+                            </td> -->
+                            <td class="py-4 px-4 text-center font-semibold text-gray-700 dark:text-gray-300">
+                                {{ number_format($aid->total_received) }} Jiwa
+                            </td>
+                            <td class="py-4 px-4 text-center font-semibold text-gray-700 dark:text-gray-300">
+                                {{ number_format($aid->total_recipients - $aid->total_received) }} Jiwa
                             </td>
                             <td class="py-4 px-4 min-w-[200px]">
                                 <div class="flex items-center gap-3">
@@ -296,12 +312,12 @@
                 </form>
 
                 @can('export data')
-                <a href="{{ route('admin.aid-disasters.print', ['year' => $selectedYear]) }}" target="_blank" data-no-pjax
+                <a href="{{ route('admin.aid-disasters.print', ['type' => 'village', 'year' => $selectedYear]) }}" target="_blank" data-no-pjax
                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
-                    <span>Cetak PDF Rinci Desa</span>
+                    <span>Cetak PDF Semua Desa</span>
                 </a>
                 @endcan
             </div>
@@ -337,7 +353,19 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2">
+                            @can('export data')
+                            <a href="{{ route('admin.aid-disasters.print', ['type' => 'village', 'year' => $selectedYear, 'disaster_id' => $aid->id]) }}" 
+                               target="_blank" data-no-pjax @click.stop
+                               title="Cetak PDF khusus Laporan Desa Kecamatan {{ $aid->district_name }}"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98]">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                </svg>
+                                <span>Cetak PDF Desa</span>
+                            </a>
+                            @endcan
+
                             <span class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                                 <span x-show="!open">Lihat Detail Desa &darr;</span>
                                 <span x-show="open">Sembunyikan &uarr;</span>
@@ -484,11 +512,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: [{
                     data: categoryValues,
                     backgroundColor: [
-                        '#6366f1', // Indigo
-                        '#10b981', // Emerald
-                        '#f59e0b', // Amber
+                        '#0d11faff', // Indigo
+                        '#19acc0ff', // Emerald
+                        '#f3ff51ff', // Amber
                         '#ec4899', // Pink
-                        '#3b82f6', // Blue
+                        '#c40000ff', // Blue
                         '#8b5cf6'  // Purple
                     ],
                     borderWidth: 2,
@@ -504,7 +532,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         labels: { color: textColor, font: { family: 'Figtree', size: 11 } }
                     }
                 },
-                cutout: '68%'
+                cutout: '58%'
             }
         });
     }

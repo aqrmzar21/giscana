@@ -313,7 +313,7 @@
                 <thead>
                     <tr class="text-xs text-gray-400 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700/60">
                         <th class="pb-3 text-left font-semibold">Kecamatan</th>
-                        <th class="pb-3 text-center font-semibold">Target / Tersalur</th>
+                        <th class="pb-3 text-center font-semibold">Tersalur / Target</th>
                         <th class="pb-3 text-left font-semibold">Progres Penyaluran</th>
                     </tr>
                 </thead>
@@ -615,54 +615,55 @@
 @endif
 @if($inventories->isNotEmpty())
 <script>
-    (function () {
-        const ctx = document.getElementById('logisticPieChart');
-        if (!ctx) return;
+(function () {
+    const ctx = document.getElementById('logisticPieChart');
+    if (!ctx) return;
 
-        // Ambil label dan data dari koleksi inventories
-        const labels  = @json($inventories->take(5)->pluck('item_name'));
-        const data    = @json($inventories->take(5)->pluck('remaining_stock'));
-        const colors  = ['#6366f1','#22c55e','#f59e0b','#ef4444','#14b8a6'];
-        const hovers  = ['#4f46e5','#16a34a','#d97706','#dc2626','#0d9488'];
+    // Ambil label dan data dari koleksi inventories
+    const labels  = @json($inventories->take(5)->pluck('item_name'));
+    const data    = @json($inventories->take(5)->pluck('remaining_stock'));
+    const colors  = ['#6366f1','#22c55e','#f59e0b','#ef4444','#14b8a6'];
+    const hovers  = ['#4f46e5','#16a34a','#d97706','#dc2626','#0d9488'];
 
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: data,
-                    backgroundColor: colors,
-                    hoverBackgroundColor: hovers,
-                    borderWidth: 2,
-                    borderColor: '#fff',
-                    hoverOffset: 8,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                cutout: '62%',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const pct   = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
-                                return ` ${context.label}: ${context.parsed.toLocaleString()} (${pct}%)`;
-                            }
+    new Chart(ctx, {
+        type: 'pie', // Gunakan 'doughnut' jika ingin menggunakan opsi cutout
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors,
+                hoverBackgroundColor: hovers,
+                borderWidth: 2,
+                borderColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+                hoverOffset: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        // Menggunakan callback 'formattedValue' atau menyesuaikan baris 'label'
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct   = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                            // Format ini mencegah label diulang oleh bawaan Chart.js
+                            return ` Stok: ${context.parsed.toLocaleString()} (${pct}%)`;
                         }
                     }
-                },
-                animation: {
-                    animateScale: true,
-                    animateRotate: true,
-                    duration: 800,
-                    easing: 'easeInOutQuart',
                 }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 800,
+                easing: 'easeInOutQuart',
             }
-        });
-    })();
+        }
+    });
+})();
 </script>
 @endif
 @endsection

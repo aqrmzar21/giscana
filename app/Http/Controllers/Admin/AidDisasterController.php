@@ -88,7 +88,7 @@ class AidDisasterController extends Controller
             // Data untuk Bar Chart
             $chartLabels[] = $disaster->district_name;
             $chartTargets[] = (int) $disaster->total_recipients;
-            $chartDistributed[] = (int) ($selectedYear !== 'all' ? $distDistributedSum : ($disaster->total_received ?? $distDistributedSum));
+            $chartDistributed[] = (int) ($selectedYear !== 'all' ? $distDistributedSum : ($disaster->distributed_aid ?? $distDistributedSum));
         }
 
         $totalVillagesReached = count(array_unique($allVillageKeys));
@@ -147,8 +147,15 @@ class AidDisasterController extends Controller
     {
         abort_if(!auth()->user()->can('export data'), 403);
         
+        $type = $request->input('type', 'district'); // 'district' or 'village'
         $selectedYear = $request->input('year', 'all');
-        $aidDisasters = AidDisaster::orderBy('district_name')->get();
+        $disasterId = $request->input('disaster_id');
+
+        $query = AidDisaster::query();
+        if ($disasterId) {
+            $query->where('id', $disasterId);
+        }
+        $aidDisasters = $query->orderBy('district_name')->get();
 
         $villageBreakdown = [];
         $totalDistributedSum = 0;
@@ -183,17 +190,23 @@ class AidDisasterController extends Controller
             $totalRecipientsCount += $distRecipientsCount;
         }
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.aid-disasters.pdf', compact(
+        $viewName = ($type === 'village') ? 'admin.aid-disasters.pdf-village' : 'admin.aid-disasters.pdf-district';
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView($viewName, compact(
             'aidDisasters', 
             'villageBreakdown', 
             'selectedYear',
             'totalDistributedSum',
-            'totalRecipientsCount'
+            'totalRecipientsCount',
+            'type',
+            'disasterId'
         ))->setPaper('a4', 'landscape');
 
-        $filename = $selectedYear !== 'all' 
-            ? "laporan-bantuan-bencana-{$selectedYear}.pdf" 
-            : "laporan-bantuan-bencana-semua-tahun.pdf";
+        $distName = ($disasterId && $aidDisasters->first()) 
+            ? \Illuminate\Support\Str::slug($aidDisasters->first()->district_name) 
+            : 'semua-kecamatan';
+
+        $filename = "laporan-bantuan-{$type}-{$distName}-{$selectedYear}.pdf";
 
         return $pdf->stream($filename);
     }

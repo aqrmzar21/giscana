@@ -66,8 +66,10 @@
 
         {{-- PROGRESS BANNER --}}
         @php
-            $percentage = $aidDisaster->total_recipients > 0 ? min(100, round(($aidDisaster->distributed_aid / $aidDisaster->total_recipients) * 100, 1)) : 0;
-            $barColor   = $percentage >= 80 ? 'bg-emerald-500' : ($percentage >= 40 ? 'bg-indigo-500' : 'bg-amber-500');
+            // Persentase dihitung dari KK yang sudah menerima (total_received) dibanding Target KK (total_recipients)
+            $percentage = $aidDisaster->total_recipients > 0 ? min(100, round(($aidDisaster->total_received / $aidDisaster->total_recipients) * 100, 1)) : 0;
+                
+            $barColor = $percentage >= 80 ? 'bg-emerald-500' : ($percentage >= 40 ? 'bg-indigo-500' : 'bg-amber-500');
         @endphp
         <div class="mt-6 p-4 rounded-xl bg-gray-50 dark:bg-gray-700/40 border border-gray-100 dark:border-gray-700/60">
             <div class="flex items-center justify-between text-xs font-bold mb-2 text-gray-700 dark:text-gray-300">

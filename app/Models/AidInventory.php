@@ -13,9 +13,9 @@ class AidInventory extends Model
     protected $fillable = [
         'item_name',
         'category',
-        'date_stock',
         'source',
         'initial_stock',
+        'date_stock',
         'remaining_stock',
         'is_active',
     ];
