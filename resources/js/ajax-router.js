@@ -5,9 +5,10 @@
  */
 
 const PJAX = (() => {
-    let isLoading = false;
     let progressTimer = null;
     let currentUrl = window.location.href;
+    let navToken = 0;            // id navigasi terbaru (mencegah render respons lama)
+    let abortController = null;  // untuk membatalkan request yang sudah tidak relevan
 
     const getProgressBar = () => document.getElementById('pjax-progress');
     const getPageContent = () => document.getElementById('page-content');
@@ -135,7 +136,7 @@ const PJAX = (() => {
         });
     }
 
-    function renderContent(html, url) {
+    function renderContent(html, url, token) {
         const pageContent = getPageContent();
         if (!pageContent) {
             window.location.href = url;
@@ -166,6 +167,9 @@ const PJAX = (() => {
         pageContent.style.transition = 'opacity 0.12s ease';
 
         setTimeout(() => {
+            // Sudah ada navigasi yang lebih baru -> abaikan render ini
+            if (token !== navToken) return;
+
             pageContent.innerHTML = newContent;
             pageContent.style.opacity = '1';
 
@@ -192,14 +196,16 @@ const PJAX = (() => {
     }
 
     async function navigate(url, pushState = true) {
-        if (isLoading) return;
-
         // Skip jika URL persis sama dengan lokasi saat ini (mencegah loop)
         if (url === window.location.href && pushState) {
             return;
         }
 
-        isLoading = true;
+        // Batalkan request sebelumnya; navigasi terbaru selalu menang
+        if (abortController) abortController.abort();
+        abortController = new AbortController();
+        const token = ++navToken;
+
         startProgress();
 
         try {
@@ -210,6 +216,8 @@ const PJAX = (() => {
                     'Accept': 'text/html',
                 },
                 credentials: 'same-origin',
+                cache: 'no-store',
+                signal: abortController.signal,
             });
 
             if (!response.ok) {
@@ -219,23 +227,25 @@ const PJAX = (() => {
             const finalUrl = response.url || url;
             const html = await response.text();
 
+            if (token !== navToken) return; // sudah digantikan navigasi lain
+
             finishProgress();
 
             if (pushState) {
                 window.history.pushState({ pjax: true, url: finalUrl }, '', finalUrl);
-                currentUrl = finalUrl;
-            } else {
-                currentUrl = finalUrl;
+            } else if (finalUrl !== window.location.href) {
+                // Popstate yang di-redirect server: sinkronkan URL tanpa menambah history
+                window.history.replaceState({ pjax: true, url: finalUrl }, '', finalUrl);
             }
+            currentUrl = finalUrl;
 
-            renderContent(html, finalUrl);
+            renderContent(html, finalUrl, token);
 
         } catch (err) {
+            if (err.name === 'AbortError') return; // dibatalkan oleh navigasi baru
             console.warn('[PJAX] Navigasi gagal, fallback ke full reload:', err.message);
             failProgress();
             window.location.href = url;
-        } finally {
-            isLoading = false;
         }
     }
 
@@ -286,6 +296,9 @@ const PJAX = (() => {
         const url = window.location.href;
         if (event.state?.pjax) {
             navigate(url, false);
+        } else if (event.state === null && url.split('#')[0] === currentUrl.split('#')[0]) {
+            // Hanya perubahan hash (#anchor) -> jangan reload
+            return;
         } else {
             window.location.reload();
         }
