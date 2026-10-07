@@ -14,37 +14,103 @@ class AidDisasterController extends Controller
 
     public function index(Request $request)
     {
-        $query = AidDisaster::query();
+        // 1. Ambil daftar tahun unik dari data transaksi & master disaster
+        $distributionYears = AidDistribution::selectRaw('YEAR(distribution_date) as yr')
+            ->whereNotNull('distribution_date')
+            ->distinct()
+            ->pluck('yr');
 
-        if ($request->filled('search')) {
-            $query->where('district_name', 'like', '%' . $request->search . '%');
+        $disasterYears = AidDisaster::selectRaw('YEAR(created_at) as yr')
+            ->whereNotNull('created_at')
+            ->distinct()
+            ->pluck('yr');
+
+        $availableYears = $distributionYears->merge($disasterYears)
+            ->filter()
+            ->unique()
+            ->sortDesc()
+            ->values()
+            ->toArray();
+
+        if (empty($availableYears)) {
+            $availableYears = [(int) date('Y')];
         }
+
+        // Selected year filter (default 'all' atau tahun spesifik)
+        $selectedYear = $request->input('year', 'all');
+
+        // Query master kecamatan
+        $query = AidDisaster::query();
 
         $aidDisasters = $query->orderBy('district_name')->paginate(15)->withQueryString();
 
-        // Overall statistics
-        $totalRecipientsSum  = AidDisaster::sum('total_recipients');
-        $totalDistributedSum = AidDisaster::sum('distributed_aid');
-        $overallPercentage   = $totalRecipientsSum > 0 ? round(($totalDistributedSum / $totalRecipientsSum) * 100, 1) : 0;
-
+        // 2. Kalkulasi breakdown desa & statistik terfilter tahun
         $villageBreakdown = [];
+        $districtYearStats = [];
+        $totalDistributedSum = 0;
+        $totalBeneficiariesCount = 0;
+        $totalVillagesReached = 0;
+        $allVillageKeys = [];
+
         foreach ($aidDisasters as $disaster) {
-            $records = AidDistribution::with(['beneficiary.village', 'aidInventory'])
-                ->where('aid_disaster_id', $disaster->id)
-                ->get()
-                ->groupBy(fn($d) => $d->village?->yard ?? $d->village?->full_name ?? 'Desa Lainnya');
+            $distQuery = AidDistribution::with(['beneficiary.village', 'aidInventory'])
+                ->where('aid_disaster_id', $disaster->id);
+
+            if ($selectedYear !== 'all') {
+                $distQuery->whereYear('distribution_date', $selectedYear);
+            }
+
+            $distributions = $distQuery->get();
+
+            $groupedByVillage = $distributions->groupBy(function ($d) {
+                $v = $d->beneficiary?->village;
+                return $v?->full_name ?? $v?->name ?? 'Desa Lainnya';
+            });
+
+            $distDistributedSum = $distributions->sum('quantity_received');
+            $distRecipientsCount = $distributions->pluck('beneficiary_id')->unique()->count();
 
             $villageBreakdown[$disaster->id] = [
-                'villages'       => $records,
-                'total_villages' => $records->count(),
+                'villages'       => $groupedByVillage,
+                'total_villages' => $groupedByVillage->count(),
+                'year_received'  => $distDistributedSum,
+                'year_recipients'=> $distRecipientsCount,
             ];
+
+            $totalDistributedSum += $distDistributedSum;
+            $totalBeneficiariesCount += $distRecipientsCount;
+
+            foreach ($groupedByVillage->keys() as $vName) {
+                $allVillageKeys[] = $vName;
+            }
+        }
+
+        $totalVillagesReached = count(array_unique($allVillageKeys));
+        $totalRecipientsSum  = AidDisaster::sum('total_recipients');
+
+        if ($selectedYear !== 'all') {
+            $overallPercentage = $totalRecipientsSum > 0 
+                ? round(($totalBeneficiariesCount / $totalRecipientsSum) * 100, 1) 
+                : 0;
+        } else {
+            $totalDistributedAll = AidDisaster::sum('distributed_aid');
+            $overallPercentage   = $totalRecipientsSum > 0 
+                ? round(($totalDistributedAll / $totalRecipientsSum) * 100, 1) 
+                : 0;
+            if ($totalDistributedSum === 0) {
+                $totalDistributedSum = $totalDistributedAll;
+            }
         }
 
         return $this->partialView('admin.aid-disasters.index', compact(
             'aidDisasters',
             'villageBreakdown',
+            'availableYears',
+            'selectedYear',
             'totalRecipientsSum',
             'totalDistributedSum',
+            'totalBeneficiariesCount',
+            'totalVillagesReached',
             'overallPercentage'
         ));
     }
@@ -52,17 +118,56 @@ class AidDisasterController extends Controller
     public function print(Request $request)
     {
         abort_if(!auth()->user()->can('export data'), 403);
-        $query = AidDisaster::query();
+        
+        $selectedYear = $request->input('year', 'all');
+        $aidDisasters = AidDisaster::orderBy('district_name')->get();
 
-        if ($search = $request->input('search')) {
-            $query->where('district_name', 'like', "%{$search}%");
+        $villageBreakdown = [];
+        $totalDistributedSum = 0;
+        $totalRecipientsCount = 0;
+
+        foreach ($aidDisasters as $disaster) {
+            $distQuery = AidDistribution::with(['beneficiary.village', 'aidInventory'])
+                ->where('aid_disaster_id', $disaster->id);
+
+            if ($selectedYear !== 'all') {
+                $distQuery->whereYear('distribution_date', $selectedYear);
+            }
+
+            $distributions = $distQuery->get();
+
+            $groupedByVillage = $distributions->groupBy(function ($d) {
+                $v = $d->beneficiary?->village;
+                return $v?->full_name ?? $v?->name ?? 'Desa Lainnya';
+            });
+
+            $distDistributedSum = $distributions->sum('quantity_received');
+            $distRecipientsCount = $distributions->pluck('beneficiary_id')->unique()->count();
+
+            $villageBreakdown[$disaster->id] = [
+                'villages'       => $groupedByVillage,
+                'total_villages' => $groupedByVillage->count(),
+                'year_received'  => $distDistributedSum,
+                'year_recipients'=> $distRecipientsCount,
+            ];
+
+            $totalDistributedSum += $distDistributedSum;
+            $totalRecipientsCount += $distRecipientsCount;
         }
 
-        $aidDisasters = $query->orderBy('district_name')->get();
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.aid-disasters.pdf', compact('aidDisasters'))
-            ->setPaper('a4', 'landscape');
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.aid-disasters.pdf', compact(
+            'aidDisasters', 
+            'villageBreakdown', 
+            'selectedYear',
+            'totalDistributedSum',
+            'totalRecipientsCount'
+        ))->setPaper('a4', 'landscape');
 
-        return $pdf->stream('laporan-bantuan-bencana-kecamatan.pdf');
+        $filename = $selectedYear !== 'all' 
+            ? "laporan-bantuan-bencana-{$selectedYear}.pdf" 
+            : "laporan-bantuan-bencana-semua-tahun.pdf";
+
+        return $pdf->stream($filename);
     }
 
     public function create()
@@ -103,13 +208,15 @@ class AidDisasterController extends Controller
 
     public function show(AidDisaster $aidDisaster)
     {
-        // Fetch distributions & village grouping for this disaster
         $distributions = AidDistribution::with(['beneficiary', 'aidInventory', 'village', 'user'])
             ->where('aid_disaster_id', $aidDisaster->id)
             ->latest('distribution_date')
             ->get();
 
-        $villageStats = $distributions->groupBy(fn($d) => $d->village?->yard ?? $d->village?->full_name ?? 'Desa Lainnya');
+        $villageStats = $distributions->groupBy(function ($d) {
+            $v = $d->beneficiary?->village;
+            return $v?->full_name ?? $v?->name ?? 'Desa Lainnya';
+        });
 
         return $this->partialView('admin.aid-disasters.show', compact('aidDisaster', 'distributions', 'villageStats'));
     }

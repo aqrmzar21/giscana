@@ -113,3 +113,97 @@ function syncDistrictName(select) {
 }
 </script>
 @endsection
+
+
+{{-- INTERACTIVE BREAKDOWN PER DESA (ACCORDION CARDS) --}}
+<div class="mt-8 space-y-4">
+    <div class="flex items-center justify-between">
+        <div>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Breakdown Penyaluran Bantuan per Desa</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Rincian desa penerima logistik di setiap kecamatan</p>
+        </div>
+        <span class="text-xs font-semibold px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">
+            Data Rinci Desa
+        </span>
+    </div>
+
+    @foreach($aidDisasters as $aid)
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700/60 overflow-hidden transition-all" x-data="{ open: false }">
+            {{-- Accordion Header --}}
+            <div @click="open = !open" class="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors select-none">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-bold text-gray-900 dark:text-white">
+                            Kecamatan {{ $aid->district_name }}
+                        </h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            {{ number_format($aid->total_received ?? 0) }} Unit Bantuan Tersalurkan &bull; 
+                            <span class="font-semibold text-indigo-600 dark:text-indigo-400">
+                                {{ $villageBreakdown[$aid->id]['total_villages'] ?? 0 }} Desa Terjangkau
+                            </span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-semibold px-3 py-1 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                        <span x-show="!open">Buka Desa &darr;</span>
+                        <span x-show="open">Tutup &uarr;</span>
+                    </span>
+                    <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </div>
+
+            {{-- Accordion Content Table --}}
+            <div x-show="open" x-collapse class="border-t border-gray-100 dark:border-gray-700/60 p-4 sm:p-5 bg-gray-50/50 dark:bg-gray-800/60">
+                @php
+                    $villages = $villageBreakdown[$aid->id]['villages'] ?? [];
+                @endphp
+
+                @if(empty($villages) || count($villages) === 0)
+                    <p class="text-xs text-gray-400 dark:text-gray-500 text-center py-4">Belum ada rincian transaksi penyaluran per desa di kecamatan ini.</p>
+                @else
+                    <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
+                        <table class="w-full text-xs text-left bg-white dark:bg-gray-800">
+                            <thead class="bg-gray-100 dark:bg-gray-700/80 text-gray-600 dark:text-gray-300 uppercase tracking-wider font-semibold">
+                                <tr>
+                                    <th class="py-2.5 px-3 text-center w-10">No</th>
+                                    <th class="py-2.5 px-3">Nama Desa</th>
+                                    <th class="py-2.5 px-3 text-center">Jumlah Penerima (KK)</th>
+                                    <th class="py-2.5 px-3 text-center">Total Barang Tersalur</th>
+                                    <th class="py-2.5 px-3">Jenis Bantuan Diterima</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 dark:divide-gray-700/50">
+                                @foreach($villages as $villageName => $records)
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                                        <td class="py-2.5 px-3 text-center text-gray-500 dark:text-gray-400 font-medium">{{ $loop->iteration }}</td>
+                                        <td class="py-2.5 px-3 font-bold text-gray-800 dark:text-gray-200">{{ $villageName }}</td>
+                                        <td class="py-2.5 px-3 text-center font-semibold text-gray-700 dark:text-gray-300">{{ $records->count() }} KK</td>
+                                        <td class="py-2.5 px-3 text-center font-bold text-emerald-600 dark:text-emerald-400">{{ number_format($records->sum('quantity_received')) }} Unit</td>
+                                        <td class="py-2.5 px-3 text-gray-600 dark:text-gray-400">
+                                            <div class="flex flex-wrap gap-1">
+                                                @foreach($records->pluck('aidInventory.item_name')->filter()->unique() as $itemName)
+                                                    <span class="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-[11px] font-medium">
+                                                        {{ $itemName }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endforeach
+</div>
