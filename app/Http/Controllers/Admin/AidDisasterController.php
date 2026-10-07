@@ -41,16 +41,17 @@ class AidDisasterController extends Controller
 
         // Query master kecamatan
         $query = AidDisaster::query();
-
         $aidDisasters = $query->orderBy('district_name')->paginate(15)->withQueryString();
 
         // 2. Kalkulasi breakdown desa & statistik terfilter tahun
         $villageBreakdown = [];
-        $districtYearStats = [];
         $totalDistributedSum = 0;
         $totalBeneficiariesCount = 0;
-        $totalVillagesReached = 0;
         $allVillageKeys = [];
+
+        $chartLabels = [];
+        $chartTargets = [];
+        $chartDistributed = [];
 
         foreach ($aidDisasters as $disaster) {
             $distQuery = AidDistribution::with(['beneficiary.village', 'aidInventory'])
@@ -83,6 +84,11 @@ class AidDisasterController extends Controller
             foreach ($groupedByVillage->keys() as $vName) {
                 $allVillageKeys[] = $vName;
             }
+
+            // Data untuk Bar Chart
+            $chartLabels[] = $disaster->district_name;
+            $chartTargets[] = (int) $disaster->total_recipients;
+            $chartDistributed[] = (int) ($selectedYear !== 'all' ? $distDistributedSum : ($disaster->total_received ?? $distDistributedSum));
         }
 
         $totalVillagesReached = count(array_unique($allVillageKeys));
@@ -102,6 +108,23 @@ class AidDisasterController extends Controller
             }
         }
 
+        // 3. Data untuk Donut/Pie Chart (Kategori Barang Logistik)
+        $categoryDistQuery = AidDistribution::with('aidInventory');
+        if ($selectedYear !== 'all') {
+            $categoryDistQuery->whereYear('distribution_date', $selectedYear);
+        }
+        $categoryStats = $categoryDistQuery->get()
+            ->groupBy(fn($d) => $d->aidInventory?->category ?? $d->aidInventory?->item_name ?? 'Logistik Umum')
+            ->map(fn($group) => $group->sum('quantity_received'));
+
+        $categoryLabels = $categoryStats->keys()->toArray();
+        $categoryValues = $categoryStats->values()->toArray();
+
+        if (empty($categoryLabels)) {
+            $categoryLabels = ['Sembako', 'Obat-obatan', 'Pakaian', 'Material'];
+            $categoryValues = [0, 0, 0, 0];
+        }
+
         return $this->partialView('admin.aid-disasters.index', compact(
             'aidDisasters',
             'villageBreakdown',
@@ -111,7 +134,12 @@ class AidDisasterController extends Controller
             'totalDistributedSum',
             'totalBeneficiariesCount',
             'totalVillagesReached',
-            'overallPercentage'
+            'overallPercentage',
+            'chartLabels',
+            'chartTargets',
+            'chartDistributed',
+            'categoryLabels',
+            'categoryValues'
         ));
     }
 

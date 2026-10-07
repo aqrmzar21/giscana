@@ -98,6 +98,45 @@
         </div>
     </div>
 
+    {{-- SECTION BARU: VISUALISASI CHARTS PIMPINAN (BAR CHART & DONUT CHART) --}}
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {{-- Chart 1: Bar Chart Perbandingan Penyaluran per Kecamatan --}}
+        <div class="lg:col-span-8 bg-white dark:bg-gray-800 rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 dark:border-gray-700/60">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span>📈</span> Grafik Perbandingan Penyaluran Logistik per Kecamatan
+                    </h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Perbandingan Target KK vs Logistik Tersalurkan (Tahun {{ $selectedYear !== 'all' ? $selectedYear : 'Semua Tahun' }})</p>
+                </div>
+                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">
+                    Bar Chart
+                </span>
+            </div>
+            <div class="relative h-64 sm:h-72 w-full">
+                <canvas id="disasterBarChart"></canvas>
+            </div>
+        </div>
+
+        {{-- Chart 2: Donut Chart Distribusi Kategori Bantuan --}}
+        <div class="lg:col-span-4 bg-white dark:bg-gray-800 rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 dark:border-gray-700/60">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span>🍩</span> Kategori Logistik
+                    </h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Proporsi jenis barang bantuan</p>
+                </div>
+                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-50 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300">
+                    Donut Chart
+                </span>
+            </div>
+            <div class="relative h-64 sm:h-72 w-full flex items-center justify-center">
+                <canvas id="categoryDonutChart"></canvas>
+            </div>
+        </div>
+    </div>
+
     {{-- MAIN STATISTICAL TABLE & YEAR FILTER CARD --}}
     <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700/60 rounded-2xl overflow-hidden">
         
@@ -114,7 +153,7 @@
             </div>
 
             <div class="flex items-center gap-3 flex-wrap">
-                {{-- Form Filter Tahun (Ganti Form Pencarian) --}}
+                {{-- Form Filter Tahun --}}
                 <form method="GET" action="{{ route('admin.aid-disasters.index') }}" class="flex items-center gap-2">
                     <label for="yearSelect" class="text-xs font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap">
                         Filter Tahun:
@@ -228,7 +267,7 @@
         @endif
     </div>
 
-    {{-- EXECUTIVE BREAKDOWN PER DESA (EXECUTIVE LEADERSHIP MONITORING SECTION) --}}
+    {{-- EXECUTIVE BREAKDOWN PER DESA WITH DEDICATED YEAR FILTER & PRINT PDF --}}
     <div class="mt-8 space-y-5">
         <div class="bg-gradient-to-r from-indigo-900 via-slate-900 to-slate-900 text-white p-6 rounded-2xl shadow-lg border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
@@ -241,15 +280,30 @@
                 </p>
             </div>
             
-            <div class="flex items-center gap-3">
-                <div class="bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700 text-center">
-                    <span class="block text-[10px] uppercase font-bold text-slate-400">Total Desa Terjangkau</span>
-                    <span class="text-lg font-extrabold text-emerald-400">{{ $totalVillagesReached }} Desa</span>
-                </div>
-                <div class="bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700 text-center">
-                    <span class="block text-[10px] uppercase font-bold text-slate-400">KK Penerima</span>
-                    <span class="text-lg font-extrabold text-blue-400">{{ number_format($totalBeneficiariesCount) }} KK</span>
-                </div>
+            <div class="flex items-center gap-3 flex-wrap">
+                {{-- Form Filter Tahun Khusus Section Breakdown Desa --}}
+                <form method="GET" action="{{ route('admin.aid-disasters.index') }}" class="flex items-center gap-2 bg-slate-800/90 px-3 py-2 rounded-xl border border-slate-700">
+                    <label for="villageYearSelect" class="text-xs font-bold text-slate-300 whitespace-nowrap">Tahun:</label>
+                    <select id="villageYearSelect" name="year" onchange="this.form.submit()" 
+                            class="py-1 px-2.5 text-xs font-bold bg-slate-900 border border-slate-700 rounded-lg text-white cursor-pointer focus:ring-1 focus:ring-indigo-400">
+                        <option value="all" {{ (string)$selectedYear === 'all' ? 'selected' : '' }}>Semua Tahun</option>
+                        @foreach($availableYears as $year)
+                            <option value="{{ $year }}" {{ (string)$selectedYear === (string)$year ? 'selected' : '' }}>
+                                {{ $year }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+
+                @can('export data')
+                <a href="{{ route('admin.aid-disasters.print', ['year' => $selectedYear]) }}" target="_blank" data-no-pjax
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>Cetak PDF Rinci Desa</span>
+                </a>
+                @endcan
             </div>
         </div>
 
@@ -355,3 +409,105 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const isDark = document.documentElement.classList.contains('dark');
+    const textColor = isDark ? '#94a3b8' : '#64748b';
+    const gridColor = isDark ? 'rgba(51, 65, 85, 0.4)' : 'rgba(226, 232, 240, 0.8)';
+
+    // Data dari Controller
+    const chartLabels = @json($chartLabels ?? []);
+    const chartTargets = @json($chartTargets ?? []);
+    const chartDistributed = @json($chartDistributed ?? []);
+
+    const categoryLabels = @json($categoryLabels ?? []);
+    const categoryValues = @json($categoryValues ?? []);
+
+    // 1. BAR CHART: Perbandingan Target KK vs Logistik Tersalurkan per Kecamatan
+    const barCtx = document.getElementById('disasterBarChart');
+    if (barCtx) {
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [
+                    {
+                        label: 'Target KK',
+                        data: chartTargets,
+                        backgroundColor: isDark ? 'rgba(99, 102, 241, 0.7)' : 'rgba(79, 70, 229, 0.85)',
+                        borderColor: '#6366f1',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                    },
+                    {
+                        label: 'Logistik Tersalurkan (Unit)',
+                        data: chartDistributed,
+                        backgroundColor: isDark ? 'rgba(16, 185, 129, 0.7)' : 'rgba(16, 185, 129, 0.85)',
+                        borderColor: '#10b981',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: textColor, font: { family: 'Figtree', weight: 'bold' } }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: textColor, font: { family: 'Figtree' } },
+                        grid: { color: 'transparent' }
+                    },
+                    y: {
+                        ticks: { color: textColor, font: { family: 'Figtree' } },
+                        grid: { color: gridColor }
+                    }
+                }
+            }
+        });
+    }
+
+    // 2. DONUT CHART: Proporsi Kategori Logistik Bantuan
+    const donutCtx = document.getElementById('categoryDonutChart');
+    if (donutCtx) {
+        new Chart(donutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryValues,
+                    backgroundColor: [
+                        '#6366f1', // Indigo
+                        '#10b981', // Emerald
+                        '#f59e0b', // Amber
+                        '#ec4899', // Pink
+                        '#3b82f6', // Blue
+                        '#8b5cf6'  // Purple
+                    ],
+                    borderWidth: 2,
+                    borderColor: isDark ? '#1e293b' : '#ffffff',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: textColor, font: { family: 'Figtree', size: 11 } }
+                    }
+                },
+                cutout: '68%'
+            }
+        });
+    }
+});
+</script>
+@endpush
