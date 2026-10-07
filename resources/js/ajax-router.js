@@ -337,6 +337,11 @@ const PJAX = (() => {
         }
     }
 
+    function isAdminRoute(pathStr) {
+        const p = pathStr.toLowerCase();
+        return p === '/dashboard' || p.startsWith('/dashboard/') || p.startsWith('/admin') || p.startsWith('/profile');
+    }
+
     function shouldIntercept(anchor) {
         if (!anchor || anchor.tagName !== 'A') return false;
         if (!anchor.href) return false;
@@ -362,6 +367,11 @@ const PJAX = (() => {
         const isTargetMap = path.startsWith('/map') || path.startsWith('/dashboard/map');
         const isCurrentMap = currentPath.startsWith('/map') || currentPath.startsWith('/dashboard/map');
         if (isTargetMap !== isCurrentMap) return false;
+
+        // Skip PJAX jika bertukar antara Layout Admin (dengan Sidebar) dan Layout Landing Public (tanpa Sidebar)
+        const isCurrentAdmin = isAdminRoute(currentPath);
+        const isTargetAdmin = isAdminRoute(path);
+        if (isCurrentAdmin !== isTargetAdmin) return false;
 
         return true;
     }

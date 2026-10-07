@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'GIScana - Peta Interaktif Spasial')</title>
+    <title>@yield('title', 'GIScana | Peta Interaktif Spasial')</title>
 
     <!-- Dark Mode Initializer Script (prevents theme flicker) -->
     <script>
@@ -46,18 +46,13 @@
         @yield('content')
         @if(!$__isPjax)
     </main>
-    
-    <footer class="text-xs font-semibold py-2 px-4 bg-white/90 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800/80 shrink-0 flex justify-between items-center z-40 transition-colors duration-200">
-        <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>© {{ date('Y') }} BPBD Kabupaten Bone Bolango — GIScana WebGIS</span>
-        </div>
-        <div class="hidden sm:flex items-center gap-4 text-slate-500 dark:text-slate-400">
-            <span>Sistem Informasi Geografis & SIMBA</span>
-        </div>
+        
+    <footer class="text-sm font-medium inline-flex justify-center text-center py-2 bg-white relative z-50 hidden md:flex">
+         <!-- @yield('map-toolbar') -->
+        ©{{ date('Y') }} All right reserved  |  Giscana
     </footer>
-
     @stack('scripts')
+    
 </body>
 </html>
 @else
@@ -65,7 +60,7 @@
 @php
     $__sections = \Illuminate\Support\Facades\View::getSections();
     echo json_encode([
-        'title'     => strip_tags($__sections['title'] ?? config('app.name', 'GIScana')),
+        'title'     => strip_tags($__sections['title'] ?? config('app.name', 'Giscana')),
         'pageTitle' => '',
     ]);
 @endphp
