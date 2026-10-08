@@ -63,9 +63,9 @@ class AidInventoryController extends Controller
         $validated = $request->validate([
             'item_name'       => 'required|string|max:255',
             'category'        => 'required|string|max:100',
-            'date_stock'      => 'date',
             'source'          => 'required|string|max:255',
             'initial_stock'   => 'required|integer|min:0',
+            'date_stock'      => 'date',
             // 'remaining_stock' => 'nullable|integer|min:0',
             'is_active'       => 'boolean',
         ]);
@@ -101,9 +101,9 @@ class AidInventoryController extends Controller
         $validated = $request->validate([
             'item_name'       => 'required|string|max:255',
             'category'        => 'required|string|max:100',
-            'date_stock'      => 'date',
             'source'          => 'required|string|max:255',
             'initial_stock'   => 'required|integer|min:0',
+            'date_stock'      => 'date',
             'remaining_stock' => 'integer|min:0',
             'is_active'       => 'boolean',
         ]);
