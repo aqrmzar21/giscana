@@ -31,6 +31,10 @@
                     Edit
                 </a>
                 @endcan
+                <a href="{{ route('admin.aid-distributions.index') }}"                
+                class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    Kembali
+                </a>
             </div>
         </div>
 
@@ -101,12 +105,7 @@
             </div>
         </dl>
 
-        <div class="mt-6 flex items-center justify-end">
-            <a href="{{ route('admin.aid-distributions.index') }}"
-               class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
-                Kembali
-            </a>
-        </div>
+                
     </div>
 </div>
 @endsection

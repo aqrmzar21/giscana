@@ -107,7 +107,7 @@
                 <div>
                     <label for="aid_status" class="block text-sm font-medium text-gray-700">Status Bantuan</label>
                     <div class="mt-1">
-                        <select id="aid_status" name="aid_status"
+                        <select id="aid_status" name="aid_status" disabled
                                 class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
                             <option value="pending" {{ old('aid_status', $aidBeneficiary->aid_status) === 'pending' ? 'selected' : '' }}>Belum menerima</option>
                             <option value="received" {{ old('aid_status', $aidBeneficiary->aid_status) === 'received' ? 'selected' : '' }}>Sudah menerima</option>

@@ -324,7 +324,7 @@
             'banjir':    'rgba(59,130,246,0.25)',
             'gempa':     'rgba(249,115,22,0.25)',
             'gelombang': 'rgba(6,182,212,0.25)',
-            'longsor':   'rgba(132,204,22,0.25)',
+            'longsor':   'rgba(229, 245, 205, 0.25)',
         };
         const bgMap = {
             'banjir':    '#eff6ff',
@@ -332,6 +332,7 @@
             'gelombang': '#ecfeff',
             'longsor':   '#f7fee7',
         };
+
 
         layerConfigs.forEach(cfg => {
             hazardLayers[cfg.disaster_type] = {
@@ -399,6 +400,14 @@
     }
 
     function loadHazardGeoJSON(disasterType) {
+        // Peta nama field hazard per jenis bencana
+        const hazardFieldMap = {
+            'longsor':   'Bhy_Lsr',
+            'gempa':     'Bhy_GmpBm',
+            'gelombang': 'Bhy_GEA',
+            'banjir':    'Bhy_Bjr',
+        };
+        
         const state = hazardLayers[disasterType];
         if (!state) return;
 
@@ -423,14 +432,19 @@
                     }),
                     onEachFeature: (feature, layer) => {
                         const p = feature.properties || {};
-                        const namaArea = p.NAMOBJ || p.nama || p.name || p.NAMA || p.desa || p.kecamatan || '–';
+                        const namaArea = p.WADMPR || p.NAMOBJ || p.nama || '–';
+                        const luas = p.Luas_Ha ? `${p.Luas_Ha.toFixed(2)} Ha` : '–';
+                        // ambil field hazard sesuai jenis bencana
+                        const hazardField = hazardFieldMap[disasterType];
+                        const tingkat = p[hazardField] || 'Tidak diketahui';
 
                         const popupHtml = `
-                            <div style="min-width:190px;font-size:13px;">
-                                <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:${cfg.border_color};">
+                            <div style="min-width:200px;font-size:13px;">
+                                <div style="font-weight:700;font-size:14px;margin-bottom:8px;color:${cfg.border_color};">
                                     ${cfg.icon_emoji || ''} ${cfg.label}
                                 </div>
-                                <div>${namaArea}</div>
+                                <div><b>Tingkat Bahaya:</b> ${tingkat}</div>
+                                <div><b>Luas:</b> ${luas}</div>
                             </div>`;
                         layer.bindPopup(popupHtml, { maxWidth: 300 });
 
@@ -639,10 +653,10 @@
 
                             polygon.bindPopup(`
                                 <strong>${p.district_name || p.nama || 'Kecamatan'}</strong><br>
-                                Penerima Bantuan: ${p.total_recipients ?? '-'}<br>
-                                Terdistribusi: ${p.distributed_aid ?? '-'}<br>
-                                Persentase: ${p.distribution_percentage ?? '-'}%
-                            `);
+                                Penerima Bantuan: ${p.total_recipients ?? '-'} orang<br>
+                                Terdistribusi: ${p.distributed_aid ?? '-'} bantuan<br>
+                                `);
+                                // Persentase: ${p.distribution_percentage ?? '-'}%
 
                             const vToggle = document.getElementById('toggle_village_boundaries');
                             if (vToggle && vToggle.checked) {
@@ -745,16 +759,22 @@
                                             if (feature.properties) {
                                                 const name = feature.properties.nama || feature.properties.kel_desa || feature.properties.NAMOBJ || 'Tidak diketahui';
                                                 const key = name.toLowerCase().replace(/desa |kelurahan /g, '').trim();
+                                                // const aidInfo =  [key];
                                                 const aidInfo = villageAidsData[key];
+
                                                 
                                                 let aidHtml = '';
-                                                if (aidInfo && aidInfo.total_amount > 0) {
-                                                    const types = aidInfo.aid_types && aidInfo.aid_types.length > 0 ? aidInfo.aid_types.join(', ') : '-';
+                                                if (aidInfo) {
+                                                    const types = aidInfo.aid_items.length > 0 ? aidInfo.aid_items.join(', ') : '-';
                                                     aidHtml = `
-                                                        Jenis Bantuan: ${types}<br>
-                                                        Total Disalurkan: ${aidInfo.total_amount}
+                                                        Total Penerima: ${aidInfo.total_beneficiaries}<br>
+                                                        Total Barang Tersalur: ${aidInfo.total_quantity}<br>
+                                                        Jenis Bantuan: ${types}
                                                     `;
+                                                } else {
+                                                    aidHtml = `<em>Belum ada data distribusi</em>`;
                                                 }
+
                                                 
                                                 layer.bindPopup(`
                                                     <strong>${name}</strong><br>

@@ -78,6 +78,16 @@
                             @enderror
                         </div>
                     </div>
+                    <div>
+                        <label for="date_stock" class="block text-sm font-medium text-gray-700">Tanggal Masuk</label>
+                        <div class="mt-1">
+                            <input type="date" name="date_stock" id="date_stock" value="{{ old('date_stock') }}"
+                                   class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('date_stock') border-red-300 @enderror">
+                            @error('date_stock')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
                     <div class="flex items-end">
                         <label class="inline-flex items-center gap-2 text-sm text-gray-700 pb-2">
                             <input type="checkbox" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}
@@ -89,14 +99,8 @@
             </div>
 
             <div class="mt-6 flex items-center justify-end space-x-3">
-                <a href="{{ route('admin.aid-inventories.index') }}"
-                   class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
-                    Batal
-                </a>
-                <button type="submit"
-                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
-                    Simpan
-                </button>
+                <a href="{{ route('admin.aid-inventories.index') }}"class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</a>
+                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">Simpan</button>
             </div>
         </form>
     </div>

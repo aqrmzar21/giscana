@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use App\Models\User;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -15,33 +17,41 @@ class RolePermissionSeeder extends Seeder
         // Reset cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // create permissions
+        // 1. Definisikan semua Permission
         $permissions = [
             'create data',
             'read data',
             'update data',
             'delete data',
+            'export data',
             'manage staff',
         ];
 
         foreach ($permissions as $permission) {
-            \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // create roles and assign created permissions
-        $roleAdmin = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
-        $roleAdmin->givePermissionTo(\Spatie\Permission\Models\Permission::all());
+        // 2. Role Admin -> Akses Penuh (Semua Permission)
+        $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
+        $roleAdmin->givePermissionTo(Permission::all());
 
-        $roleStaff = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'staff']);
-        $roleStaff->syncPermissions(['create data', 'read data']);
+        // 3. Role Staff -> Create & Read & Export
+        $roleStaff = Role::firstOrCreate(['name' => 'staff']);
+        $roleStaff->syncPermissions(['create data', 'read data', 'export data']);
 
-        // Sync existing users
-        $users = \App\Models\User::all();
+        // 4. Role Pimpinan -> HANYA Read & Export (Read-Only & Print)
+        $rolePimpinan = Role::firstOrCreate(['name' => 'pimpinan']);
+        $rolePimpinan->syncPermissions(['read data', 'export data']);
+
+        // 5. Sinkronkan role pengguna berdasarkan kolom `role` di tabel users
+        $users = User::all();
         foreach ($users as $user) {
             if ($user->role === 'admin') {
-                $user->assignRole('admin');
+                $user->syncRoles(['admin']);
             } elseif ($user->role === 'staff') {
-                $user->assignRole('staff');
+                $user->syncRoles(['staff']);
+            } elseif ($user->role === 'pimpinan') {
+                $user->syncRoles(['pimpinan']);
             }
         }
     }

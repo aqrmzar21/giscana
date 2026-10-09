@@ -21,14 +21,26 @@
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Daftar Warga Penerima Bantuan</h3>
                 <p class="mt-2 text-sm text-gray-700">Master target KK/warga terdampak. Status diperbarui otomatis saat distribusi dicatat.</p>
             </div>
-            <div class="mt-4 sm:mt-0 sm:ml-4 sm:flex-none">
+            <div class="mt-4 sm:mt-0 sm:ml-4 sm:flex-none flex items-center gap-2">
+                @can('export data')
+                <a href="{{ route('admin.aid-beneficiaries.print', request()->query()) }}" target="_blank" data-no-pjax
+                   class="inline-flex items-center justify-center rounded-md border border-red-300 bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap">
+                    <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Cetak Laporan PDF
+                </a>
+                @endcan
+
+                @can('create data')
                 <a href="{{ route('admin.aid-beneficiaries.create') }}"
                    class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 whitespace-nowrap">
                     <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Tambah Warga
+                    Tambah Warga Baru
                 </a>
+                @endcan
             </div>
         </div>
 
@@ -48,7 +60,7 @@
                 </button>
                 @if(request()->anyFilled(['search', 'aid_status']))
                     <a href="{{ route('admin.aid-beneficiaries.index') }}"
-                       class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+                       class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
                         Reset
                     </a>
                 @endif

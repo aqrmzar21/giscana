@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Traits\PartialRenderable;
 use App\Models\AidInventory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AidInventoryController extends Controller
 {
@@ -32,6 +33,26 @@ class AidInventoryController extends Controller
         return $this->partialView('admin.aid-inventories.index', compact('inventories'));
     }
 
+    public function print(Request $request)
+    {
+        abort_if(!auth()->user()->can('export data'), 403);
+        $query = AidInventory::latest();
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('item_name', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%")
+                  ->orWhere('source', 'like', "%{$search}%");
+            });
+        }
+
+        $inventories = $query->get();
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.aid-inventories.pdf', compact('inventories'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->stream('laporan-stok-logistik-bantuan.pdf');
+    }
+
     public function create()
     {
         return $this->partialView('admin.aid-inventories.create');
@@ -44,7 +65,8 @@ class AidInventoryController extends Controller
             'category'        => 'required|string|max:100',
             'source'          => 'required|string|max:255',
             'initial_stock'   => 'required|integer|min:0',
-            'remaining_stock' => 'nullable|integer|min:0',
+            'date_stock'      => 'date',
+            // 'remaining_stock' => 'nullable|integer|min:0',
             'is_active'       => 'boolean',
         ]);
 
@@ -81,7 +103,8 @@ class AidInventoryController extends Controller
             'category'        => 'required|string|max:100',
             'source'          => 'required|string|max:255',
             'initial_stock'   => 'required|integer|min:0',
-            'remaining_stock' => 'required|integer|min:0',
+            'date_stock'      => 'date',
+            'remaining_stock' => 'integer|min:0',
             'is_active'       => 'boolean',
         ]);
 

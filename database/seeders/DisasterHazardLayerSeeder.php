@@ -26,7 +26,7 @@ class DisasterHazardLayerSeeder extends Seeder
                 'border_color'  => '#1d4ed8',
                 'fill_opacity'  => 0.35,
                 'border_weight' => 1.5,
-                'icon_emoji'    => '🌊',
+                'icon_emoji'    => '🏞️',
                 'description'   => 'Peta kawasan yang rawan terdampak banjir di Kabupaten Bone Bolango berdasarkan data historis dan analisis topografi.',
                 'is_active'     => true,
                 'sort_order'    => 1,

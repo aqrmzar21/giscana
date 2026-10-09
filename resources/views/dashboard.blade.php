@@ -221,6 +221,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
     {{-- Pie / Doughnut Chart Card --}}
+<<<<<<< HEAD
     <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700/60 rounded-2xl overflow-hidden flex flex-col justify-between">
         <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-700/60 flex items-center justify-between">
             <div>
@@ -228,10 +229,20 @@
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Top 5 kecamatan berdasarkan akumulasi bantuan tersalur</p>
             </div>
             <span class="inline-flex items-center rounded-full bg-indigo-50 dark:bg-indigo-900/40 px-3 py-1 text-xs font-semibold text-indigo-700 dark:text-indigo-300">
+=======
+    <div class="lg:col-span-1 bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-100 flex items-center justify-between">
+            <div>
+                <h3 class="text-base font-semibold text-gray-900">Distribusi Logistik</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Top 5 barang berdasarkan stok tersisa</p>
+            </div>
+            <span class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+>>>>>>> main
                 Top 5
             </span>
         </div>
 
+<<<<<<< HEAD
         @if($aidByDistrict->isEmpty())
             <div class="flex flex-col items-center justify-center py-16 text-gray-400 dark:text-gray-500">
                 <svg class="h-12 w-12 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -276,6 +287,61 @@
                                 <td class="py-2.5 text-right">
                                     <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-bold" style="background:{{ $colors[$i] ?? '#9ca3af' }}22; color:{{ $colors[$i] ?? '#9ca3af' }}">
                                         {{ $totalDistributed > 0 ? round(($aid->distributed_aid / $totalDistributed) * 100, 1) : 0 }}%
+=======
+        @if($inventories->isEmpty())
+            <div class="flex flex-col items-center justify-center py-16 text-gray-400">
+                <svg class="h-12 w-12 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                </svg>
+                <p class="text-sm">Belum ada data logistik.</p>
+            </div>
+        @else
+            <div class="p-5 flex flex-col sm:flex-row items-center gap-6">
+                {{-- Canvas --}}
+                <div class="flex-shrink-0" style="width:220px; height:220px;">
+                    <canvas id="logisticPieChart"></canvas>
+                </div>
+
+                {{-- Legend + Detail --}}
+                <div class="flex-1 w-full">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-xs text-gray-500 border-b border-gray-100">
+                                <th class="pb-2 text-left font-medium">Barang</th>
+                                <th class="pb-2 text-right font-medium">Stok Masuk</th>
+                                <th class="pb-2 text-right font-medium">Sisa Stok</th>
+                                <th class="pb-2 text-right font-medium">%</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @php
+                                $colors = ['#6366f1','#22c55e','#f59e0b','#ef4444','#14b8a6'];
+                                $totalStock = $inventories->sum('initial_stock') ?: 1;
+                            @endphp
+                            @foreach($inventories->take(5) as $i => $inventory)
+                            @php
+                                $stockPercent = $inventory->initial_stock > 0
+                                    ? round(($inventory->remaining_stock / $inventory->initial_stock) * 100, 1)
+                                    : 0;
+                            @endphp
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-2 pr-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="inline-block w-3 h-3 rounded-full flex-shrink-0"
+                                            style="background:{{ $colors[$i] ?? '#9ca3af' }}"></span>
+                                        <span class="font-medium text-gray-800 truncate max-w-[130px]">{{ $inventory->item_name }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-2 text-right text-gray-600">{{ number_format($inventory->initial_stock) }}</td>
+                                <td class="py-2 text-right text-gray-600">{{ number_format($inventory->remaining_stock) }}</td>
+                                <td class="py-2 text-right">
+                                    <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold"
+                                        style="background:{{ $colors[$i] ?? '#9ca3af' }}22; color:{{ $colors[$i] ?? '#9ca3af' }}">
+                                        {{ $stockPercent }}%
+>>>>>>> main
                                     </span>
                                 </td>
                             </tr>
@@ -304,14 +370,22 @@
                 <thead>
                     <tr class="text-xs text-gray-400 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700/60">
                         <th class="pb-3 text-left font-semibold">Kecamatan</th>
+<<<<<<< HEAD
                         <th class="pb-3 text-center font-semibold">Target / Tersalur</th>
+=======
+                        <th class="pb-3 text-center font-semibold">Tersalur / Target</th>
+>>>>>>> main
                         <th class="pb-3 text-left font-semibold">Progres Penyaluran</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50 dark:divide-gray-700/40">
                     @forelse($aidDisasters as $aid)
                         @php
+<<<<<<< HEAD
                             $percentage = $aid->total_recipients > 0 ? min(100, round(($aid->distributed_aid / $aid->total_recipients) * 100, 1)) : 0;
+=======
+                            $percentage = $aid->total_recipients > 0 ? min(100, round(($aid->total_received / $aid->total_recipients) * 100, 1)) : 0;
+>>>>>>> main
                             $barColor = $percentage >= 80 ? 'bg-emerald-500' : ($percentage >= 40 ? 'bg-indigo-500' : 'bg-amber-500');
                         @endphp
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
@@ -319,7 +393,11 @@
                                 {{ $aid->district_name }}
                             </td>
                             <td class="py-3 text-center text-xs text-gray-600 dark:text-gray-300 font-medium">
+<<<<<<< HEAD
                                 <span class="text-indigo-600 dark:text-indigo-400 font-bold">{{ number_format($aid->distributed_aid) }}</span> / {{ number_format($aid->total_recipients) }}
+=======
+                                <span class="text-indigo-600 dark:text-indigo-400 font-bold">{{ number_format($aid->total_received) }}</span> / {{ number_format($aid->total_recipients) }}
+>>>>>>> main
                             </td>
                             <td class="py-3">
                                 <div class="flex items-center gap-3">
@@ -604,4 +682,60 @@
     })();
 </script>
 @endif
+<<<<<<< HEAD
+=======
+@if($inventories->isNotEmpty())
+<script>
+(function () {
+    const ctx = document.getElementById('logisticPieChart');
+    if (!ctx) return;
+
+    // Ambil label dan data dari koleksi inventories
+    const labels  = @json($inventories->take(5)->pluck('item_name'));
+    const data    = @json($inventories->take(5)->pluck('remaining_stock'));
+    const colors  = ['#6366f1','#22c55e','#f59e0b','#ef4444','#14b8a6'];
+    const hovers  = ['#4f46e5','#16a34a','#d97706','#dc2626','#0d9488'];
+
+    new Chart(ctx, {
+        type: 'pie', // Gunakan 'doughnut' jika ingin menggunakan opsi cutout
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors,
+                hoverBackgroundColor: hovers,
+                borderWidth: 2,
+                borderColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+                hoverOffset: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        // Menggunakan callback 'formattedValue' atau menyesuaikan baris 'label'
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct   = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                            // Format ini mencegah label diulang oleh bawaan Chart.js
+                            return ` Stok: ${context.parsed.toLocaleString()} (${pct}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 800,
+                easing: 'easeInOutQuart',
+            }
+        }
+    });
+})();
+</script>
+@endif
+>>>>>>> main
 @endsection

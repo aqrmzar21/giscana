@@ -63,6 +63,19 @@ class GiscanaDataSeeder extends Seeder
             ]
         );
 
+        User::updateOrCreate(
+            ['email' => 'pimpinan@giscana.local'],
+            [
+                'uuid' => (string) Str::uuid(),
+                'name' => 'Kepala BPBD Bone Bolango',
+                'password' => bcrypt('pimpinan123'),
+                'role' => 'pimpinan',
+                'phone' => '+6281234567899',
+                'organization' => 'Badan Penanggulangan Bencana Daerah',
+                'is_active' => true,
+            ]
+        );
+
         $districtBonepantai = District::where('name', 'like', '%Bonepantai%')->first();
         $districtKabilaBone = District::where('name', 'like', '%Kabila Bone%')->first();
 

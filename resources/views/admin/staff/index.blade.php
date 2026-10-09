@@ -21,15 +21,15 @@
     <div class="px-4 py-5 sm:p-6">
         <div class="sm:flex sm:items-center justify-between mb-4">
             <div class="sm:flex-auto">
-                <h3 class="text-lg font-medium leading-6 text-gray-900">Daftar Staff</h3>
-                <p class="mt-2 text-sm text-gray-700">Daftar semua staff yang terdaftar dalam sistem.</p>
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Daftar User</h3>
+                <p class="mt-2 text-sm text-gray-700">Daftar semua user (admin, staff, pimpinan) yang terdaftar dalam sistem.</p>
             </div>
             <div class="mt-4 sm:mt-0 sm:ml-4 sm:flex-none flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                 <a href="{{ route('admin.staff.create') }}" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto whitespace-nowrap">
                     <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Tambah Staff
+                    Tambah User
                 </a>
             </div>
         </div>
@@ -38,10 +38,16 @@
             <form action="{{ route('admin.staff.index') }}" method="GET" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
                 <div class="flex items-center gap-2 flex-1">
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau email..." class="flex w-full sm:w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <select name="role" id="filter-role" onchange="this.form.submit()" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        <option value="">Semua Role</option>
+                        @foreach($roles as $value => $label)
+                            <option value="{{ $value }}" {{ request('role') === $value ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
                     <button type="submit" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Cari
                     </button>
-                    @if(request()->filled('search'))
+                    @if(request()->filled('search') || request()->filled('role'))
                     <a href="{{ route('admin.staff.index') }}" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Reset
                     </a>
@@ -57,6 +63,7 @@
                         <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">NO</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nama</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Email</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Role</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Telepon</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Organisasi</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
@@ -69,6 +76,17 @@
                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ $loop->iteration }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $staff->name }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $staff->email }}</td>
+                        @php
+                            $userRole = $staff->roles->pluck('name')->first(fn($r) => array_key_exists($r, $roles)) ?? $staff->role;
+                            $roleBadge = [
+                                'admin' => 'bg-red-100 text-red-800',
+                                'staff' => 'bg-blue-100 text-blue-800',
+                                'pimpinan' => 'bg-purple-100 text-purple-800',
+                            ][$userRole] ?? 'bg-gray-100 text-gray-800';
+                        @endphp
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            <span class="inline-flex rounded-full px-2 py-1 leading-3 text-xs font-medium {{ $roleBadge }}">{{ $roles[$userRole] ?? ucfirst($userRole) }}</span>
+                        </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $staff->phone ?? '-' }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $staff->organization ?? '-' }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
@@ -99,8 +117,8 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 text-center sm:pl-6">
-                            Tidak ada data staff.
+                        <td colspan="8" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 text-center sm:pl-6">
+                            Tidak ada data user.
                         </td>
                     </tr>
                     @endforelse

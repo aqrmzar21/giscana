@@ -20,6 +20,7 @@ class AidDisaster extends Model
         'district_id',
         'district_name',
         'total_recipients',
+        'total_received', // baru
         'distributed_aid',
         'is_active',
         'last_synced_at',
@@ -27,6 +28,7 @@ class AidDisaster extends Model
 
     protected $casts = [
         'total_recipients' => 'integer',
+        'total_received' => 'integer', // baru
         'distributed_aid'  => 'integer',
         'is_active'        => 'boolean',
         'last_synced_at'   => 'datetime',
@@ -61,14 +63,17 @@ class AidDisaster extends Model
     public function recalculate()
     {
         if ($this->district_id) {
-            // Hitung dari relasi district_id langsung
             $this->total_recipients = AidBeneficiary::where('district_id', $this->district_id)->count();
 
             $this->distributed_aid = AidDistribution::whereHas('beneficiary', function ($q) {
                 $q->where('district_id', $this->district_id);
             })->sum('quantity_received');
+
+            // Tambahan: hitung KK unik yang sudah menerima
+            $this->total_received = AidDistribution::whereHas('beneficiary', function ($q) {
+                $q->where('district_id', $this->district_id);
+            })->distinct('beneficiary_id')->count('beneficiary_id');
         } else {
-            // Fallback: Hitung berdasarkan district_name menggunakan kolom 'name' pada tabel districts
             $this->total_recipients = AidBeneficiary::whereHas('district', function ($q) {
                 $q->where('name', $this->district_name);
             })->count();
@@ -76,6 +81,10 @@ class AidDisaster extends Model
             $this->distributed_aid = AidDistribution::whereHas('beneficiary.district', function ($q) {
                 $q->where('name', $this->district_name);
             })->sum('quantity_received');
+
+            $this->total_received = AidDistribution::whereHas('beneficiary.district', function ($q) {
+                $q->where('name', $this->district_name);
+            })->distinct('beneficiary_id')->count('beneficiary_id');
         }
 
         $this->save();
@@ -86,19 +95,19 @@ class AidDisaster extends Model
         return $query->where('is_active', true);
     }
 
-    public function getDistributionPercentageAttribute(): float|null
+    public function getReceivedPercentageAttribute(): float
     {
         if (!$this->total_recipients || $this->total_recipients === 0) {
             return 0.0;
         }
-        return round(($this->distributed_aid / $this->total_recipients) * 100, 2);
+        return round(($this->total_received / $this->total_recipients) * 100, 2);
     }
 
     public function getRemainingAidAttribute(): int|null
     {
-        if (is_null($this->total_recipients) || is_null($this->distributed_aid)) {
+        if (is_null($this->total_recipients) || is_null($this->total_received)) {
             return 0;
         }
-        return max(0, $this->total_recipients - $this->distributed_aid);
+        return max(0, $this->total_recipients - $this->total_received);
     }
 }

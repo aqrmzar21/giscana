@@ -8,31 +8,31 @@ class AidRecipient extends Model
 {
     use \App\Traits\HasUuid;
 
-    protected static function booted()
-    {
-        static::saved(function ($aidRecipient) {
-            if ($aidRecipient->aidDisaster) {
-                $aidRecipient->aidDisaster->recalculateDistributedAid();
-            }
+    // protected static function booted()
+    // {
+    //     static::saved(function ($aidRecipient) {
+    //         if ($aidRecipient->aidDisaster) {
+    //             $aidRecipient->aidDisaster->recalculateDistributedAid();
+    //         }
             
-            // Handle if aid_disaster_id changed
-            if ($aidRecipient->isDirty('aid_disaster_id')) {
-                $originalDisasterId = $aidRecipient->getOriginal('aid_disaster_id');
-                if ($originalDisasterId) {
-                    $originalDisaster = AidDisaster::find($originalDisasterId);
-                    if ($originalDisaster) {
-                        $originalDisaster->recalculateDistributedAid();
-                    }
-                }
-            }
-        });
+    //         // Handle if aid_disaster_id changed
+    //         if ($aidRecipient->isDirty('aid_disaster_id')) {
+    //             $originalDisasterId = $aidRecipient->getOriginal('aid_disaster_id');
+    //             if ($originalDisasterId) {
+    //                 $originalDisaster = AidDisaster::find($originalDisasterId);
+    //                 if ($originalDisaster) {
+    //                     $originalDisaster->recalculateDistributedAid();
+    //                 }
+    //             }
+    //         }
+    //     });
 
-        static::deleted(function ($aidRecipient) {
-            if ($aidRecipient->aidDisaster) {
-                $aidRecipient->aidDisaster->recalculateDistributedAid();
-            }
-        });
-    }
+    //     static::deleted(function ($aidRecipient) {
+    //         if ($aidRecipient->aidDisaster) {
+    //             $aidRecipient->aidDisaster->recalculateDistributedAid();
+    //         }
+    //     });
+    // }
 
     protected $fillable = [
         'date',

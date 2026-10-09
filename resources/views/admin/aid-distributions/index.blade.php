@@ -21,14 +21,26 @@
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Catatan Distribusi Bantuan</h3>
                 <p class="mt-2 text-sm text-gray-700">Riwayat lengkap transaksi penyaluran bantuan kepada warga terdampak.</p>
             </div>
-            <div class="mt-4 sm:mt-0 sm:ml-4 sm:flex-none">
+            <div class="mt-4 sm:mt-0 sm:ml-4 sm:flex-none flex items-center gap-2">
+                @can('export data')
+                <a href="{{ route('admin.aid-distributions.print', request()->query()) }}" target="_blank" data-no-pjax
+                   class="inline-flex items-center justify-center rounded-md border border-red-300 bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap">
+                    <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Cetak Laporan PDF
+                </a>
+                @endcan
+
+                @can('create data')
                 <a href="{{ route('admin.aid-distributions.create') }}"
                    class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 whitespace-nowrap">
                     <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Catat Distribusi Baru
+                    Tambah Distribusi Baru
                 </a>
+                @endcan
             </div>
         </div>
 
@@ -50,7 +62,7 @@
                 </button>
                 @if(request()->anyFilled(['search','start_date','end_date']))
                     <a href="{{ route('admin.aid-distributions.index') }}"
-                       class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+                       class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
                         Reset
                     </a>
                 @endif
@@ -154,8 +166,10 @@
                     <select name="per_page" onchange="this.form.submit()"
                             class="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-1 pl-3 pr-8">
                         <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
-                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
                         <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                        <option value="250" {{ request('per_page') == 250 ? 'selected' : '' }}>250</option>
+                        <option value="500" {{ request('per_page') == 500 ? 'selected' : '' }}>500</option>
                     </select>
                 </form>
                 <span class="text-sm text-gray-700">data</span>

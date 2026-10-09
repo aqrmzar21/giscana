@@ -78,6 +78,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user has pimpinan role
+     */
+    public function isPimpinan(): bool
+    {
+        return $this->role === 'pimpinan' || $this->hasRole('pimpinan');
+    }
+
+    /**
      * Check if user can manage data
      */
     public function canManageData(): bool

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('district_id')->nullable()->constrained('districts')->onDelete('cascade');
             $table->string('district_name'); // nama_kecamatan
             $table->integer('total_recipients')->nullable(); // jumlah_penerima_bantuan
+            $table->integer('total_received')->nullable(); // jumlah_bantuan_terdistribusi
             $table->integer('distributed_aid')->nullable(); // bantuan_terdistribusi
             $table->boolean('is_active')->default(true); // is_active
             $table->timestamps();

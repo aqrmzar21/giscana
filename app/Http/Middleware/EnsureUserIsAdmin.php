@@ -15,8 +15,17 @@ class EnsureUserIsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || (!auth()->user()->hasRole('admin') && !auth()->user()->hasRole('staff'))) {
-            abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk mengakses halaman ini.');
+        if (!auth()->check()) {
+            abort(401, 'Silakan login terlebih dahulu.');
+        }
+
+        $user = auth()->user();
+        $allowedRoles = ['admin', 'staff', 'pimpinan'];
+
+        $hasAllowedRole = in_array($user->role, $allowedRoles) || $user->hasAnyRole($allowedRoles);
+
+        if (!$hasAllowedRole) {
+            abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk mengakses halaman panel ini.');
         }
 
         return $next($request);

@@ -29,9 +29,9 @@
     $stockPercent = $aidInventory->initial_stock > 0
         ? min(100, round(($aidInventory->remaining_stock / $aidInventory->initial_stock) * 100, 1))
         : 0;
-    $distributed = $aidInventory->initial_stock - $aidInventory->remaining_stock;
-@endphp
-
+        $distributed = $aidInventory->initial_stock - $aidInventory->remaining_stock;
+        @endphp
+        
 <div class="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-6">
     <div class="bg-white overflow-hidden shadow rounded-lg">
         <div class="p-5">
@@ -60,13 +60,16 @@
                 <h3 class="text-lg font-medium leading-6 text-gray-900">{{ $aidInventory->item_name }}</h3>
                 <p class="mt-1 text-sm text-gray-500">Detail master stok logistik dan riwayat penyaluran.</p>
             </div>
-            <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex space-x-2">
+            <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex space-x-2 justify-end">
                 @can('update data')
-                <a href="{{ route('admin.aid-inventories.edit', $aidInventory) }}"
-                   class="inline-flex items-center justify-center rounded-md border border-transparent bg-yellow-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-yellow-700">
+                <a href="{{ route('admin.aid-inventories.edit', $aidInventory) }}" class="inline-flex items-center justify-center rounded-md border border-transparent bg-yellow-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-yellow-700">
                     Edit
                 </a>
                 @endcan
+                <a href="{{ route('admin.aid-inventories.index') }}"
+                class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    Kembali
+                </a>
             </div>
         </div>
 
@@ -90,20 +93,13 @@
                 </dd>
             </div>
             <div>
+                <dt class="text-sm font-medium text-gray-500">Bantuan Masuk</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ $aidInventory->date_stock }}</dd>
+            </div>            
+            <div>
                 <dt class="text-sm font-medium text-gray-500">Sumber Bantuan</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $aidInventory->source ?: '-' }}</dd>
-            </div>
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Persentase Sisa</dt>
-                <dd class="mt-2">
-                    <div class="flex items-center">
-                        <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                            <div class="{{ $stockPercent <= 20 ? 'bg-red-400' : ($stockPercent <= 50 ? 'bg-yellow-400' : 'bg-green-400') }} h-2.5 rounded-full" style="width: {{ $stockPercent }}%"></div>
-                        </div>
-                        <span class="text-sm text-gray-700">{{ $stockPercent }}%</span>
-                    </div>
-                </dd>
-            </div>
+            </div>            
             <div>
                 <dt class="text-sm font-medium text-gray-500">Dibuat Pada</dt>
                 <dd class="mt-1 text-sm text-gray-900">{{ $aidInventory->created_at?->format('d/m/Y H:i') }}</dd>
@@ -113,43 +109,127 @@
                 <dd class="mt-1 text-sm text-gray-900">{{ $aidInventory->updated_at?->format('d/m/Y H:i') }}</dd>
             </div>
         </dl>
+    </div>
+</div>
 
-        <div class="mt-8">
-            <h4 class="text-base font-semibold text-gray-900 mb-3">Riwayat Penyaluran</h4>
-            <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                <table class="min-w-full divide-y divide-gray-300">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="py-3 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Tanggal</th>
-                            <th class="px-3 py-3 text-left text-sm font-semibold text-gray-900">Penerima</th>
-                            <th class="px-3 py-3 text-left text-sm font-semibold text-gray-900">Jumlah</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white">
-                        @forelse($aidInventory->distributions as $distribution)
-                        <tr>
-                            <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">
-                                {{ $distribution->distribution_date?->format('d/m/Y') }}
-                            </td>
-                            <td class="px-3 py-3 text-sm text-gray-900">{{ $distribution->beneficiary?->recipient_name ?? '-' }}</td>
-                            <td class="whitespace-nowrap px-3 py-3 text-sm font-semibold text-gray-900">{{ number_format($distribution->quantity_received) }}</td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="3" class="py-6 text-center text-sm text-gray-500">Belum ada penyaluran dari stok ini.</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+<div class="bg-white shadow rounded-lg">
+    <div class="mt-8 p-6 border-t border-gray-200">
+        <div>
+            <dt class="text-sm font-medium text-gray-500">Persentase Sisa</dt>
+            <dd class="mt-2">
+                <div class="flex items-center">
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
+                        <div class="{{ $stockPercent <= 20 ? 'bg-red-400' : ($stockPercent <= 50 ? 'bg-yellow-400' : 'bg-green-400') }} h-2.5 rounded-full" style="width: {{ $stockPercent }}%"></div>
+                    </div>
+                    <span class="text-sm text-gray-700">{{ $stockPercent }}%</span>
+                </div>
+            </dd>
         </div>
+    
+    </div>
+</div>
 
-        <div class="mt-6 flex items-center justify-end">
-            <a href="{{ route('admin.aid-inventories.index') }}"
-               class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
-                Kembali
-            </a>
+<div class="bg-white shadow rounded-lg">
+    <div class="mt-8 p-6 border-t border-gray-200">
+        <h4 class="text-base font-bold text-gray-900 mb-4">Riwayat Penyaluran</h4>
+    
+        <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+            <table id="distributions-table" class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-gray-50 text-xs font-semibold uppercase text-gray-700 border-b border-gray-200">
+                    <tr>
+                        <th scope="col" class="px-4 py-3.5">Tanggal</th>
+                        <th scope="col" class="px-4 py-3.5">Penerima</th>
+                        <th scope="col" class="px-4 py-3.5 text-right">Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    @forelse($aidInventory->distributions as $distribution)
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="whitespace-nowrap px-4 py-3 text-gray-700">
+                            {{ $distribution->distribution_date?->format('d/m/Y') ?? '-' }}
+                        </td>
+                        <td class="px-4 py-3 font-medium text-gray-900">
+                            {{ $distribution->beneficiary?->recipient_name ?? '-' }}
+                        </td>
+                        <td class="whitespace-nowrap px-4 py-3 text-right font-semibold text-gray-900">
+                            {{ number_format($distribution->quantity_received) }}
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="3" class="px-4 py-8 text-center text-sm text-gray-500">
+                            Belum ada penyaluran dari stok ini.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+
 @endsection
+
+@push('style')
+<!-- Container Riwayat Penyaluran -->
+
+<!-- Styling Tambahan untuk Merapikan Layout DataTables -->
+<style>
+    /* Merapikan kontrol DataTables agar tidak bentrok dengan Tailwind */
+    .dataTables_wrapper {
+        padding: 0.5rem 0;
+    }
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+        color: #374151;
+    }
+    .dataTables_wrapper .dataTables_filter input {
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        padding: 0.25rem 0.5rem;
+        margin-left: 0.5rem;
+        outline: none;
+    }
+    .dataTables_wrapper .dataTables_length select {
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        padding: 0.25rem 0.5rem;
+        margin: 0 0.25rem;
+    }
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        color: #4b5563;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        border-radius: 0.375rem !important;
+        border: 1px solid #e5e7eb !important;
+        margin: 0 0.125rem;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #2563eb !important;
+        color: white !important;
+        border-color: #2563eb !important;
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#distributions-table').DataTable({
+        pageLength: 5, // jumlah data per halaman
+        lengthMenu: [5, 10, 25, 50], // opsi jumlah per halaman
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json' // bahasa Indonesia
+        }
+    });
+});
+</script>
+@endpush

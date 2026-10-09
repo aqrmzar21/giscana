@@ -15,6 +15,7 @@ class AidInventory extends Model
         'category',
         'source',
         'initial_stock',
+        'date_stock',
         'remaining_stock',
         'is_active',
     ];
