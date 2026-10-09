@@ -355,10 +355,7 @@
 
                         <div class="flex items-center gap-2">
                             @can('export data')
-                            <a href="{{ route('admin.aid-disasters.print', ['type' => 'village', 'year' => $selectedYear, 'disaster_id' => $aid->id]) }}" 
-                               target="_blank" data-no-pjax @click.stop
-                               title="Cetak PDF khusus Laporan Desa Kecamatan {{ $aid->district_name }}"
-                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98]">
+                            <a href="{{ route('admin.aid-disasters.print', ['type' => 'village', 'year' => $selectedYear, 'disaster_id' => $aid->id]) }}" target="_blank" data-no-pjax @click.stop title="Cetak PDF khusus Laporan Desa Kecamatan {{ $aid->district_name }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98]">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                 </svg>
@@ -376,57 +373,75 @@
                         </div>
                     </div>
 
-                    {{-- Content Accordion: Tabel Rincian Desa --}}
+                    {{-- Content Accordion --}}
                     <div x-show="open" x-collapse class="border-t border-gray-100 dark:border-gray-700/60 p-4 sm:p-5 bg-gray-50/50 dark:bg-gray-800/50">
                         @if(empty($villages) || count($villages) === 0)
                             <div class="text-center py-6 text-gray-400 dark:text-gray-500">
-                                <p class="text-xs font-medium">Belum ada transaksi penyaluran terdata untuk kecamatan ini {{ $selectedYear !== 'all' ? 'pada tahun ' . $selectedYear : '' }}.</p>
+                                <p class="text-xs font-medium">
+                                    Belum ada transaksi penyaluran terdata untuk kecamatan ini 
+                                    {{ $selectedYear !== 'all' ? 'pada tahun ' . $selectedYear : '' }}.
+                                </p>
                             </div>
                         @else
-                            <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
-                                <table class="w-full text-xs text-left bg-white dark:bg-gray-800">
-                                    <thead class="bg-gray-100 dark:bg-gray-700/80 text-gray-600 dark:text-gray-300 uppercase tracking-wider font-bold">
-                                        <tr>
-                                            <th class="py-3 px-4 text-center w-12">No</th>
-                                            <th class="py-3 px-4">Nama Desa / Kelurahan</th>
-                                            <th class="py-3 px-4 text-center">Jumlah Penerima</th>
-                                            <th class="py-3 px-4 text-center">Total Barang Tersalur</th>
-                                            <th class="py-3 px-4">Jenis & Kategori Bantuan Terdistribusi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700/50">
-                                        @foreach($villages as $villageName => $records)
-                                            @php
-                                                $recipientsInVillage = $records->pluck('beneficiary_id')->unique()->count();
-                                                $totalQtyInVillage = $records->sum('quantity_received');
-                                            @endphp
-                                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                                                <td class="py-3 px-4 text-center text-gray-500 dark:text-gray-400 font-bold">{{ $loop->iteration }}</td>
-                                                <td class="py-3 px-4 font-bold text-gray-900 dark:text-white text-sm">
-                                                    <div class="flex items-center gap-2">
-                                                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                                        <span>{{ $villageName }}</span>
-                                                    </div>
-                                                </td>
-                                                <td class="py-3 px-4 text-center font-bold text-gray-800 dark:text-gray-200">
-                                                    {{ number_format($recipientsInVillage) }} KK
-                                                </td>
-                                                <td class="py-3 px-4 text-center font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">
-                                                    {{ number_format($totalQtyInVillage) }} Unit
-                                                </td>
-                                                <td class="py-3 px-4">
-                                                    <div class="flex flex-wrap gap-1.5">
-                                                        @foreach($records->pluck('aidInventory.item_name')->filter()->unique() as $itemName)
-                                                            <span class="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold border border-indigo-100 dark:border-indigo-800/40">
-                                                                📦 {{ $itemName }}
-                                                            </span>
-                                                        @endforeach
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                                {{-- Tabel Desa (2 kolom) --}}
+                                <div class="xl:col-span-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                                    <div class="overflow-x-auto overflow-y-auto max-h-[500px] rounded-xl">
+                                        <table class="w-full text-xs sm:text-sm text-left bg-white dark:bg-gray-800">
+                                            <thead class="bg-gray-100 dark:bg-gray-700/80 text-gray-600 dark:text-gray-300 uppercase tracking-wider font-bold">
+                                                <tr>
+                                                    <th class="py-3 px-2 sm:px-4 text-center w-12">No</th>
+                                                    <th class="py-3 px-2 sm:px-4">Nama Desa / Kelurahan</th>
+                                                    <th class="py-3 px-2 sm:px-4 text-center">Jumlah Penerima</th>
+                                                    <th class="py-3 px-2 sm:px-4 text-center">Total Barang</th>
+                                                    <th class="py-3 px-2 sm:px-4 hidden md:table-cell">Jenis Bantuan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-gray-100 dark:divide-gray-700/50">
+                                                @foreach($villages as $villageName => $records)
+                                                    @php
+                                                        $recipientsInVillage = $records->pluck('beneficiary_id')->unique()->count();
+                                                        $totalQtyInVillage = $records->sum('quantity_received');
+                                                    @endphp
+                                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                                                        <td class="py-3 px-2 sm:px-4 text-center text-gray-500 dark:text-gray-400 font-bold">{{ $loop->iteration }}</td>
+                                                        <td class="py-3 px-2 sm:px-4 font-bold text-gray-900 dark:text-white">
+                                                            <div class="flex items-center gap-2">
+                                                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                                                <span class="truncate max-w-[120px] sm:max-w-none">{{ $villageName }}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="py-3 px-2 sm:px-4 text-center font-bold text-gray-800 dark:text-gray-200">
+                                                            {{ number_format($recipientsInVillage) }} KK
+                                                        </td>
+                                                        <td class="py-3 px-2 sm:px-4 text-center font-extrabold text-emerald-600 dark:text-emerald-400">
+                                                            {{ number_format($totalQtyInVillage) }} Unit
+                                                        </td>
+                                                        <td class="py-3 px-2 sm:px-4 hidden md:table-cell">
+                                                            <div class="flex flex-wrap gap-1.5">
+                                                                @foreach($records->pluck('aidInventory.item_name')->filter()->unique() as $itemName)
+                                                                    <span class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold border border-indigo-100 dark:border-indigo-800/40">
+                                                                        📦 {{ $itemName }}
+                                                                    </span>
+                                                                @endforeach
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                {{-- Chart Desa (kanan) --}}
+                                <div class="flex flex-col gap-6">
+                                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-2 relative h-64">
+                                        <canvas id="villageRecipientsChart-{{ $aid->id }}"></canvas>
+                                    </div>
+                                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-2 relative h-64">
+                                        <canvas id="villageItemsChart-{{ $aid->id }}"></canvas>
+                                    </div>
+                                </div>
                             </div>
                         @endif
                     </div>
@@ -441,101 +456,196 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const isDark = document.documentElement.classList.contains('dark');
-    const textColor = isDark ? '#94a3b8' : '#64748b';
-    const gridColor = isDark ? 'rgba(51, 65, 85, 0.4)' : 'rgba(226, 232, 240, 0.8)';
+    document.addEventListener('DOMContentLoaded', function () {
+        const isDark = document.documentElement.classList.contains('dark');
+        const textColor = isDark ? '#94a3b8' : '#64748b';
+        const gridColor = isDark ? 'rgba(51, 65, 85, 0.4)' : 'rgba(226, 232, 240, 0.8)';
 
-    // Data dari Controller
-    const chartLabels = @json($chartLabels ?? []);
-    const chartTargets = @json($chartTargets ?? []);
-    const chartDistributed = @json($chartDistributed ?? []);
+        // Data dari Controller
+        const chartLabels = @json($chartLabels ?? []);
+        const chartTargets = @json($chartTargets ?? []);
+        const chartDistributed = @json($chartDistributed ?? []);
 
-    const categoryLabels = @json($categoryLabels ?? []);
-    const categoryValues = @json($categoryValues ?? []);
+        const categoryLabels = @json($categoryLabels ?? []);
+        const categoryValues = @json($categoryValues ?? []);
 
-    // 1. BAR CHART: Perbandingan Target KK vs Logistik Tersalurkan per Kecamatan
-    const barCtx = document.getElementById('disasterBarChart');
-    if (barCtx) {
-        new Chart(barCtx, {
-            type: 'bar',
-            data: {
-                labels: chartLabels,
-                datasets: [
-                    {
-                        label: 'Target KK',
-                        data: chartTargets,
-                        backgroundColor: isDark ? 'rgba(99, 102, 241, 0.7)' : 'rgba(79, 70, 229, 0.85)',
-                        borderColor: '#6366f1',
-                        borderWidth: 1,
-                        borderRadius: 8,
-                    },
-                    {
-                        label: 'Logistik Tersalurkan (Unit)',
-                        data: chartDistributed,
-                        backgroundColor: isDark ? 'rgba(16, 185, 129, 0.7)' : 'rgba(16, 185, 129, 0.85)',
-                        borderColor: '#10b981',
-                        borderWidth: 1,
-                        borderRadius: 8,
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: { color: textColor, font: { family: 'Figtree', weight: 'bold' } }
-                    }
+        // 1. BAR CHART: Perbandingan Target KK vs Logistik Tersalurkan per Kecamatan
+        const barCtx = document.getElementById('disasterBarChart');
+        if (barCtx) {
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [
+                        {
+                            label: 'Target KK',
+                            data: chartTargets,
+                            backgroundColor: isDark ? 'rgba(99, 102, 241, 0.7)' : 'rgba(79, 70, 229, 0.85)',
+                            borderColor: '#6366f1',
+                            borderWidth: 1,
+                            borderRadius: 8,
+                        },
+                        {
+                            label: 'Logistik Tersalurkan (Unit)',
+                            data: chartDistributed,
+                            backgroundColor: isDark ? 'rgba(16, 185, 129, 0.7)' : 'rgba(16, 185, 129, 0.85)',
+                            borderColor: '#10b981',
+                            borderWidth: 1,
+                            borderRadius: 8,
+                        }
+                    ]
                 },
-                scales: {
-                    x: {
-                        ticks: { color: textColor, font: { family: 'Figtree' } },
-                        grid: { color: 'transparent' }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: textColor, font: { family: 'Figtree', weight: 'bold' } }
+                        }
                     },
-                    y: {
-                        ticks: { color: textColor, font: { family: 'Figtree' } },
-                        grid: { color: gridColor }
+                    scales: {
+                        x: {
+                            ticks: { color: textColor, font: { family: 'Figtree' } },
+                            grid: { color: 'transparent' }
+                        },
+                        y: {
+                            ticks: { color: textColor, font: { family: 'Figtree' } },
+                            grid: { color: gridColor }
+                        }
                     }
                 }
-            }
-        });
-    }
+            });
+        }
 
-    // 2. DONUT CHART: Proporsi Kategori Logistik Bantuan
-    const donutCtx = document.getElementById('categoryDonutChart');
-    if (donutCtx) {
-        new Chart(donutCtx, {
-            type: 'doughnut',
-            data: {
-                labels: categoryLabels,
-                datasets: [{
-                    data: categoryValues,
-                    backgroundColor: [
-                        '#0d11faff', // Indigo
-                        '#19acc0ff', // Emerald
-                        '#f3ff51ff', // Amber
-                        '#ec4899', // Pink
-                        '#c40000ff', // Blue
-                        '#8b5cf6'  // Purple
-                    ],
-                    borderWidth: 2,
-                    borderColor: isDark ? '#1e293b' : '#ffffff',
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { color: textColor, font: { family: 'Figtree', size: 11 } }
-                    }
+        // 2. DONUT CHART: Proporsi Kategori Logistik Bantuan
+        const donutCtx = document.getElementById('categoryDonutChart');
+        if (donutCtx) {
+            new Chart(donutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        data: categoryValues,
+                        backgroundColor: [
+                            '#6366f1', // Indigo
+                            '#10b981', // Emerald
+                            '#f59e0b', // Amber
+                            '#ec4899', // Pink
+                            '#3b82f6', // Blue
+                            '#8b5cf6'  // Purple
+                        ],
+                        borderWidth: 2,
+                        borderColor: isDark ? '#1e293b' : '#ffffff',
+                    }]
                 },
-                cutout: '58%'
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: textColor, font: { family: 'Figtree', size: 11 } }
+                        }
+                    },
+                    cutout: '58%'
+                }
+            });
+        }
+
+        // 3. BAR CHARTS PER KECAMATAN (RINCIAN DESA)
+        @foreach($aidDisasters as $aid)
+            @php
+                $vData = $villageBreakdown[$aid->id]['villages'] ?? collect();
+                $vLabels = collect($vData)->keys()->values()->toArray();
+                $vRecipients = collect($vData)->map(fn($records) => collect($records)->pluck('beneficiary_id')->unique()->count())->values()->toArray();
+                $vQuantities = collect($vData)->map(fn($records) => collect($records)->sum('quantity_received'))->values()->toArray();
+            @endphp
+
+            const recipientsEl{{ $aid->id }} = document.getElementById('villageRecipientsChart-{{ $aid->id }}');
+            if (recipientsEl{{ $aid->id }}) {
+                new Chart(recipientsEl{{ $aid->id }}, {
+                    type: 'bar',
+                    data: {
+                        labels: @json($vLabels),
+                        datasets: [{
+                            label: 'Jumlah Penerima (KK)',
+                            data: @json($vRecipients),
+                            backgroundColor: isDark ? 'rgba(56, 189, 248, 0.75)' : 'rgba(14, 165, 233, 0.85)',
+                            borderColor: '#0284c7',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: 'Jumlah Penerima (KK) per Desa',
+                                color: textColor,
+                                font: { family: 'Figtree', weight: 'bold', size: 12 }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: { color: textColor, font: { family: 'Figtree', size: 11 } },
+                                grid: { color: 'transparent' }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: { color: textColor, font: { family: 'Figtree', size: 11 } },
+                                grid: { color: gridColor }
+                            }
+                        }
+                    }
+                });
             }
-        });
-    }
-});
+
+            const itemsEl{{ $aid->id }} = document.getElementById('villageItemsChart-{{ $aid->id }}');
+            if (itemsEl{{ $aid->id }}) {
+                new Chart(itemsEl{{ $aid->id }}, {
+                    type: 'bar',
+                    data: {
+                        labels: @json($vLabels),
+                        datasets: [{
+                            label: 'Total Barang Tersalur (Unit)',
+                            data: @json($vQuantities),
+                            backgroundColor: isDark ? 'rgba(244, 63, 94, 0.75)' : 'rgba(225, 29, 72, 0.85)',
+                            borderColor: '#be123c',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: 'Total Barang Tersalur per Desa',
+                                color: textColor,
+                                font: { family: 'Figtree', weight: 'bold', size: 12 }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: { color: textColor, font: { family: 'Figtree', size: 11 } },
+                                grid: { color: 'transparent' }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: { color: textColor, font: { family: 'Figtree', size: 11 } },
+                                grid: { color: gridColor }
+                            }
+                        }
+                    }
+                });
+            }
+        @endforeach
+    });
 </script>
 @endpush
+

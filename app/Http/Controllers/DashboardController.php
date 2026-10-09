@@ -23,26 +23,25 @@ class DashboardController extends Controller
     {
         // Aggregated summary statistics
         $stats = [
-            'disaster_zones_count'       => DisasterZone::count(),
-            'disaster_zones_high_risk'   => DisasterZone::whereIn('risk_level', ['high', 'critical', 'tinggi', 'sangat_tinggi'])->count(),
-            'total_affected_population'  => DisasterZone::sum('affected_population'),
-            
-            'evacuation_routes_count'    => EvacuationRoute::count(),
-            'evacuation_routes_accessible' => EvacuationRoute::where('is_accessible', true)->count(),
-            
-            'evacuation_facilities_count'=> EvacuationFacility::count(),
-            'total_facility_capacity'    => EvacuationFacility::sum('capacity'),
-            'medical_facilities_count'   => EvacuationFacility::where('has_medical_facility', true)->count(),
-            'food_facilities_count'      => EvacuationFacility::where('has_food_storage', true)->count(),
-            
-            'aid_inventories_count'      => AidInventory::count(),
-            'aid_inventory_total_stock'  => AidInventory::sum('remaining_stock'),
-            'aid_inventory_initial_stock'=> AidInventory::sum('initial_stock'),
-            
-            'aid_beneficiaries_count'    => AidBeneficiary::count(),
-            'total_distributed_aid'      => AidDistribution::sum('quantity_received'),
-        ];
+            'disaster_zones_count'         => DisasterZone::count(),
+            'disaster_zones_high_risk'     => DisasterZone::whereIn('risk_level', ['high', 'critical', 'tinggi', 'sangat_tinggi'])->count(),
+            'total_affected_population'    => DisasterZone::sum('affected_population'),
 
+            'evacuation_routes_count'      => EvacuationRoute::count(),
+            'evacuation_routes_accessible' => EvacuationRoute::where('is_accessible', true)->count(),
+
+            'evacuation_facilities_count'  => EvacuationFacility::count(),
+            'total_facility_capacity'      => EvacuationFacility::sum('capacity'),
+            'medical_facilities_count'     => EvacuationFacility::where('has_medical_facility', true)->count(),
+            'food_facilities_count'        => EvacuationFacility::where('has_food_storage', true)->count(),
+
+            'aid_inventories_count'        => AidInventory::count(),
+            'aid_inventory_total_stock'    => AidInventory::sum('remaining_stock'),
+            'aid_inventory_initial_stock'  => AidInventory::sum('initial_stock'),
+
+            'aid_beneficiaries_count'      => AidBeneficiary::count(),
+            'total_distributed_aid'        => AidDistribution::sum('quantity_received'),
+        ];
 
         // Breakdown disaster types count
         $disasterTypes = DisasterZone::select(
@@ -54,8 +53,8 @@ class DashboardController extends Controller
             ->groupBy('disaster_type')
             ->get();
 
-        // Top 5 kecamatan berdasarkan distributed_aid untuk pie chart
-        $aidByDistrict = AidDisaster::select('district_name', 'distributed_aid', 'total_recipients')
+        // Top 5 kecamatan berdasarkan jumlah KK penerima (total_received) untuk pie chart
+        $aidByDistrict = AidDisaster::select('district_name', 'total_received', 'total_recipients')
             ->whereNotNull('district_name')
             ->orderByDesc('total_received')
             ->limit(5)
@@ -66,7 +65,7 @@ class DashboardController extends Controller
 
         // Stok logistik bantuan (diurutkan stok tersisa paling sedikit)
         $aidInventories = AidInventory::orderBy('remaining_stock', 'asc')
-            ->limit(6)
+            ->limit(5)
             ->get();
 
         // Riwayat distribusi bantuan terbaru
@@ -76,14 +75,21 @@ class DashboardController extends Controller
             ->limit(6)
             ->get();
 
+            // Top 5 barang logistik berdasarkan stok tersisa untuk pie chart
+        $inventories = AidInventory::select('item_name', 'category', 'initial_stock', 'remaining_stock')
+            ->where('is_active', true)
+            ->orderByDesc('remaining_stock')
+            ->limit(5)
+            ->get();
+
         return $this->partialView('dashboard', compact(
             'stats',
             'disasterTypes',
             'aidByDistrict',
             'aidDisasters',
             'aidInventories',
-            'recentDistributions'
+            'recentDistributions',
+            'inventories'
         ));
     }
 }
-

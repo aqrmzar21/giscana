@@ -65,7 +65,7 @@ class AidDisasterController extends Controller
 
             $groupedByVillage = $distributions->groupBy(function ($d) {
                 $v = $d->beneficiary?->village;
-                return $v?->full_name ?? $v?->name ?? 'Desa Lainnya';
+                return $v?->yard ?? $v?->name ?? 'Desa Lainnya';
             });
 
             $distDistributedSum = $distributions->sum('quantity_received');
