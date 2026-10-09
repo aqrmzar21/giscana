@@ -102,10 +102,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('aid-disasters/print', [\App\Http\Controllers\Admin\AidDisasterController::class, 'print'])->name('aid-disasters.print');
     Route::resource('aid-disasters', \App\Http\Controllers\Admin\AidDisasterController::class);
     Route::get('aid-distributions/print', [\App\Http\Controllers\Admin\AidDistributionController::class, 'print'])->name('aid-distributions.print');
+    Route::get('aid-distributions/export-excel', [\App\Http\Controllers\Admin\AidDistributionController::class, 'exportExcel'])->name('aid-distributions.export-excel');
     Route::resource('aid-distributions', \App\Http\Controllers\Admin\AidDistributionController::class);
     Route::get('aid-inventories/print', [\App\Http\Controllers\Admin\AidInventoryController::class, 'print'])->name('aid-inventories.print');
     Route::resource('aid-inventories', \App\Http\Controllers\Admin\AidInventoryController::class);
     Route::get('aid-beneficiaries/print', [\App\Http\Controllers\Admin\AidBeneficiaryController::class, 'print'])->name('aid-beneficiaries.print');
+    Route::get('aid-beneficiaries/export-excel', [\App\Http\Controllers\Admin\AidBeneficiaryController::class, 'exportExcel'])->name('aid-beneficiaries.export-excel');
     Route::resource('aid-beneficiaries', \App\Http\Controllers\Admin\AidBeneficiaryController::class);
     Route::get('aid-recipients/print', [\App\Http\Controllers\Admin\AidRecipientController::class, 'print'])->name('aid-recipients.print');
     Route::resource('aid-recipients', \App\Http\Controllers\Admin\AidRecipientController::class);

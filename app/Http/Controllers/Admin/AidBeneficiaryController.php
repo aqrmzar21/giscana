@@ -44,7 +44,9 @@ class AidBeneficiaryController extends Controller
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('recipient_name', 'like', "%{$search}%")
-                  ->orWhere('identity_card_number', 'like', "%{$search}%");
+                  ->orWhere('identity_card_number', 'like', "%{$search}%")
+                  ->orWhereHas('village', fn ($vq) => $vq->where('full_name', 'like', "%{$search}%")->orWhere('yard', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%"))
+                  ->orWhereHas('district', fn ($dq) => $dq->where('name', 'like', "%{$search}%"));
             });
         }
 
@@ -57,6 +59,33 @@ class AidBeneficiaryController extends Controller
             ->setPaper('a4', 'landscape');
 
         return $pdf->stream('laporan-penerima-bantuan.pdf');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        abort_if(!auth()->user()->can('export data'), 403);
+        $query = AidBeneficiary::with(['district', 'village'])->latest();
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('recipient_name', 'like', "%{$search}%")
+                  ->orWhere('identity_card_number', 'like', "%{$search}%")
+                  ->orWhereHas('village', fn ($vq) => $vq->where('full_name', 'like', "%{$search}%")->orWhere('yard', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%"))
+                  ->orWhereHas('district', fn ($dq) => $dq->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($status = $request->input('aid_status')) {
+            $query->where('aid_status', $status);
+        }
+
+        $beneficiaries = $query->get();
+        $filename = 'laporan-penerima-bantuan-' . date('Y-m-d-His') . '.xls';
+
+        return response()->view('admin.aid-beneficiaries.excel', compact('beneficiaries'))
+            ->header('Content-Type', 'application/vnd.ms-excel')
+            ->header('Content-Disposition', "attachment; filename=\"{$filename}\"")
+            ->header('Cache-Control', 'max-age=0');
     }
 
     public function create()

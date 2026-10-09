@@ -63,6 +63,12 @@ class AidDistributionController extends Controller
                 })
                 ->orWhereHas('aidInventory', function ($q2) use ($search) {
                     $q2->where('item_name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('beneficiary.village', function ($vq) use ($search) {
+                    $vq->where('full_name', 'like', "%{$search}%")->orWhere('yard', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('beneficiary.village.district', function ($dq) use ($search) {
+                    $dq->where('name', 'like', "%{$search}%");
                 });
             });
         }
@@ -79,6 +85,45 @@ class AidDistributionController extends Controller
             ->setPaper('a4', 'landscape');
 
         return $pdf->stream('laporan-distribusi-bantuan.pdf');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        abort_if(!auth()->user()->can('export data'), 403);
+        $query = AidDistribution::with(['beneficiary.village.district', 'aidInventory', 'aidDisaster', 'user'])->latest('distribution_date');
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('beneficiary', function ($q2) use ($search) {
+                    $q2->where('recipient_name', 'like', "%{$search}%")
+                    ->orWhere('identity_card_number', 'like', "%{$search}%");
+                })
+                ->orWhereHas('aidInventory', function ($q2) use ($search) {
+                    $q2->where('item_name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('beneficiary.village', function ($vq) use ($search) {
+                    $vq->where('full_name', 'like', "%{$search}%")->orWhere('yard', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('beneficiary.village.district', function ($dq) use ($search) {
+                    $dq->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        if ($startDate = $request->input('start_date')) {
+            $query->whereDate('distribution_date', '>=', $startDate);
+        }
+        if ($endDate = $request->input('end_date')) {
+            $query->whereDate('distribution_date', '<=', $endDate);
+        }
+
+        $distributions = $query->get();
+        $filename = 'laporan-distribusi-bantuan-' . date('Y-m-d-His') . '.xls';
+
+        return response()->view('admin.aid-distributions.excel', compact('distributions'))
+            ->header('Content-Type', 'application/vnd.ms-excel')
+            ->header('Content-Disposition', "attachment; filename=\"{$filename}\"")
+            ->header('Cache-Control', 'max-age=0');
     }
 
     public function create()
