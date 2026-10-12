@@ -255,11 +255,19 @@
             }
         });
 
+        // Percobaan suaru notif
         if (nearestMarker) {
             const el = nearestMarker.getElement();
             if (el) {
                 el.classList.add('is-blinking');
                 nearestMarker.openPopup();
+
+                // Play sound
+                const audio = document.getElementById('alert-sound');
+                if (audio) {
+                    audio.currentTime = 0; // mulai dari awal
+                    audio.play().catch(err => console.log('Audio play blocked:', err));
+                }
 
                 // Timer 1 Menit Mati Otomatis
                 blinkingTimer = setTimeout(() => {
