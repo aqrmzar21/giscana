@@ -138,6 +138,8 @@
                 <p class="text-[10px] text-slate-400 font-medium tracking-wide">©2026 Giscana</p>
             </div>
         </div>
+        <audio id="alert-sound" src="{{ asset('sound/alert_alarm_tikum.mp3') }}" preload="auto"></audio>
+
 
     </div>
 @endsection

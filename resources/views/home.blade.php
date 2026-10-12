@@ -45,12 +45,7 @@
                 @auth
                     <a href="{{ route('dashboard') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-800/90 hover:bg-slate-700/90 text-slate-200 hover:text-white font-semibold px-8 py-4 rounded-xl border border-slate-700 transition-all duration-200">
                         <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-                        <span>Akses Dashboard Admin</span>
-                    </a>
-                @else
-                    <a href="{{ route('login') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white dark:bg-slate-800/90 hover:bg-slate-100 dark:hover:bg-slate-700/90 text-slate-800 dark:text-slate-200 font-semibold px-8 py-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-md transition-all duration-200">
-                        <svg class="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-                        <span>Login Petugas / Admin</span>
+                        <span>Akses Dashboard</span>
                     </a>
                 @endauth
             </div>
@@ -339,16 +334,13 @@
                 Temukan lokasi titik kumpul terdekat, rute evakuasi tercepat, dan status logistik bantuan di Kabupaten Bone Bolango.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('map.index') }}" class="bg-white text-blue-700 hover:bg-slate-100 font-bold px-8 py-4 rounded-xl text-base shadow-xl transition-all duration-200 hover:scale-105">
-                    Buka Peta Interaktif Spasial
-                </a>
-                @guest
+               @guest
                     <a href="{{ route('login') }}" class="border border-white/40 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-xl font-bold text-base transition-colors backdrop-blur-sm">
-                        Login Petugas SIMBA
+                        Login
                     </a>
                 @else
                     <a href="{{ route('dashboard') }}" class="border border-white/40 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-xl font-bold text-base transition-colors backdrop-blur-sm">
-                        Ke Dashboard Management
+                        Akses Dashboard
                     </a>
                 @endguest
             </div>
