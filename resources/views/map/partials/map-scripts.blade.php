@@ -217,19 +217,14 @@
             return;
         }
 
-        // 1. Bersihkan state lokasi lama sebelum set baru
+        // 1. Bersihkan state lokasi lama
         resetUserLocation();
-
-        // 2. Tutup modal
         closeLocationModal();
 
-        // 3. Tambahkan Marker Lokasi User
+        // 2. Tambahkan Marker Lokasi User
         userMarker = L.marker([lat, lng]).addTo(map).bindPopup("Lokasi Saya").openPopup();
         map.setView([lat, lng], 14);
 
-        const userLatLng = L.latLng(lat, lng);
-
-        // 4. Update UI Status ke "Aktif"
         const statusElem = document.getElementById('userLocationStatus');
         const resetBtn = document.getElementById('btnResetLocation');
 
@@ -237,67 +232,87 @@
             statusElem.textContent = 'Aktif ✓';
             statusElem.className = 'text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full';
         }
-
         if (resetBtn) {
             resetBtn.disabled = false;
             resetBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         }
 
-        // 5. Hitung & Aktifkan Efek Kedip Marker Terdekat
-        let nearestMarker = null;
-        let minDistance = Infinity;
-
-        layers.evacuationFacilities.eachLayer(marker => {
-            const dist = userLatLng.distanceTo(marker.getLatLng());
-            if (dist < minDistance) {
-                minDistance = dist;
-                nearestMarker = marker;
-            }
-        });
-
-        // Percobaan suaru notif
-        if (nearestMarker) {
-            const el = nearestMarker.getElement();
-            if (el) {
-                el.classList.add('is-blinking');
-                nearestMarker.openPopup();
-
-                // Play sound
-                const audio = document.getElementById('alert-sound');
-                if (audio) {
-                    audio.currentTime = 0; // mulai dari awal
-                    audio.play().catch(err => console.log('Audio play blocked:', err));
-                }
-
-                // Timer 1 Menit Mati Otomatis
-                blinkingTimer = setTimeout(() => {
-                    if (el) el.classList.remove('is-blinking');
-                }, 60000);
-            }
-        }
-
-        // 6. Panggil API Rute Evakuasi
+        // 3. Panggil API Rute Evakuasi
         fetch(`/api/nearest-evacuation-with-route?lat=${lat}&lng=${lng}`)
             .then(res => res.json())
             .then(data => {
-                if (!data.success) return;
+                if (!data.success || !data.facility) {
+                    alert("Gagal menemukan titik kumpul terdekat.");
+                    return;
+                }
 
                 const facility = data.facility;
-                const routes = data.routes;
+                let fLat, fLng;
 
-                if (routes && routes.length > 0) {
-                    routes.forEach(route => {
-                        const coords = route.line_coordinates.map(c => [c[1], c[0]]);
-                        L.polyline(coords, {
-                            color: 'blue',
-                            weight: 5,
-                            dashArray: '5,10'
-                        }).addTo(userRouteLayerGroup).bindPopup(route.name);
-                    });
-                } else if (facility && facility.point_coordinates) {
-                    let fLat = facility.point_coordinates.lat;
-                    let fLng = facility.point_coordinates.lng;
+                // --- PERBAIKAN BACA DATA DATABASE (ARRAY [LNG, LAT]) ---
+                if (Array.isArray(facility.point_coordinates)) {
+                    fLng = parseFloat(facility.point_coordinates[0]); // Indeks 0 = Longitude
+                    fLat = parseFloat(facility.point_coordinates[1]); // Indeks 1 = Latitude
+                } else if (typeof facility.point_coordinates === 'string') {
+                    // Jaga-jaga jika dari API terbaca sebagai string "[123.xxx, 0.xxx]"
+                    const coords = JSON.parse(facility.point_coordinates);
+                    fLng = parseFloat(coords[0]);
+                    fLat = parseFloat(coords[1]);
+                }
 
+                if (isNaN(fLat) || isNaN(fLng)) {
+                    console.error("Format koordinat tidak valid", facility.point_coordinates);
+                    return; 
+                }
+
+                const facilityLatLng = L.latLng(fLat, fLng);
+
+                // --- A. EFEK KEDIP & SUARA PADA TITIK KUMPUL ---
+                let targetMarker = null;
+                let minTargetDist = Infinity;
+
+                layers.evacuationFacilities.eachLayer(marker => {
+                    const dist = facilityLatLng.distanceTo(marker.getLatLng());
+                    if (dist < minTargetDist) {
+                        minTargetDist = dist;
+                        targetMarker = marker;
+                    }
+                });
+
+                if (targetMarker) {
+                    const el = targetMarker.getElement();
+                    if (el) {
+                        el.classList.add('is-blinking');
+                        targetMarker.openPopup();
+
+                        // Mainkan suara sirine/alert
+                        const audio = document.getElementById('alert-sound');
+                        if (audio) {
+                            audio.currentTime = 0;
+                            audio.play().catch(err => console.log('Audio play blocked:', err));
+                        }
+
+                        blinkingTimer = setTimeout(() => {
+                            if (el) el.classList.remove('is-blinking');
+                        }, 30000);
+                    }
+                }
+
+                // --- B. BUAT RUTE BARU DARI USER KE TITIK KUMPUL ---
+                const routeCoords = [[lat, lng], [fLat, fLng]];
+                
+                // 1. Gambar Garis Lurus (Biru Putus-putus)
+                const dashLine = L.polyline(routeCoords, {
+                    color: '#3b82f6', // Warna biru 
+                    weight: 4,
+                    dashArray: '8, 8' 
+                }).addTo(userRouteLayerGroup).bindPopup('Jarak Lurus ke Fasilitas');
+                
+                // Zoom peta otomatis agar lokasi user dan titik kumpul terlihat sekaligus
+                map.fitBounds(dashLine.getBounds(), { padding: [50, 50] });
+
+                // 2. (Opsional) Coba gambar rute mengikuti jalan jika L.Routing tersedia
+                try {
                     if (typeof L.Routing !== 'undefined') {
                         userRoutingControl = L.Routing.control({
                             waypoints: [
@@ -305,10 +320,15 @@
                                 L.latLng(fLat, fLng)
                             ],
                             lineOptions: {
-                                styles: [{color: 'red', weight: 4, dashArray: '5, 10'}]
-                            }
+                                styles: [{color: '#ef4444', weight: 4, dashArray: '5, 10'}] // Warna merah untuk rute jalan
+                            },
+                            show: false,
+                            addWaypoints: false,
+                            routeWhileDragging: false
                         }).addTo(map);
                     }
+                } catch (e) {
+                    console.log("Leaflet Routing Machine tidak dijalankan.");
                 }
             })
             .catch(err => console.error('Error fetching route:', err));
@@ -332,13 +352,13 @@
             'banjir':    'rgba(59,130,246,0.25)',
             'gempa':     'rgba(249,115,22,0.25)',
             'gelombang': 'rgba(6,182,212,0.25)',
-            'longsor':   'rgba(229, 245, 205, 0.25)',
+            'longsor':   'rgba(245, 205, 236, 0.25)',
         };
         const bgMap = {
             'banjir':    '#eff6ff',
             'gempa':     '#fff7ed',
             'gelombang': '#ecfeff',
-            'longsor':   '#f7fee7',
+            'longsor':   '#fee7faff',
         };
 
 
