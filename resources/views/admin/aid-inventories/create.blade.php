@@ -42,7 +42,7 @@
                         <div class="mt-1">
                             <select id="category" name="category" required
                                     class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('category') border-red-300 @enderror">
-                                <option value="">Pilih Kategori</option>
+                                <option value=""hidden>Pilih Kategori</option>
                                 @foreach(['sembako' => 'Sembako', 'obat' => 'Obat', 'pakaian' => 'Pakaian', 'material' => 'Material', 'lainnya' => 'Lainnya'] as $value => $label)
                                     <option value="{{ $value }}" {{ old('category') === $value ? 'selected' : '' }}>{{ $label }}</option>
                                 @endforeach
