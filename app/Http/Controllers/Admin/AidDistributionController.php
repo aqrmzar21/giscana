@@ -30,7 +30,7 @@ class AidDistributionController extends Controller
                     $q2->where('item_name', 'like', "%{$search}%");
                 })
                 ->orWhereHas('beneficiary.village', function ($vq) use ($search) {
-                    $vq->where('full_name', 'like', "%{$search}%");
+                    $vq->where('full_name', 'like', "%{$search}%")->orWhere('yard', 'like', "%{$search}%");
                 })
                 ->orWhereHas('beneficiary.village.district', function ($dq) use ($search) {
                     $dq->where('name', 'like', "%{$search}%");
@@ -65,7 +65,7 @@ class AidDistributionController extends Controller
                     $q2->where('item_name', 'like', "%{$search}%");
                 })
                 ->orWhereHas('beneficiary.village', function ($vq) use ($search) {
-                    $vq->where('full_name', 'like', "%{$search}%")->orWhere('yard', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%");
+                    $vq->where('full_name', 'like', "%{$search}%")->orWhere('yard', 'like', "%{$search}%");
                 })
                 ->orWhereHas('beneficiary.village.district', function ($dq) use ($search) {
                     $dq->where('name', 'like', "%{$search}%");
@@ -102,7 +102,7 @@ class AidDistributionController extends Controller
                     $q2->where('item_name', 'like', "%{$search}%");
                 })
                 ->orWhereHas('beneficiary.village', function ($vq) use ($search) {
-                    $vq->where('full_name', 'like', "%{$search}%")->orWhere('yard', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%");
+                    $vq->where('full_name', 'like', "%{$search}%")->orWhere('yard', 'like', "%{$search}%");
                 })
                 ->orWhereHas('beneficiary.village.district', function ($dq) use ($search) {
                     $dq->where('name', 'like', "%{$search}%");

@@ -23,7 +23,7 @@ class AidBeneficiaryController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('recipient_name', 'like', "%{$search}%")
                   ->orWhere('identity_card_number', 'like', "%{$search}%")
-                  ->orWhereHas('village', fn ($vq) => $vq->where('full_name', 'like', "%{$search}%"))
+                  ->orWhereHas('village', fn ($vq) => $vq->where('full_name', 'like', "%{$search}%")->orWhere('yard', 'like', "%{$search}%"))
                   ->orWhereHas('district', fn ($dq) => $dq->where('name', 'like', "%{$search}%"));
             });
         }
@@ -45,7 +45,7 @@ class AidBeneficiaryController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('recipient_name', 'like', "%{$search}%")
                   ->orWhere('identity_card_number', 'like', "%{$search}%")
-                  ->orWhereHas('village', fn ($vq) => $vq->where('full_name', 'like', "%{$search}%")->orWhere('yard', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%"))
+                  ->orWhereHas('village', fn ($vq) => $vq->where('full_name', 'like', "%{$search}%")->orWhere('yard', 'like', "%{$search}%"))
                   ->orWhereHas('district', fn ($dq) => $dq->where('name', 'like', "%{$search}%"));
             });
         }
@@ -70,7 +70,7 @@ class AidBeneficiaryController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('recipient_name', 'like', "%{$search}%")
                   ->orWhere('identity_card_number', 'like', "%{$search}%")
-                  ->orWhereHas('village', fn ($vq) => $vq->where('full_name', 'like', "%{$search}%")->orWhere('yard', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%"))
+                  ->orWhereHas('village', fn ($vq) => $vq->where('full_name', 'like', "%{$search}%")->orWhere('yard', 'like', "%{$search}%"))
                   ->orWhereHas('district', fn ($dq) => $dq->where('name', 'like', "%{$search}%"));
             });
         }
