@@ -158,40 +158,47 @@ class AidDisasterController extends Controller
         $allDistricts = District::all();
 
         foreach ($disasters as $disaster) {
-            // 1. Resolve district_id secara eksak (exact match)
             $district = null;
-            if ($disaster->district_id) {
-                $district = $allDistricts->firstWhere('id', $disaster->district_id);
-            }
 
-            if (!$district && $disaster->district_name) {
+            // 1. PRIORITAS UTAMA: Cocokkan nama kecamatan (district_name) terlebih dahulu ke tabel districts!
+            // Karena nama kecamatan adalah identitas tampilan utama pada kartu rekapitulasi.
+            if ($disaster->district_name) {
                 $cleanDisasterName = strtolower(trim($disaster->district_name));
+                // Hilangkan prefiks 'kecamatan ' jika tidak sengaja tersimpan
+                $cleanDisasterName = preg_replace('/^kecamatan\s+/i', '', $cleanDisasterName);
 
-                // 1a. Cocokkan nama persis sama (exact match)
+                // 1a. Pencocokan nama eksak
                 $district = $allDistricts->first(function ($d) use ($cleanDisasterName) {
-                    return strtolower(trim($d->name)) === $cleanDisasterName;
+                    $cleanDName = strtolower(trim(preg_replace('/^kecamatan\s+/i', '', $d->name)));
+                    return $cleanDName === $cleanDisasterName;
                 });
 
-                // 1b. Fallback normalisasi hanya untuk variasi penulisan spasi (misal "Bonepantai" vs "Bone Pantai")
+                // 1b. Fallback normalisasi variasi spasi (misal "Bonepantai" vs "Bone Pantai", "Kabila Bone" vs "KabilaBone")
                 if (!$district) {
                     $slugTarget = preg_replace('/[^a-z0-9]/', '', $cleanDisasterName);
                     $district = $allDistricts->first(function ($d) use ($slugTarget) {
-                        return preg_replace('/[^a-z0-9]/', '', strtolower(trim($d->name))) === $slugTarget;
+                        $slugD = preg_replace('/[^a-z0-9]/', '', strtolower(trim($d->name)));
+                        return $slugD === $slugTarget;
                     });
                 }
             }
 
+            // 2. Fallback: jika tidak ditemukan via nama, baru cocokkan via district_id
+            if (!$district && $disaster->district_id) {
+                $district = $allDistricts->firstWhere('id', $disaster->district_id);
+            }
+
             $districtId = $district?->id ?? $disaster->district_id;
 
-            // Perbarui district_id pada model bencana jika belum ada/berbeda
-            if ($districtId && $disaster->exists && (int)$disaster->district_id !== (int)$districtId) {
+            // 3. Auto-heal: Perbarui district_id pada tabel aid_disasters di database agar selalu sinkron dan akurat
+            if ($district && $disaster->exists && (int)$disaster->district_id !== (int)$district->id) {
                 try {
-                    $disaster->district_id = $districtId;
+                    $disaster->district_id = $district->id;
                     $disaster->saveQuietly();
                 } catch (\Throwable $e) {}
             }
 
-            // 2. Ambil HANYA desa-desa yang terdaftar di kecamatan ini dari tabel villages
+            // 4. Ambil HANYA desa-desa yang terdaftar di kecamatan ini dari tabel villages
             if ($districtId) {
                 $allVillages = Village::where('district_id', $districtId)
                     ->orderBy('yard')
@@ -206,9 +213,16 @@ class AidDisasterController extends Controller
                     ->get();
             }
 
+            // Fallback jika belum terisi district_id pada sebagian data desa
+            if ($allVillages->isEmpty() && $district) {
+                $allVillages = Village::where('zone', $district->name)
+                    ->orderBy('yard')
+                    ->get();
+            }
+
             $villageIds = $allVillages->pluck('id')->filter()->all();
 
-            // 3. Query transaksi distribusi bantuan khusus untuk desa-desa di kecamatan ini
+            // 5. Query transaksi distribusi bantuan khusus untuk desa-desa di kecamatan ini
             $distQuery = AidDistribution::with(['beneficiary.village', 'aidInventory', 'village'])
                 ->where(function ($q) use ($disaster, $villageIds) {
                     $q->where('aid_disaster_id', $disaster->id);
@@ -226,7 +240,7 @@ class AidDisasterController extends Controller
 
             $distributions = $distQuery->get();
 
-            // 4. Group distribusi berdasarkan ID desa dan Nama Desa
+            // 6. Group distribusi berdasarkan ID desa dan Nama Desa
             $groupedByVillageId = $distributions->groupBy(function ($d) {
                 return $d->village_id ?: ($d->beneficiary?->village_id ?: 0);
             });
@@ -237,7 +251,7 @@ class AidDisasterController extends Controller
                 return strtolower(trim($name));
             });
 
-            // 5. Gabungkan master desa dengan data distribusi
+            // 7. Gabungkan master desa dengan data distribusi
             // HANYA desa-desa di kecamatan ini yang dimasukkan, tidak menambah desa luar!
             $mergedVillages = collect();
 
@@ -252,14 +266,22 @@ class AidDisasterController extends Controller
                     $records = $groupedByVillageName->get(strtolower(trim($vName)));
                 }
 
-                $mergedVillages->put($vName, $records ?: collect());
-                $allVillageKeys[] = $vName;
+                $keyName = $vName;
+                if ($mergedVillages->has($keyName)) {
+                    $keyName = $vName . ' (' . ($village->full_name ?: $village->id) . ')';
+                }
+
+                $mergedVillages->put($keyName, $records ?: collect());
+                $allVillageKeys[] = $village->id;
             }
 
             // Hitung total unit dan penerima untuk kecamatan ini
             $districtDistributions = $distributions->filter(function ($d) use ($villageIds, $disaster) {
                 $vId = $d->village_id ?: ($d->beneficiary?->village_id ?: 0);
-                return in_array($vId, $villageIds) || (int)$d->aid_disaster_id === (int)$disaster->id;
+                if ($vId && !empty($villageIds)) {
+                    return in_array($vId, $villageIds);
+                }
+                return (int)$d->aid_disaster_id === (int)$disaster->id;
             });
 
             $distDistributedSum = (int) $districtDistributions->sum('quantity_received');
@@ -351,6 +373,18 @@ class AidDisasterController extends Controller
         ]);
 
         $validated['is_active'] = $request->has('is_active');
+
+        if (!empty($validated['district_name'])) {
+            $cleanName = strtolower(trim(preg_replace('/^kecamatan\s+/i', '', $validated['district_name'])));
+            $matchedDistrict = District::all()->first(function ($d) use ($cleanName) {
+                $cleanD = strtolower(trim(preg_replace('/^kecamatan\s+/i', '', $d->name)));
+                return $cleanD === $cleanName || preg_replace('/[^a-z0-9]/', '', $cleanD) === preg_replace('/[^a-z0-9]/', '', $cleanName);
+            });
+            if ($matchedDistrict) {
+                $validated['district_id'] = $matchedDistrict->id;
+                $validated['district_name'] = $matchedDistrict->name;
+            }
+        }
 
         $aidDisaster->update($validated);
 

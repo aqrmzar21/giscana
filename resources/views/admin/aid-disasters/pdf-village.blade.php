@@ -202,7 +202,7 @@
         @endphp
 
         <div class="district-header">
-            <h3>Kecamatan {{ $aid->district_name }}</h3>
+            <h3>Kecamatan {{ preg_replace('/^kecamatan\s+/i', '', $aid->district_name) }}</h3>
             <div class="subtitle">
                 Total Desa Terdata: <strong>{{ $vCount }} Desa</strong> &bull; Total Logistik Tersalur: <strong>{{ number_format($yearUnits) }} Unit</strong> &bull; Total Penerima: <strong>{{ number_format($yearRecipients) }} KK</strong>
             </div>

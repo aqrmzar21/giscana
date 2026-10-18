@@ -66,7 +66,7 @@
                     <label for="role" class="block text-sm font-medium text-gray-700">Role <span class="text-red-500">*</span></label>
                     <div class="mt-1">
                         <select name="role" id="role" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
-                            <option value="" disabled {{ old('role') ? '' : 'selected' }}>-- Pilih Role --</option>
+                            <option value="" disabled {{ old('role') ? '' : 'selected' }} hidden>-- Pilih Role --</option>
                             @foreach($roles as $value => $label)
                                 <option value="{{ $value }}" {{ old('role') === $value ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach

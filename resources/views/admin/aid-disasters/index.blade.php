@@ -195,8 +195,8 @@
                         <th scope="col" class="py-3.5 px-4 text-center w-12">No</th>
                         <th scope="col" class="py-3.5 px-4">Kecamatan</th>
                         <th scope="col" class="py-3.5 px-4 text-center">Bantuan Tersalur ({{ $selectedYear !== 'all' ? 'Tahun ' . $selectedYear : 'Total' }})</th>
-                        <th scope="col" class="py-3.5 px-4 text-center">Jumlah Warga (KK)</th>
-                        <!-- <th scope="col" class="py-3.5 px-4 text-center">Jumlah Penerima (KK)</th> -->
+                        <!-- <th scope="col" class="py-3.5 px-4 text-center">Jumlah Warga (KK)</th> -->
+                        <th scope="col" class="py-3.5 px-4 text-center">Jumlah Penerima (KK)</th>
                         <th scope="col" class="py-3.5 px-4 text-center">Jumlah Warga Belum Menerima (KK)</th>
                         <th scope="col" class="py-3.5 px-4">Progres Penyaluran</th>
                         <th scope="col" class="py-3.5 px-4 text-center">Aksi</th>
@@ -225,20 +225,20 @@
                             <td class="py-4 px-4 font-bold text-gray-900 dark:text-white">
                                 <div class="flex items-center gap-2">
                                     <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                                    <span>Kecamatan {{ $aid->district_name }}</span>
+                                    <span>Kecamatan {{ preg_replace('/^kecamatan\s+/i', '', $aid->district_name) }}</span>
                                 </div>
                             </td>
                             <td class="py-4 px-4 text-center font-extrabold text-emerald-600 dark:text-emerald-400">
                                 {{ number_format($yearDistributed) }} Unit
                             </td>
-                            <td class="py-4 px-4 text-center font-semibold text-gray-700 dark:text-gray-300">
-                                {{ number_format($aid->total_recipients) }} KK
-                            </td>
                             <!-- <td class="py-4 px-4 text-center font-semibold text-gray-700 dark:text-gray-300">
-                                {{ number_format($aid->total_received) }} Jiwa
+                                {{ number_format($aid->total_recipients) }} KK
                             </td> -->
                             <td class="py-4 px-4 text-center font-semibold text-gray-700 dark:text-gray-300">
-                                {{ number_format($aid->total_recipients - $aid->total_received) }} Jiwa
+                                {{ number_format($aid->total_received) }} Jiwa
+                            </td>
+                            <td class="py-4 px-4 text-center font-semibold text-gray-700 dark:text-gray-300">
+                                {{ number_format(max(0, ($aid->total_recipients ?? 0) - ($aid->total_received ?? 0))) }} Jiwa
                             </td>
                             <td class="py-4 px-4 min-w-[200px]">
                                 <div class="flex items-center gap-3">
@@ -341,7 +341,7 @@
                             </div>
                             <div>
                                 <h4 class="text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-                                    <span>Kecamatan {{ $aid->district_name }}</span>
+                                    <span>Kecamatan {{ preg_replace('/^kecamatan\s+/i', '', $aid->district_name) }}</span>
                                     <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">
                                         {{ $totalVillagesCount }} Desa Terdaftar
                                     </span>
@@ -539,12 +539,12 @@
                     datasets: [{
                         data: categoryValues,
                         backgroundColor: [
-                            '#6366f1', // Indigo
-                            '#10b981', // Emerald
+                            '#f51919ff', // Indigo
+                            '#2fee1eff', // Emerald
                             '#f59e0b', // Amber
                             '#ec4899', // Pink
-                            '#3b82f6', // Blue
-                            '#8b5cf6'  // Purple
+                            '#f3f63bff', // Blue
+                            '#1dd9f1ff'  // Purple
                         ],
                         borderWidth: 2,
                         borderColor: isDark ? '#1e293b' : '#ffffff',
@@ -559,7 +559,7 @@
                             labels: { color: textColor, font: { family: 'Figtree', size: 11 } }
                         }
                     },
-                    cutout: '58%'
+                    cutout: '50%'
                 }
             });
         }
