@@ -344,7 +344,7 @@
                 </a>
                 @guest
                     <a href="{{ route('login') }}" class="border border-white/40 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-xl font-bold text-base transition-colors backdrop-blur-sm">
-                        Login Petugas SIMBA
+                        Login
                     </a>
                 @else
                     <a href="{{ route('dashboard') }}" class="border border-white/40 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-xl font-bold text-base transition-colors backdrop-blur-sm">

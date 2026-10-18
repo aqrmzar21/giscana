@@ -195,8 +195,8 @@
                         <th scope="col" class="py-3.5 px-4 text-center w-12">No</th>
                         <th scope="col" class="py-3.5 px-4">Kecamatan</th>
                         <th scope="col" class="py-3.5 px-4 text-center">Bantuan Tersalur ({{ $selectedYear !== 'all' ? 'Tahun ' . $selectedYear : 'Total' }})</th>
-                        <!-- <th scope="col" class="py-3.5 px-4 text-center">Jumlah Warga (KK)</th> -->
-                        <th scope="col" class="py-3.5 px-4 text-center">Jumlah Penerima (KK)</th>
+                        <th scope="col" class="py-3.5 px-4 text-center">Jumlah Warga (KK)</th>
+                        <!-- <th scope="col" class="py-3.5 px-4 text-center">Jumlah Penerima (KK)</th> -->
                         <th scope="col" class="py-3.5 px-4 text-center">Jumlah Warga Belum Menerima (KK)</th>
                         <th scope="col" class="py-3.5 px-4">Progres Penyaluran</th>
                         <th scope="col" class="py-3.5 px-4 text-center">Aksi</th>
@@ -231,12 +231,12 @@
                             <td class="py-4 px-4 text-center font-extrabold text-emerald-600 dark:text-emerald-400">
                                 {{ number_format($yearDistributed) }} Unit
                             </td>
-                            <!-- <td class="py-4 px-4 text-center font-semibold text-gray-700 dark:text-gray-300">
-                                {{ number_format($aid->total_recipients) }} KK
-                            </td> -->
                             <td class="py-4 px-4 text-center font-semibold text-gray-700 dark:text-gray-300">
-                                {{ number_format($aid->total_received) }} Jiwa
+                                {{ number_format($aid->total_recipients) }} KK
                             </td>
+                            <!-- <td class="py-4 px-4 text-center font-semibold text-gray-700 dark:text-gray-300">
+                                {{ number_format($aid->total_received) }} Jiwa
+                            </td> -->
                             <td class="py-4 px-4 text-center font-semibold text-gray-700 dark:text-gray-300">
                                 {{ number_format($aid->total_recipients - $aid->total_received) }} Jiwa
                             </td>
@@ -349,6 +349,7 @@
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                     Total Terdistribusi: <strong class="text-emerald-600 dark:text-emerald-400">{{ number_format($totalYearUnits) }} Unit</strong> &bull; 
                                     Penerima Terdata: <strong class="text-blue-600 dark:text-blue-400">{{ number_format($totalYearRecipients) }} KK</strong>
+                                    <!-- Target Penerima : <strong class="text-blue-600 dark:text-blue-400">{{ number_format($aid->total_recipients) }} KK</strong> -->
                                 </p>
                             </div>
                         </div>
@@ -391,7 +392,7 @@
                                             <thead class="bg-gray-100 dark:bg-gray-700/80 text-gray-600 dark:text-gray-300 uppercase tracking-wider font-bold">
                                                 <tr>
                                                     <th class="py-3 px-2 sm:px-4 text-center w-12">No</th>
-                                                    <th class="py-3 px-2 sm:px-4">Nama Desa / Kelurahan</th>
+                                                    <th class="py-3 px-2 sm:px-4">Nama Desa</th>
                                                     <th class="py-3 px-2 sm:px-4 text-center">Jumlah Penerima</th>
                                                     <th class="py-3 px-2 sm:px-4 text-center">Total Barang</th>
                                                     <th class="py-3 px-2 sm:px-4 hidden md:table-cell">Jenis Bantuan</th>
@@ -399,6 +400,10 @@
                                             </thead>
                                             <tbody class="divide-y divide-gray-100 dark:divide-gray-700/50">
                                                 @foreach($villages as $villageName => $records)
+                                                    <!-- @php
+                                                        $recipientsInVillage = $records->pluck('beneficiary_id')->unique()->count();
+                                                        $totalQtyInVillage = $records->sum('quantity_received');
+                                                    @endphp -->
                                                     @php
                                                         $recipientsInVillage = $records->pluck('beneficiary_id')->unique()->count();
                                                         $totalQtyInVillage = $records->sum('quantity_received');
@@ -411,19 +416,34 @@
                                                                 <span class="truncate max-w-[120px] sm:max-w-none">{{ $villageName }}</span>
                                                             </div>
                                                         </td>
-                                                        <td class="py-3 px-2 sm:px-4 text-center font-bold text-gray-800 dark:text-gray-200">
+                                                        <!-- <td class="py-3 px-2 sm:px-4 text-center font-bold text-gray-800 dark:text-gray-200">
                                                             {{ number_format($recipientsInVillage) }} KK
                                                         </td>
                                                         <td class="py-3 px-2 sm:px-4 text-center font-extrabold text-emerald-600 dark:text-emerald-400">
                                                             {{ number_format($totalQtyInVillage) }} Unit
+                                                        </td> -->
+                                                        <td class="py-3 px-2 sm:px-4 text-center font-bold text-gray-800 dark:text-gray-200">
+                                                            {{ $recipientsInVillage > 0 ? number_format($recipientsInVillage).' KK' : '-' }}
+                                                        </td>
+                                                        <td class="py-3 px-2 sm:px-4 text-center font-extrabold text-emerald-600 dark:text-emerald-400">
+                                                            {{ $totalQtyInVillage > 0 ? number_format($totalQtyInVillage).' Unit' : '-' }}
                                                         </td>
                                                         <td class="py-3 px-2 sm:px-4 hidden md:table-cell">
                                                             <div class="flex flex-wrap gap-1.5">
-                                                                @foreach($records->pluck('aidInventory.item_name')->filter()->unique() as $itemName)
+                                                                <!-- @foreach($records->pluck('aidInventory.item_name')->filter()->unique() as $itemName)
                                                                     <span class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold border border-indigo-100 dark:border-indigo-800/40">
                                                                         📦 {{ $itemName }}
                                                                     </span>
-                                                                @endforeach
+                                                                @endforeach -->
+                                                                @if($records->isNotEmpty())
+                                                                    @foreach($records->pluck('aidInventory.item_name')->filter()->unique() as $itemName)
+                                                                        <span class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold border border-indigo-100 dark:border-indigo-800/40">
+                                                                            📦 {{ $itemName }}
+                                                                        </span>
+                                                                    @endforeach
+                                                                @else
+                                                                    <span class="text-gray-400 dark:text-gray-500 text-xs italic">-</span>
+                                                                @endif
                                                             </div>
                                                         </td>
                                                     </tr>
