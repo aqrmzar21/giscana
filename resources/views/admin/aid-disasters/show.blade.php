@@ -160,11 +160,17 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700/50">
                         @forelse($villageStats as $villageName => $records)
+                            @php
+                                $recipientsInVillage = $records->pluck('beneficiary_id')->filter()->unique()->count();
+                                $totalQtyInVillage = $records->sum('quantity_received');
+                            @endphp
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30">
                                 <td class="py-3 px-3 font-bold text-gray-800 dark:text-gray-200">{{ $villageName }}</td>
-                                <td class="py-3 px-3 text-center font-semibold text-gray-700 dark:text-gray-300">{{ $records->count() }} KK</td>
+                                <td class="py-3 px-3 text-center font-semibold text-gray-700 dark:text-gray-300">
+                                    {{ $recipientsInVillage > 0 ? number_format($recipientsInVillage) . ' KK' : '-' }}
+                                </td>
                                 <td class="py-3 px-3 text-center font-bold text-emerald-600 dark:text-emerald-400">
-                                    {{ number_format($records->sum('quantity_received')) }} Unit
+                                    {{ $totalQtyInVillage > 0 ? number_format($totalQtyInVillage) . ' Unit' : '-' }}
                                 </td>
                             </tr>
                         @empty

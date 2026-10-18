@@ -379,8 +379,7 @@
                         @if(empty($villages) || count($villages) === 0)
                             <div class="text-center py-6 text-gray-400 dark:text-gray-500">
                                 <p class="text-xs font-medium">
-                                    Belum ada transaksi penyaluran terdata untuk kecamatan ini 
-                                    {{ $selectedYear !== 'all' ? 'pada tahun ' . $selectedYear : '' }}.
+                                    Belum ada data desa terdaftar untuk Kecamatan {{ $aid->district_name }}.
                                 </p>
                             </div>
                         @else
@@ -400,41 +399,26 @@
                                             </thead>
                                             <tbody class="divide-y divide-gray-100 dark:divide-gray-700/50">
                                                 @foreach($villages as $villageName => $records)
-                                                    <!-- @php
-                                                        $recipientsInVillage = $records->pluck('beneficiary_id')->unique()->count();
-                                                        $totalQtyInVillage = $records->sum('quantity_received');
-                                                    @endphp -->
                                                     @php
-                                                        $recipientsInVillage = $records->pluck('beneficiary_id')->unique()->count();
+                                                        $recipientsInVillage = $records->pluck('beneficiary_id')->filter()->unique()->count();
                                                         $totalQtyInVillage = $records->sum('quantity_received');
                                                     @endphp
                                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                                                         <td class="py-3 px-2 sm:px-4 text-center text-gray-500 dark:text-gray-400 font-bold">{{ $loop->iteration }}</td>
                                                         <td class="py-3 px-2 sm:px-4 font-bold text-gray-900 dark:text-white">
                                                             <div class="flex items-center gap-2">
-                                                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                                                <span class="w-2 h-2 rounded-full {{ $recipientsInVillage > 0 ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600' }}"></span>
                                                                 <span class="truncate max-w-[120px] sm:max-w-none">{{ $villageName }}</span>
                                                             </div>
                                                         </td>
-                                                        <!-- <td class="py-3 px-2 sm:px-4 text-center font-bold text-gray-800 dark:text-gray-200">
-                                                            {{ number_format($recipientsInVillage) }} KK
-                                                        </td>
-                                                        <td class="py-3 px-2 sm:px-4 text-center font-extrabold text-emerald-600 dark:text-emerald-400">
-                                                            {{ number_format($totalQtyInVillage) }} Unit
-                                                        </td> -->
                                                         <td class="py-3 px-2 sm:px-4 text-center font-bold text-gray-800 dark:text-gray-200">
-                                                            {{ $recipientsInVillage > 0 ? number_format($recipientsInVillage).' KK' : '-' }}
+                                                            {{ $recipientsInVillage > 0 ? number_format($recipientsInVillage) . ' KK' : '-' }}
                                                         </td>
                                                         <td class="py-3 px-2 sm:px-4 text-center font-extrabold text-emerald-600 dark:text-emerald-400">
-                                                            {{ $totalQtyInVillage > 0 ? number_format($totalQtyInVillage).' Unit' : '-' }}
+                                                            {{ $totalQtyInVillage > 0 ? number_format($totalQtyInVillage) . ' Unit' : '-' }}
                                                         </td>
                                                         <td class="py-3 px-2 sm:px-4 hidden md:table-cell">
                                                             <div class="flex flex-wrap gap-1.5">
-                                                                <!-- @foreach($records->pluck('aidInventory.item_name')->filter()->unique() as $itemName)
-                                                                    <span class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold border border-indigo-100 dark:border-indigo-800/40">
-                                                                        📦 {{ $itemName }}
-                                                                    </span>
-                                                                @endforeach -->
                                                                 @if($records->isNotEmpty())
                                                                     @foreach($records->pluck('aidInventory.item_name')->filter()->unique() as $itemName)
                                                                         <span class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold border border-indigo-100 dark:border-indigo-800/40">
@@ -476,7 +460,9 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    function initAllDisasterCharts() {
+        if (typeof Chart === 'undefined') return;
+
         const isDark = document.documentElement.classList.contains('dark');
         const textColor = isDark ? '#94a3b8' : '#64748b';
         const gridColor = isDark ? 'rgba(51, 65, 85, 0.4)' : 'rgba(226, 232, 240, 0.8)';
@@ -492,6 +478,9 @@
         // 1. BAR CHART: Perbandingan Target KK vs Logistik Tersalurkan per Kecamatan
         const barCtx = document.getElementById('disasterBarChart');
         if (barCtx) {
+            const existingBar = Chart.getChart(barCtx);
+            if (existingBar) existingBar.destroy();
+
             new Chart(barCtx, {
                 type: 'bar',
                 data: {
@@ -540,6 +529,9 @@
         // 2. DONUT CHART: Proporsi Kategori Logistik Bantuan
         const donutCtx = document.getElementById('categoryDonutChart');
         if (donutCtx) {
+            const existingDonut = Chart.getChart(donutCtx);
+            if (existingDonut) existingDonut.destroy();
+
             new Chart(donutCtx, {
                 type: 'doughnut',
                 data: {
@@ -577,12 +569,15 @@
             @php
                 $vData = $villageBreakdown[$aid->id]['villages'] ?? collect();
                 $vLabels = collect($vData)->keys()->values()->toArray();
-                $vRecipients = collect($vData)->map(fn($records) => collect($records)->pluck('beneficiary_id')->unique()->count())->values()->toArray();
+                $vRecipients = collect($vData)->map(fn($records) => collect($records)->pluck('beneficiary_id')->filter()->unique()->count())->values()->toArray();
                 $vQuantities = collect($vData)->map(fn($records) => collect($records)->sum('quantity_received'))->values()->toArray();
             @endphp
 
             const recipientsEl{{ $aid->id }} = document.getElementById('villageRecipientsChart-{{ $aid->id }}');
             if (recipientsEl{{ $aid->id }}) {
+                const existingRecChart = Chart.getChart(recipientsEl{{ $aid->id }});
+                if (existingRecChart) existingRecChart.destroy();
+
                 new Chart(recipientsEl{{ $aid->id }}, {
                     type: 'bar',
                     data: {
@@ -610,12 +605,12 @@
                         },
                         scales: {
                             x: {
-                                ticks: { color: textColor, font: { family: 'Figtree', size: 11 } },
+                                ticks: { color: textColor, font: { family: 'Figtree', size: 10 }, autoSkip: false, maxRotation: 45, minRotation: 0 },
                                 grid: { color: 'transparent' }
                             },
                             y: {
                                 beginAtZero: true,
-                                ticks: { color: textColor, font: { family: 'Figtree', size: 11 } },
+                                ticks: { color: textColor, font: { family: 'Figtree', size: 11 }, precision: 0 },
                                 grid: { color: gridColor }
                             }
                         }
@@ -625,6 +620,9 @@
 
             const itemsEl{{ $aid->id }} = document.getElementById('villageItemsChart-{{ $aid->id }}');
             if (itemsEl{{ $aid->id }}) {
+                const existingItemsChart = Chart.getChart(itemsEl{{ $aid->id }});
+                if (existingItemsChart) existingItemsChart.destroy();
+
                 new Chart(itemsEl{{ $aid->id }}, {
                     type: 'bar',
                     data: {
@@ -652,12 +650,12 @@
                         },
                         scales: {
                             x: {
-                                ticks: { color: textColor, font: { family: 'Figtree', size: 11 } },
+                                ticks: { color: textColor, font: { family: 'Figtree', size: 10 }, autoSkip: false, maxRotation: 45, minRotation: 0 },
                                 grid: { color: 'transparent' }
                             },
                             y: {
                                 beginAtZero: true,
-                                ticks: { color: textColor, font: { family: 'Figtree', size: 11 } },
+                                ticks: { color: textColor, font: { family: 'Figtree', size: 11 }, precision: 0 },
                                 grid: { color: gridColor }
                             }
                         }
@@ -665,7 +663,14 @@
                 });
             }
         @endforeach
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAllDisasterCharts);
+    } else {
+        initAllDisasterCharts();
+    }
+    document.addEventListener('pjax:complete', initAllDisasterCharts);
 </script>
 @endpush
 

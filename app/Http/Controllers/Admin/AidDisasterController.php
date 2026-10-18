@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\PartialRenderable;
+use App\Models\District;
 use App\Models\Village;
 use App\Models\AidDisaster;
 use App\Models\AidDistribution;
@@ -42,58 +43,19 @@ class AidDisasterController extends Controller
         // Query master kecamatan
         $aidDisasters = AidDisaster::orderBy('district_name')->paginate(15)->withQueryString();
 
-        // 2. Breakdown desa
-        $villageBreakdown = [];
-        $totalDistributedSum = 0;
-        $totalBeneficiariesCount = 0;
-        $allVillageKeys = [];
+        // 2. Breakdown desa (Semua desa di kecamatan tetap muncul walau belum ada distribusi)
+        $breakdownData = $this->buildVillageBreakdown($aidDisasters, $selectedYear);
+        $villageBreakdown = $breakdownData['villageBreakdown'];
+        $totalDistributedSum = $breakdownData['totalDistributedSum'];
+        $totalBeneficiariesCount = $breakdownData['totalBeneficiariesCount'];
+        $allVillageKeys = $breakdownData['allVillageKeys'];
 
         $chartLabels = [];
         $chartTargets = [];
         $chartDistributed = [];
 
         foreach ($aidDisasters as $disaster) {
-            $distQuery = AidDistribution::with(['beneficiary.village', 'aidInventory'])
-                ->where('aid_disaster_id', $disaster->id);
-
-            if ($selectedYear !== 'all') {
-                $distQuery->whereYear('distribution_date', $selectedYear);
-            }
-
-            $distributions = $distQuery->get();
-
-            // Ambil semua desa di kecamatan ini
-            $allVillages = Village::where('district_id', $disaster->district_id)
-                ->pluck('yard', 'id');
-
-            // Group distribusi berdasarkan nama desa
-            $groupedByVillage = $distributions->groupBy(function ($d) {
-                $v = $d->beneficiary?->village;
-                return $v?->yard ?? $v?->name ?? 'Desa Lainnya';
-            });
-
-            // Gabungkan semua desa dengan distribusi
-            $mergedVillages = collect();
-            foreach ($allVillages as $villageId => $villageName) {
-                $mergedVillages[$villageName] = $groupedByVillage[$villageName] ?? collect();
-            }
-
-            $distDistributedSum = $distributions->sum('quantity_received');
-            $distRecipientsCount = $distributions->pluck('beneficiary_id')->unique()->count();
-
-            $villageBreakdown[$disaster->id] = [
-                'villages'       => $mergedVillages,
-                'total_villages' => $mergedVillages->count(),
-                'year_received'  => $distDistributedSum,
-                'year_recipients'=> $distRecipientsCount,
-            ];
-
-            $totalDistributedSum += $distDistributedSum;
-            $totalBeneficiariesCount += $distRecipientsCount;
-
-            foreach ($mergedVillages->keys() as $vName) {
-                $allVillageKeys[] = $vName;
-            }
+            $distDistributedSum = $villageBreakdown[$disaster->id]['year_received'] ?? 0;
 
             // Data untuk Bar Chart
             $chartLabels[] = $disaster->district_name;
@@ -157,47 +119,10 @@ class AidDisasterController extends Controller
         }
         $aidDisasters = $query->orderBy('district_name')->get();
 
-        $villageBreakdown = [];
-        $totalDistributedSum = 0;
-        $totalRecipientsCount = 0;
-
-        foreach ($aidDisasters as $disaster) {
-            $distQuery = AidDistribution::with(['beneficiary.village', 'aidInventory'])
-                ->where('aid_disaster_id', $disaster->id);
-
-            if ($selectedYear !== 'all') {
-                $distQuery->whereYear('distribution_date', $selectedYear);
-            }
-
-            $distributions = $distQuery->get();
-
-            // Ambil semua desa di kecamatan ini
-            $allVillages = Village::where('district_id', $disaster->district_id)
-                ->pluck('yard', 'id');
-
-            $groupedByVillage = $distributions->groupBy(function ($d) {
-                $v = $d->beneficiary?->village;
-                return $v?->full_name ?? $v?->yard ?? 'Desa Lainnya';
-            });
-
-            $mergedVillages = collect();
-            foreach ($allVillages as $villageId => $villageName) {
-                $mergedVillages[$villageName] = $groupedByVillage[$villageName] ?? collect();
-            }
-
-            $distDistributedSum = $distributions->sum('quantity_received');
-            $distRecipientsCount = $distributions->pluck('beneficiary_id')->unique()->count();
-
-            $villageBreakdown[$disaster->id] = [
-                'villages'       => $mergedVillages,
-                'total_villages' => $mergedVillages->count(),
-                'year_received'  => $distDistributedSum,
-                'year_recipients'=> $distRecipientsCount,
-            ];
-
-            $totalDistributedSum += $distDistributedSum;
-            $totalRecipientsCount += $distRecipientsCount;
-        }
+        $breakdownData = $this->buildVillageBreakdown($aidDisasters, $selectedYear);
+        $villageBreakdown = $breakdownData['villageBreakdown'];
+        $totalDistributedSum = $breakdownData['totalDistributedSum'];
+        $totalRecipientsCount = $breakdownData['totalBeneficiariesCount'];
 
         $viewName = ($type === 'village') ? 'admin.aid-disasters.pdf-village' : 'admin.aid-disasters.pdf-district';
 
@@ -213,6 +138,150 @@ class AidDisasterController extends Controller
         $filename = "laporan-bantuan-{$type}-{$distName}-{$selectedYear}.pdf";
 
         return $pdf->stream($filename);
+    }
+
+    /**
+     * Helper untuk memproses rincian penyaluran logistik per desa.
+     * Menjamin semua desa di kecamatan tetap muncul meski belum ada data distribusi.
+     */
+    private function buildVillageBreakdown($disasters, $selectedYear = 'all'): array
+    {
+        if ($disasters instanceof \Illuminate\Database\Eloquent\Model) {
+            $disasters = collect([$disasters]);
+        }
+
+        $villageBreakdown = [];
+        $totalDistributedSum = 0;
+        $totalBeneficiariesCount = 0;
+        $allVillageKeys = [];
+
+        $allDistricts = District::all();
+
+        foreach ($disasters as $disaster) {
+            // 1. Resolve district_id secara eksak (exact match)
+            $district = null;
+            if ($disaster->district_id) {
+                $district = $allDistricts->firstWhere('id', $disaster->district_id);
+            }
+
+            if (!$district && $disaster->district_name) {
+                $cleanDisasterName = strtolower(trim($disaster->district_name));
+
+                // 1a. Cocokkan nama persis sama (exact match)
+                $district = $allDistricts->first(function ($d) use ($cleanDisasterName) {
+                    return strtolower(trim($d->name)) === $cleanDisasterName;
+                });
+
+                // 1b. Fallback normalisasi hanya untuk variasi penulisan spasi (misal "Bonepantai" vs "Bone Pantai")
+                if (!$district) {
+                    $slugTarget = preg_replace('/[^a-z0-9]/', '', $cleanDisasterName);
+                    $district = $allDistricts->first(function ($d) use ($slugTarget) {
+                        return preg_replace('/[^a-z0-9]/', '', strtolower(trim($d->name))) === $slugTarget;
+                    });
+                }
+            }
+
+            $districtId = $district?->id ?? $disaster->district_id;
+
+            // Perbarui district_id pada model bencana jika belum ada/berbeda
+            if ($districtId && $disaster->exists && (int)$disaster->district_id !== (int)$districtId) {
+                try {
+                    $disaster->district_id = $districtId;
+                    $disaster->saveQuietly();
+                } catch (\Throwable $e) {}
+            }
+
+            // 2. Ambil HANYA desa-desa yang terdaftar di kecamatan ini dari tabel villages
+            if ($districtId) {
+                $allVillages = Village::where('district_id', $districtId)
+                    ->orderBy('yard')
+                    ->get();
+            } elseif ($district) {
+                $allVillages = Village::where('zone', $district->name)
+                    ->orderBy('yard')
+                    ->get();
+            } else {
+                $allVillages = Village::whereRaw('LOWER(TRIM(zone)) = ?', [strtolower(trim($disaster->district_name))])
+                    ->orderBy('yard')
+                    ->get();
+            }
+
+            $villageIds = $allVillages->pluck('id')->filter()->all();
+
+            // 3. Query transaksi distribusi bantuan khusus untuk desa-desa di kecamatan ini
+            $distQuery = AidDistribution::with(['beneficiary.village', 'aidInventory', 'village'])
+                ->where(function ($q) use ($disaster, $villageIds) {
+                    $q->where('aid_disaster_id', $disaster->id);
+                    if (!empty($villageIds)) {
+                        $q->orWhereIn('village_id', $villageIds)
+                          ->orWhereHas('beneficiary', function ($bq) use ($villageIds) {
+                              $bq->whereIn('village_id', $villageIds);
+                          });
+                    }
+                });
+
+            if ($selectedYear !== 'all') {
+                $distQuery->whereYear('distribution_date', $selectedYear);
+            }
+
+            $distributions = $distQuery->get();
+
+            // 4. Group distribusi berdasarkan ID desa dan Nama Desa
+            $groupedByVillageId = $distributions->groupBy(function ($d) {
+                return $d->village_id ?: ($d->beneficiary?->village_id ?: 0);
+            });
+
+            $groupedByVillageName = $distributions->groupBy(function ($d) {
+                $v = $d->village ?: $d->beneficiary?->village;
+                $name = $v?->yard ?: ($v?->full_name ?: '');
+                return strtolower(trim($name));
+            });
+
+            // 5. Gabungkan master desa dengan data distribusi
+            // HANYA desa-desa di kecamatan ini yang dimasukkan, tidak menambah desa luar!
+            $mergedVillages = collect();
+
+            foreach ($allVillages as $village) {
+                $vName = $village->yard ?: ($village->full_name ?: ('Desa ' . $village->id));
+
+                // Cocokkan via ID desa
+                $records = $groupedByVillageId->get($village->id);
+
+                // Fallback cocokkan via nama desa persis jika ID belum sesuai
+                if ((!$records || $records->isEmpty()) && $groupedByVillageName->has(strtolower(trim($vName)))) {
+                    $records = $groupedByVillageName->get(strtolower(trim($vName)));
+                }
+
+                $mergedVillages->put($vName, $records ?: collect());
+                $allVillageKeys[] = $vName;
+            }
+
+            // Hitung total unit dan penerima untuk kecamatan ini
+            $districtDistributions = $distributions->filter(function ($d) use ($villageIds, $disaster) {
+                $vId = $d->village_id ?: ($d->beneficiary?->village_id ?: 0);
+                return in_array($vId, $villageIds) || (int)$d->aid_disaster_id === (int)$disaster->id;
+            });
+
+            $distDistributedSum = (int) $districtDistributions->sum('quantity_received');
+            $distRecipientsCount = (int) $districtDistributions->pluck('beneficiary_id')->filter()->unique()->count();
+
+            $villageBreakdown[$disaster->id] = [
+                'villages'        => $mergedVillages,
+                'total_villages'  => $mergedVillages->count(),
+                'year_received'   => $distDistributedSum,
+                'year_recipients' => $distRecipientsCount,
+            ];
+
+            $totalDistributedSum += $distDistributedSum;
+            $totalBeneficiariesCount += $distRecipientsCount;
+        }
+
+        return [
+            'villageBreakdown'        => $villageBreakdown,
+            'totalDistributedSum'    => $totalDistributedSum,
+            'totalBeneficiariesCount'=> $totalBeneficiariesCount,
+            'allVillageKeys'          => $allVillageKeys,
+        ];
     }
 
     public function create()
@@ -253,15 +322,13 @@ class AidDisasterController extends Controller
 
     public function show(AidDisaster $aidDisaster)
     {
+        $breakdownData = $this->buildVillageBreakdown($aidDisaster);
+        $villageStats = $breakdownData['villageBreakdown'][$aidDisaster->id]['villages'] ?? collect();
+
         $distributions = AidDistribution::with(['beneficiary', 'aidInventory', 'village', 'user'])
             ->where('aid_disaster_id', $aidDisaster->id)
             ->latest('distribution_date')
             ->get();
-
-        $villageStats = $distributions->groupBy(function ($d) {
-            $v = $d->beneficiary?->village;
-            return $v?->full_name ?? $v?->name ?? 'Desa Lainnya';
-        });
 
         return $this->partialView('admin.aid-disasters.show', compact('aidDisaster', 'distributions', 'villageStats'));
     }
