@@ -126,11 +126,13 @@
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div>
                             <label for="latitude" class="block text-sm font-medium text-gray-700">Latitude</label>
-                            <input type="text" id="latitude" readonly class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md bg-gray-50">
+                            <input type="text" name="latitude" id="latitude" class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md bg-gray-50">
+                            <!-- <input type="text" id="latitude" readonly class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md bg-gray-50"> -->
                         </div>
                         <div>
                             <label for="longitude" class="block text-sm font-medium text-gray-700">Longitude</label>
-                            <input type="text" id="longitude" readonly class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md bg-gray-50">
+                            <input type="text" id="longitude" class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md bg-gray-50">
+                            <!-- <input type="text" id="longitude" readonly class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md bg-gray-50"> -->
                         </div>
                     </div>
 

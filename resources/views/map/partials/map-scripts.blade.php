@@ -207,6 +207,9 @@
         );
     });
 
+    // 🚫 default: belum pernah bunyi
+    let hasPlayedAlert = false; 
+
     // Proses "Set Lokasi"
     document.getElementById('setLocation')?.addEventListener('click', function() {
         const lat = parseFloat(document.getElementById('lat').value);
@@ -285,11 +288,19 @@
                         el.classList.add('is-blinking');
                         targetMarker.openPopup();
 
-                        // Mainkan suara sirine/alert
+                        // // Mainkan suara sirine/alert
+                        // const audio = document.getElementById('alert-sound');
+                        // if (audio) {
+                        //     audio.currentTime = 0;
+                        //     audio.play().catch(err => console.log('Audio play blocked:', err));
+                        // }
+                        
+                        // Mainkan suara sirine/alert hanya sekali
                         const audio = document.getElementById('alert-sound');
-                        if (audio) {
+                        if (audio && !hasPlayedAlert) {
                             audio.currentTime = 0;
                             audio.play().catch(err => console.log('Audio play blocked:', err));
+                            hasPlayedAlert = true; // ✅ tandai sudah bunyi
                         }
 
                         blinkingTimer = setTimeout(() => {
@@ -308,6 +319,29 @@
                     dashArray: '8, 8' 
                 }).addTo(userRouteLayerGroup).bindPopup('Jarak Lurus ke Fasilitas');
                 
+                // Garis Lurus (Biru Putus-putus)
+                // const dashLine = L.polyline(routeCoords, {
+                //     color: '#41f63bff',
+                //     color: '#3b82f6',
+                //     weight: 4,
+                //     dashArray: '8, 8'
+                // }).addTo(userRouteLayerGroup).bindPopup('Jarak Lurus ke Fasilitas');
+
+                // // Tambahkan panah arah di sepanjang garis
+                // const arrowHead = L.polylineDecorator(dashLine, {
+                //     patterns: [
+                //         {
+                //             offset: 25, // jarak awal panah
+                //             repeat: 50, // jarak antar panah
+                //             symbol: L.Symbol.arrowHead({
+                //                 pixelSize: 12,
+                //                 polygon: false,
+                //                 pathOptions: { stroke: true, color: '#41f63bff', weight: 2 }
+                //             })
+                //         }
+                //     ]
+                // }).addTo(userRouteLayerGroup);
+
                 // Zoom peta otomatis agar lokasi user dan titik kumpul terlihat sekaligus
                 map.fitBounds(dashLine.getBounds(), { padding: [50, 50] });
 
@@ -635,16 +669,16 @@
                         return { color: borderColor, fillColor: '#f59e0b' }; // Amber / Emas Pekat
                     }
                     if (name.includes('bulawa') || id === '2') {
-                        return { color: borderColor, fillColor: '#f97316' }; // Oranye Jingga
+                        return { color: borderColor, fillColor: '#f95e16ff' }; // Oranye Jingga
                     }
                     if (name.includes('bonepantai') || name.includes('bone pantai') || id === '4') {
                         return { color: borderColor, fillColor: '#f43f5e' }; // Rose / Merah Muda Pekat
                     }
                     if (name.includes('kabila bone') || id === '5') {
-                        return { color: borderColor, fillColor: '#b45309' }; // Cokelat Terakota
+                        return { color: borderColor, fillColor: '#f36e08ff' }; // Cokelat Terakota
                     }
                     if (name.includes('bone') || id === '3') {
-                        return { color: borderColor, fillColor: '#ef4444' }; // Merah
+                        return { color: borderColor, fillColor: '#58ef44ff' }; // Merah
                     }
 
                     return { color: borderColor, fillColor: '#eab308' };
