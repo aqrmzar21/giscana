@@ -2,9 +2,9 @@
 <div id="evacuationNavigationPanel"
      class="hidden fixed z-40 transition-all duration-300 ease-in-out
             /* Mobile: Slide-up floating sheet */
-            bottom-4 left-3 right-3 max-h-[82vh]
+            bottom-16 left-3 right-3 max-h-[80vh]
             /* Desktop: Floating Card di Kiri Atas */
-            md:bottom-auto md:left-5 md:top-20 md:right-auto md:w-96 md:max-w-md md:max-h-[88vh]
+            md:bottom-auto md:left-5 md:top-24 md:right-auto md:w-96 md:max-w-md md:max-h-[86vh]
             bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 flex flex-col overflow-hidden text-slate-800 dark:text-slate-100"
      style="box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.25);">
 
@@ -35,119 +35,30 @@
         </div>
     </div>
 
-    {{-- Body Panel (Dapat di-collapse) --}}
-    <div id="navPanelBody" class="p-4 space-y-3.5 overflow-y-auto max-h-[calc(82vh-4rem)] md:max-h-[calc(88vh-4.5rem)] scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700">
+    {{-- Body Panel: Berisi Panduan Arah Evakuasi (Hasil Pertukaran dari Pop-up) --}}
+    <div id="navPanelBody" class="p-4 space-y-3 overflow-y-auto max-h-[calc(82vh-4rem)] md:max-h-[calc(86vh-4.5rem)] scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700">
 
         {{-- Badge Mode Routing --}}
-        <div id="navModeBadgeContainer" class="p-3 rounded-xl border transition-all">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <span class="text-[10px] font-bold tracking-wider uppercase opacity-80" id="navModePrefix">MODE SISTEM</span>
-                    <h4 id="navModeTitle" class="text-xs font-extrabold flex items-center gap-1.5 mt-0.5">
-                        <span id="navModeIcon">🛣</span>
-                        <span id="navModeLabel">Jalur Evakuasi Resmi</span>
-                    </h4>
-                </div>
-                <span id="navModeTag" class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
-                    Aktif
-                </span>
-            </div>
-            <p id="navModeDescription" class="text-[11px] mt-1.5 opacity-90 leading-snug">
-                Rute langsung mengikuti jalur evakuasi resmi BPBD menuju titik kumpul terdekat.
-            </p>
-        </div>
-
-        {{-- Kartu Lokasi & Titik Kumpul --}}
-        <div class="space-y-2 text-xs">
-            {{-- Lokasi User --}}
-            <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800">
-                <div class="p-1.5 bg-rose-100 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400 rounded-lg shrink-0 mt-0.5">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Lokasi Saat Ini</span>
-                    <p id="navUserCoord" class="font-semibold text-slate-800 dark:text-slate-100 truncate">
-                        Mendeteksi...
-                    </p>
-                </div>
-            </div>
-
-            {{-- Titik Kumpul Tujuan --}}
-            <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/50">
-                <div class="p-1.5 bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 rounded-lg shrink-0 mt-0.5">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                    </svg>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase">Titik Kumpul</span>
-                    <h5 id="navFacilityName" class="font-bold text-emerald-950 dark:text-emerald-200 text-sm truncate">
-                        Memuat...
-                    </h5>
-                    <p id="navFacilityDetail" class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-                        Kapasitas & Alamat
-                    </p>
-                </div>
-            </div>
-        </div>
+        <!-- <div id="navModeBadgeContainer" class="p-3 rounded-xl border transition-all">
+        </div> -->
 
         {{-- Metrik Utama: Jarak & Estimasi --}}
-        <div class="grid grid-cols-2 gap-2.5">
-            <div class="bg-gradient-to-br from-indigo-50 to-indigo-100/60 dark:from-slate-800 dark:to-slate-800/80 p-3 rounded-xl border border-indigo-100 dark:border-slate-700">
-                <div class="flex items-center gap-1.5 text-indigo-700 dark:text-indigo-400 mb-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-                    </svg>
-                    <span class="text-[10px] font-bold uppercase tracking-wider">Jarak</span>
-                </div>
-                <div id="navDistanceValue" class="text-lg font-black text-slate-900 dark:text-white">
-                    0 m
-                </div>
-                <span class="text-[10px] text-slate-500 dark:text-slate-400">Total rute evakuasi</span>
+
+        {{-- Panduan Arah (Daftar Instruksi Langkah Demi Langkah) --}}
+        <div class="pt-1">
+            <div class="flex items-center justify-between mb-2 pb-1 border-b border-slate-100 dark:border-slate-800">
+                <h5 class="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>🧭</span> Panduan Arah Evakuasi
+                </h5>
+                <span id="navStepsCount" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
+                    0 Langkah
+                </span>
             </div>
 
-            <div class="bg-gradient-to-br from-amber-50 to-amber-100/60 dark:from-slate-800 dark:to-slate-800/80 p-3 rounded-xl border border-amber-100 dark:border-slate-700">
-                <div class="flex items-center gap-1.5 text-amber-700 dark:text-amber-400 mb-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span class="text-[10px] font-bold uppercase tracking-wider">Estimasi</span>
-                </div>
-                <div id="navDurationValue" class="text-lg font-black text-slate-900 dark:text-white">
-                    0 Menit
-                </div>
-                <span class="text-[10px] text-slate-500 dark:text-slate-400">Kecepatan jalan kaki</span>
+            <div id="navInstructionsList" class="space-y-2 max-h-64 md:max-h-80 overflow-y-auto pr-1 text-xs scrollbar-thin">
+                {{-- Diisi secara dinamis oleh JavaScript --}}
             </div>
         </div>
 
-        {{-- Tombol Buka Instruksi Arah di Popup Marker --}}
-        <button id="btnOpenInstructionPopup" type="button" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-sm active:scale-[0.98]">
-            <svg class="w-4 h-4 text-emerald-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-            </svg>
-            <span>🧭 Buka Instruksi Arah di Peta</span>
-            <span id="navStepsCountBadge" class="bg-white/20 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold ml-0.5">0</span>
-        </button>
-
-        {{-- Tombol Aksi Bawah --}}
-        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2">
-            <button id="btnFocusNavigationRoute" type="button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                <span>Fokus Rute</span>
-            </button>
-
-            <button id="btnResetNavFromPanel" type="button" class="w-full bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-rose-950/40 dark:hover:text-rose-400 font-semibold py-2 px-3 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 border border-slate-200/80 dark:border-slate-700">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                <span>Reset Rute</span>
-            </button>
-        </div>
     </div>
 </div>

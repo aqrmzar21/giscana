@@ -256,85 +256,38 @@
         }
     }
 
-    // Helper bangun konten HTML popup instruksi arah untuk Marker Lokasi User
-    function buildInstructionPopupHtml(data, userLat, userLng) {
+    // Helper bangun konten HTML popup ringkas dan rapi untuk Marker Lokasi User saat Rute Evakuasi Aktif
+    function buildUserLocationPopupHtml(data, userLat, userLng) {
         const facility = data.facility;
         const summary = data.summary || {};
-        const instructions = data.instructions || [];
         const isMode1 = data.mode === 'jalur_resmi';
 
-        const modeBadge = isMode1
-            ? `<span style="font-size:10px;font-weight:700;color:#065f46;background:#d1fae5;padding:2px 8px;border-radius:9999px;border:1px solid #a7f3d0;">🛡️ Jalur Resmi BPBD</span>`
-            : `<span style="font-size:10px;font-weight:700;color:#3730a3;background:#e0e7ff;padding:2px 8px;border-radius:9999px;border:1px solid #c7d2fe;">🛣 Routing Jalan Umum</span>`;
-
-        let rowsHtml = '';
-        instructions.forEach(ins => {
-            const isArrival = ins.type === 'arrive';
-            const isEnterOfficial = ins.type === 'enter_official';
-
-            let rowBg = '#f8fafc';
-            let iconBg = '#e2e8f0';
-            let iconColor = '#334155';
-
-            if (isArrival) {
-                rowBg = '#ecfdf5';
-                iconBg = '#10b981';
-                iconColor = '#ffffff';
-            } else if (isEnterOfficial) {
-                rowBg = '#eef2ff';
-                iconBg = '#6366f1';
-                iconColor = '#ffffff';
-            }
-
-            rowsHtml += `
-                <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 9px;border-radius:10px;background:${rowBg};margin-bottom:6px;border:1px solid rgba(0,0,0,0.04);">
-                    <div style="width:22px;height:22px;border-radius:6px;background:${iconBg};color:${iconColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
-                        ${getInstructionIconSvg(ins.type)}
-                    </div>
-                    <div style="flex:1;min-width:0;">
-                        <div style="font-weight:600;font-size:11px;color:#1e293b;line-height:1.35;">
-                            ${ins.step}. ${ins.text}
-                        </div>
-                        ${ins.distance_meters > 0 ? `<div style="font-size:10px;color:#64748b;font-weight:500;margin-top:2px;">${ins.distance_formatted}</div>` : ''}
-                    </div>
-                </div>
-            `;
-        });
 
         return `
-            <div style="padding:14px;font-family:system-ui,-apple-system,sans-serif;color:#1e293b;">
-                <!-- Header Popup -->
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid #f1f5f9;">
-                    <div style="flex:1;">
-                        <div style="font-size:12px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:4px;">
-                            <span>🧭</span> Instruksi Arah Evakuasi
-                        </div>
-                        <div style="margin-top:4px;">
-                            ${modeBadge}
-                        </div>
+            <div style="padding:10px 12px;font-family:system-ui,-apple-system,sans-serif;color:#1e293b;min-width:210px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e2e8f0;">
+                    <div style="font-weight:800;font-size:12px;color:#0f172a;display:flex;align-items:center;gap:4px;">
+                        <span>📍</span> Lokasi Saat Ini
                     </div>
-                    <div style="text-align:right;">
-                        <div style="font-size:13px;font-weight:900;color:#4f46e5;">${summary.distance_formatted || '–'}</div>
-                        <div style="font-size:10px;color:#64748b;font-weight:600;">⏱ ${summary.duration_formatted || '–'}</div>
+                </div>
+                
+                <div style="font-size:11px;color:#64748b;margin-bottom:6px;">
+                    <span style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;display:block;">Koordinat GPS</span>
+                    <span style="font-weight:600;color:#334155;">${userLat.toFixed(5)}, ${userLng.toFixed(5)}</span>
+                </div>
+
+                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:6px 8px;margin-bottom:8px;">
+                    <span style="font-size:9px;font-weight:700;color:#15803d;text-transform:uppercase;display:block;">Tujuan Evakuasi</span>
+                    <div style="font-weight:700;font-size:11px;color:#0f172a;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${facility.name || 'Titik Kumpul'}</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;font-size:10px;font-weight:600;color:#4f46e5;">
+                        <span>Jarak: ${summary.distance_formatted || '–'}</span>
+                        <span>⏱ ${summary.duration_formatted || '–'}</span>
                     </div>
                 </div>
 
-                <!-- Info Titik Kumpul Tujuan -->
-                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:7px 10px;margin-bottom:10px;font-size:11px;">
-                    <div style="font-size:9px;font-weight:700;color:#15803d;text-transform:uppercase;letter-spacing:0.5px;">🏫 Titik Kumpul Tujuan</div>
-                    <div style="font-weight:700;color:#14532d;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                        ${facility.name}
-                    </div>
-                </div>
-
-                <!-- Daftar Instruksi -->
-                <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;display:flex;justify-content:space-between;">
-                    <span>Panduan Evakuasi</span>
-                    <span style="color:#94a3b8;font-weight:600;">${instructions.length} Langkah</span>
-                </div>
-                <div style="max-height:210px;overflow-y:auto;padding-right:4px;">
-                    ${rowsHtml}
-                </div>
+                <button type="button" onclick="const p = document.getElementById('evacuationNavigationPanel'); if(p){ p.classList.remove('hidden'); p.scrollIntoView({behavior:'smooth'}); }" style="width:100%;background:#4f46e5;color:#ffffff;border:none;border-radius:7px;padding:6px 8px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,0.1);">
+                    <span>🧭</span> Panduan Rute di Panel Kiri
+                </button>
             </div>
         `;
     }
@@ -345,7 +298,6 @@
         if (!panel) return;
 
         const isMode1 = data.mode === 'jalur_resmi';
-        const facility = data.facility;
         const summary = data.summary || {};
         const instructions = data.instructions || [];
 
@@ -358,47 +310,29 @@
         const modeTag = document.getElementById('navModeTag');
         const modeDesc = document.getElementById('navModeDescription');
 
-        if (isMode1) {
-            modeBadgeContainer.className = 'p-3 rounded-xl border transition-all bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100';
-            if (modePrefix) modePrefix.textContent = 'MODE 1 (DEKAT < 100M)';
-            if (modeIcon) modeIcon.textContent = '🛡️';
-            if (modeLabel) modeLabel.textContent = 'Jalur Evakuasi Resmi';
-            if (modeTag) {
-                modeTag.textContent = 'JALUR RESMI';
-                modeTag.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-200';
-            }
-            if (modeDesc) modeDesc.textContent = 'Posisi Anda berada di/dekat jalur resmi. Mengikuti rute evakuasi resmi terverifikasi BPBD langsung ke titik kumpul.';
-        } else {
-            modeBadgeContainer.className = 'p-3 rounded-xl border transition-all bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-800 text-indigo-950 dark:text-indigo-100';
-            if (modePrefix) modePrefix.textContent = 'MODE 2 (JAUH > 100M)';
-            if (modeIcon) modeIcon.textContent = '🛣';
-            if (modeLabel) modeLabel.textContent = 'Routing Jalan Umum (Hybrid)';
-            if (modeTag) {
-                modeTag.textContent = 'HYBRID OSRM';
-                modeTag.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-indigo-200 dark:bg-indigo-800 text-indigo-800 dark:text-indigo-200';
-            }
-            if (modeDesc) modeDesc.textContent = 'Menavigasikan rute via jalan umum menuju titik masuk jalur evakuasi resmi, kemudian diarahkan ke titik kumpul.';
-        }
+        // if (isMode1) {
+        //     modeBadgeContainer.className = 'p-3 rounded-xl border transition-all bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100';
+        //     if (modePrefix) modePrefix.textContent = 'MODE 1 (DEKAT < 100M)';
+        //     if (modeIcon) modeIcon.textContent = '🛡️';
+        //     if (modeLabel) modeLabel.textContent = 'Jalur Evakuasi Resmi';
+        //     if (modeTag) {
+        //         modeTag.textContent = 'JALUR RESMI';
+        //         modeTag.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-200';
+        //     }
+        //     if (modeDesc) modeDesc.textContent = 'Posisi Anda berada di/dekat jalur resmi. Mengikuti rute evakuasi resmi terverifikasi BPBD langsung ke titik kumpul.';
+        // } else {
+        //     modeBadgeContainer.className = 'p-3 rounded-xl border transition-all bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-800 text-indigo-950 dark:text-indigo-100';
+        //     if (modePrefix) modePrefix.textContent = 'MODE 2 (JAUH > 100M)';
+        //     if (modeIcon) modeIcon.textContent = '🛣';
+        //     if (modeLabel) modeLabel.textContent = 'Routing Jalan Umum (Hybrid)';
+        //     if (modeTag) {
+        //         modeTag.textContent = 'HYBRID OSRM';
+        //         modeTag.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-indigo-200 dark:bg-indigo-800 text-indigo-800 dark:text-indigo-200';
+        //     }
+        //     if (modeDesc) modeDesc.textContent = 'Menavigasikan rute via jalan umum menuju titik masuk jalur evakuasi resmi, kemudian diarahkan ke titik kumpul.';
+        // }
 
-        // 2. Lokasi User & Fasilitas
-        const userCoordElem = document.getElementById('navUserCoord');
-        if (userCoordElem) {
-            userCoordElem.textContent = `${userLat.toFixed(5)}, ${userLng.toFixed(5)}`;
-        }
-
-        const facilityNameElem = document.getElementById('navFacilityName');
-        if (facilityNameElem) {
-            facilityNameElem.textContent = facility.name || 'Titik Kumpul Evakuasi';
-        }
-
-        const facilityDetailElem = document.getElementById('navFacilityDetail');
-        if (facilityDetailElem) {
-            const district = facility.district_name || 'Bone Bolango';
-            const capacity = facility.capacity ? ` • Kapasitas: ${facility.capacity} Jiwa` : '';
-            facilityDetailElem.textContent = `${facility.address || 'Kecamatan ' + district}${capacity}`;
-        }
-
-        // 3. Jarak & Estimasi
+        // 2. Metrik Jarak & Estimasi
         const distElem = document.getElementById('navDistanceValue');
         if (distElem) {
             distElem.textContent = summary.distance_formatted || '–';
@@ -409,10 +343,59 @@
             durElem.textContent = summary.duration_formatted || '–';
         }
 
-        // 4. Update Badge Jumlah Langkah Instruksi di Tombol Panel
-        const stepsBadge = document.getElementById('navStepsCountBadge');
+        // 3. Update Badge Jumlah Langkah Instruksi
+        const stepsBadge = document.getElementById('navStepsCount');
         if (stepsBadge) {
             stepsBadge.textContent = `${instructions.length} Langkah`;
+        }
+
+        // 4. Render Daftar Instruksi Arah ke dalam Panel Body (Hasil Pertukaran dari Pop-up)
+        const instructionsContainer = document.getElementById('navInstructionsList');
+        if (instructionsContainer) {
+            if (instructions.length === 0) {
+                instructionsContainer.innerHTML = `
+                    <div class="p-3 text-center text-slate-500 text-xs bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                        Tidak ada panduan arah terinci. Silakan ikuti garis rute evakuasi pada peta.
+                    </div>
+                `;
+            } else {
+                let html = '';
+                instructions.forEach(ins => {
+                    const isArrival = ins.type === 'arrive';
+                    const isEnterOfficial = ins.type === 'enter_official';
+
+                    let cardClass = 'bg-slate-50 dark:bg-slate-800/60 border-slate-200/70 dark:border-slate-700/60 text-slate-800 dark:text-slate-200';
+                    let iconBgClass = 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200';
+
+                    if (isArrival) {
+                        cardClass = 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100 font-semibold';
+                        iconBgClass = 'bg-emerald-500 text-white';
+                    } else if (isEnterOfficial) {
+                        cardClass = 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-800 text-indigo-950 dark:text-indigo-100 font-semibold';
+                        iconBgClass = 'bg-indigo-600 text-white';
+                    }
+
+                    html += `
+                        <div class="flex items-start gap-2.5 p-2.5 rounded-xl border ${cardClass} transition-all hover:shadow-xs">
+                            <div class="w-6 h-6 rounded-lg ${iconBgClass} flex items-center justify-center shrink-0 mt-0.5 text-xs shadow-xs">
+                                ${getInstructionIconSvg(ins.type)}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs leading-snug font-medium">
+                                    <span class="font-bold opacity-80">${ins.step}.</span> ${ins.text}
+                                </p>
+                                ${ins.distance_meters > 0 ? `
+                                    <div class="text-[10px] font-semibold opacity-70 mt-1 flex items-center gap-1">
+                                        <span>📏</span>
+                                        <span>${ins.distance_formatted}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                instructionsContainer.innerHTML = html;
+            }
         }
 
         // Tampilkan panel
@@ -631,16 +614,16 @@
                     console.log("LRM fallback: ", e);
                 }
 
-                // E. Pasang Pop-up Instruksi Arah pada Marker Lokasi User (Bukan lagi hanya titik koordinat)
-                const instructionPopupHtml = buildInstructionPopupHtml(data, lat, lng);
-                userMarker.bindPopup(instructionPopupHtml, {
-                    maxWidth: 350,
-                    minWidth: 290,
+                // E. Pasang Pop-up Lokasi Saat Ini (Rute Evakuasi Aktif) pada Marker Lokasi User
+                const userLocationPopupHtml = buildUserLocationPopupHtml(data, lat, lng);
+                userMarker.bindPopup(userLocationPopupHtml, {
+                    maxWidth: 290,
+                    minWidth: 220,
                     className: 'instruction-popup',
                     autoPan: false
                 }).openPopup();
 
-                // F. Render Panel Navigasi Modern (Tailwind)
+                // F. Render Panel Navigasi Modern (Tailwind) dengan Panduan Arah
                 renderNavigationPanel(data, lat, lng);
             })
             .catch(err => {

@@ -59,7 +59,7 @@
         </button>
     </div>
 
-    <div class="absolute md:bottom-4 bottom-16 left-4 z-50 md:p-2 pb-12">
+    <div class="hidden md:flex absolute md:bottom-4 bottom-16 left-4 z-50 md:p-2 pb-1 group">
         @include('map.partials.map-legend-content')
     </div>
 
