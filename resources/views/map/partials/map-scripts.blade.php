@@ -1,6 +1,7 @@
 @php($mapUiVariant = $mapUiVariant ?? 'admin')
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 <script>
 (function () {
     const mapUiVariant = @json($mapUiVariant);
@@ -65,12 +66,14 @@
     }).addTo(map);
 
     // =====================================================================
-    // MANAJEMEN MODAL & KONTROL LOKASI USER
+    // MANAJEMEN MODAL & KONTROL LOKASI USER (HYBRID EVACUATION SYSTEM)
     // =====================================================================
     let userMarker = null;
+    let nearestMarker = null;
     let userRouteLayerGroup = L.layerGroup().addTo(map); // Layer khusus rute user
     let userRoutingControl = null;
     let blinkingTimer = null;
+    let currentNavigationBounds = null;
 
     // Fungsi Buka Modal
     function openLocationModal() {
@@ -97,10 +100,14 @@
             userMarker = null;
         }
 
-        // 2. Hapus Garis Rute Khusus User
+        // 2. Hapus Garis Rute Khusus User & LRM
         userRouteLayerGroup.clearLayers();
         if (userRoutingControl) {
-            map.removeControl(userRoutingControl);
+            try {
+                map.removeControl(userRoutingControl);
+            } catch (e) {
+                console.log('LRM control remove safe catch');
+            }
             userRoutingControl = null;
         }
 
@@ -110,12 +117,32 @@
             blinkingTimer = null;
         }
 
+        if (nearestMarker) {
+            const el = nearestMarker.getElement();
+            if (el) el.classList.remove('is-blinking');
+            nearestMarker = null;
+        }
+
         layers.evacuationFacilities.eachLayer(marker => {
             const el = marker.getElement();
             if (el) el.classList.remove('is-blinking');
         });
 
-        // 4. Update UI Status
+        // 4. Hentikan dan Reset Audio Alarm
+        const audio = document.getElementById('alert-sound');
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+        hasPlayedAlert = false;
+
+        // 5. Sembunyikan Panel Navigasi Modern
+        const navPanel = document.getElementById('evacuationNavigationPanel');
+        if (navPanel) {
+            navPanel.classList.add('hidden');
+        }
+
+        // 6. Update UI Status Kontrol
         const statusElem = document.getElementById('userLocationStatus');
         const resetBtn = document.getElementById('btnResetLocation');
 
@@ -129,6 +156,7 @@
             resetBtn.classList.add('opacity-50', 'cursor-not-allowed');
         }
 
+        currentNavigationBounds = null;
         invalidateMapSize();
     }
 
@@ -207,10 +235,143 @@
         );
     });
 
-    // 🚫 default: belum pernah bunyi
+    // 🚫 Flag status audio alarm
     let hasPlayedAlert = false; 
 
-    // Proses "Set Lokasi"
+    // Helper render icon SVG instruksi navigasi
+    function getInstructionIconSvg(type) {
+        switch (type) {
+            case 'left':
+                return `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>`;
+            case 'right':
+                return `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
+            case 'arrive':
+                return `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/></svg>`;
+            case 'enter_official':
+                return `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`;
+            case 'uturn':
+                return `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>`;
+            default:
+                return `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>`;
+        }
+    }
+
+    // Helper update tampilan Panel Navigasi Modern (Tailwind)
+    function renderNavigationPanel(data, userLat, userLng) {
+        const panel = document.getElementById('evacuationNavigationPanel');
+        if (!panel) return;
+
+        const isMode1 = data.mode === 'jalur_resmi';
+        const facility = data.facility;
+        const summary = data.summary || {};
+        const instructions = data.instructions || [];
+
+        // 1. Badge Mode
+        const modeBadgeContainer = document.getElementById('navModeBadgeContainer');
+        const modePrefix = document.getElementById('navModePrefix');
+        const modeTitle = document.getElementById('navModeTitle');
+        const modeLabel = document.getElementById('navModeLabel');
+        const modeIcon = document.getElementById('navModeIcon');
+        const modeTag = document.getElementById('navModeTag');
+        const modeDesc = document.getElementById('navModeDescription');
+
+        if (isMode1) {
+            modeBadgeContainer.className = 'p-3 rounded-xl border transition-all bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100';
+            if (modePrefix) modePrefix.textContent = 'MODE 1 (DEKAT < 100M)';
+            if (modeIcon) modeIcon.textContent = '🛡️';
+            if (modeLabel) modeLabel.textContent = 'Jalur Evakuasi Resmi';
+            if (modeTag) {
+                modeTag.textContent = 'JALUR RESMI';
+                modeTag.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-200';
+            }
+            if (modeDesc) modeDesc.textContent = 'Posisi Anda berada di/dekat jalur resmi. Mengikuti rute evakuasi resmi terverifikasi BPBD langsung ke titik kumpul.';
+        } else {
+            modeBadgeContainer.className = 'p-3 rounded-xl border transition-all bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-800 text-indigo-950 dark:text-indigo-100';
+            if (modePrefix) modePrefix.textContent = 'MODE 2 (JAUH > 100M)';
+            if (modeIcon) modeIcon.textContent = '🛣';
+            if (modeLabel) modeLabel.textContent = 'Routing Jalan Umum (Hybrid)';
+            if (modeTag) {
+                modeTag.textContent = 'HYBRID OSRM';
+                modeTag.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-indigo-200 dark:bg-indigo-800 text-indigo-800 dark:text-indigo-200';
+            }
+            if (modeDesc) modeDesc.textContent = 'Menavigasikan rute via jalan umum menuju titik masuk jalur evakuasi resmi, kemudian diarahkan ke titik kumpul.';
+        }
+
+        // 2. Lokasi User & Fasilitas
+        const userCoordElem = document.getElementById('navUserCoord');
+        if (userCoordElem) {
+            userCoordElem.textContent = `${userLat.toFixed(5)}, ${userLng.toFixed(5)}`;
+        }
+
+        const facilityNameElem = document.getElementById('navFacilityName');
+        if (facilityNameElem) {
+            facilityNameElem.textContent = facility.name || 'Titik Kumpul Evakuasi';
+        }
+
+        const facilityDetailElem = document.getElementById('navFacilityDetail');
+        if (facilityDetailElem) {
+            const district = facility.district_name || 'Bone Bolango';
+            const capacity = facility.capacity ? ` • Kapasitas: ${facility.capacity} Jiwa` : '';
+            facilityDetailElem.textContent = `${facility.address || 'Kecamatan ' + district}${capacity}`;
+        }
+
+        // 3. Jarak & Estimasi
+        const distElem = document.getElementById('navDistanceValue');
+        if (distElem) {
+            distElem.textContent = summary.distance_formatted || '–';
+        }
+
+        const durElem = document.getElementById('navDurationValue');
+        if (durElem) {
+            durElem.textContent = summary.duration_formatted || '–';
+        }
+
+        // 4. Instruksi Langkah Demi Langkah
+        const countElem = document.getElementById('navStepsCount');
+        if (countElem) {
+            countElem.textContent = `${instructions.length} Langkah`;
+        }
+
+        const listElem = document.getElementById('navInstructionsList');
+        if (listElem) {
+            listElem.innerHTML = '';
+            instructions.forEach((ins, idx) => {
+                const isArrival = ins.type === 'arrive';
+                const isEnterOfficial = ins.type === 'enter_official';
+
+                let bgClass = 'bg-slate-50 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-800';
+                let iconBg = 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200';
+
+                if (isArrival) {
+                    bgClass = 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800/70';
+                    iconBg = 'bg-emerald-500 text-white shadow-sm';
+                } else if (isEnterOfficial) {
+                    bgClass = 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-800/70';
+                    iconBg = 'bg-indigo-600 text-white shadow-sm';
+                }
+
+                const row = document.createElement('div');
+                row.className = `flex items-start gap-2.5 p-2 rounded-xl border transition-all ${bgClass}`;
+                row.innerHTML = `
+                    <div class="w-6 h-6 rounded-lg ${iconBg} font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                        ${getInstructionIconSvg(ins.type)}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-semibold text-slate-800 dark:text-slate-100 text-[11px] leading-snug">
+                            ${ins.step}. ${ins.text}
+                        </div>
+                        ${ins.distance_meters > 0 ? `<span class="inline-block mt-0.5 text-[10px] font-medium text-slate-500 dark:text-slate-400 bg-slate-200/60 dark:bg-slate-700/60 px-1.5 py-0.2 rounded">${ins.distance_formatted}</span>` : ''}
+                    </div>
+                `;
+                listElem.appendChild(row);
+            });
+        }
+
+        // Tampilkan panel
+        panel.classList.remove('hidden');
+    }
+
+    // Proses "Set Lokasi" (Hybrid Routing Pipeline)
     document.getElementById('setLocation')?.addEventListener('click', function() {
         const lat = parseFloat(document.getElementById('lat').value);
         const lng = parseFloat(document.getElementById('lng').value);
@@ -220,153 +381,247 @@
             return;
         }
 
-        // 1. Bersihkan state lokasi lama
+        // 1. Bersihkan state lokasi lama & tutup modal
         resetUserLocation();
         closeLocationModal();
 
-        // 2. Tambahkan Marker Lokasi User
-        userMarker = L.marker([lat, lng]).addTo(map).bindPopup("Lokasi Saya").openPopup();
-        map.setView([lat, lng], 14);
+        // 2. Tambahkan Marker Lokasi User Berdesain Modern (Radar Pulsing)
+        const userIcon = L.divIcon({
+            className: 'user-gps-marker',
+            html: '<div class="pulse-ring"></div><div class="dot-center"></div>',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+        });
+        userMarker = L.marker([lat, lng], { icon: userIcon })
+            .addTo(map)
+            .bindPopup(`<b>📍 Lokasi Anda</b><br><span style="font-size:11px;color:#64748b;">${lat.toFixed(5)}, ${lng.toFixed(5)}</span>`)
+            .openPopup();
 
+        // Update status kontrol panel
         const statusElem = document.getElementById('userLocationStatus');
         const resetBtn = document.getElementById('btnResetLocation');
 
         if (statusElem) {
-            statusElem.textContent = 'Aktif ✓';
-            statusElem.className = 'text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full';
-        }
-        if (resetBtn) {
-            resetBtn.disabled = false;
-            resetBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            statusElem.textContent = 'Mencari Rute...';
+            statusElem.className = 'text-[10px] font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full';
         }
 
-        // 3. Panggil API Rute Evakuasi
+        // 3. Panggil API Hybrid Evacuation Routing
         fetch(`/api/nearest-evacuation-with-route?lat=${lat}&lng=${lng}`)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+                return res.json();
+            })
             .then(data => {
                 if (!data.success || !data.facility) {
-                    alert("Gagal menemukan titik kumpul terdekat.");
+                    alert(data.message || "Gagal menemukan titik kumpul terdekat.");
+                    if (statusElem) {
+                        statusElem.textContent = 'Gagal';
+                        statusElem.className = 'text-[10px] font-semibold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full';
+                    }
                     return;
+                }
+
+                // Update Status Kontrol Aktif
+                if (statusElem) {
+                    statusElem.textContent = data.mode === 'jalur_resmi' ? 'Jalur Resmi ✓' : 'Jalan Umum ✓';
+                    statusElem.className = data.mode === 'jalur_resmi' 
+                        ? 'text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full'
+                        : 'text-[10px] font-semibold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full';
+                }
+                if (resetBtn) {
+                    resetBtn.disabled = false;
+                    resetBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                 }
 
                 const facility = data.facility;
                 let fLat, fLng;
 
-                // --- PERBAIKAN BACA DATA DATABASE (ARRAY [LNG, LAT]) ---
-                if (Array.isArray(facility.point_coordinates)) {
-                    fLng = parseFloat(facility.point_coordinates[0]); // Indeks 0 = Longitude
-                    fLat = parseFloat(facility.point_coordinates[1]); // Indeks 1 = Latitude
+                if (data.summary && data.summary.facility_location) {
+                    fLat = data.summary.facility_location.lat;
+                    fLng = data.summary.facility_location.lng;
+                } else if (Array.isArray(facility.point_coordinates)) {
+                    fLng = parseFloat(facility.point_coordinates[0]);
+                    fLat = parseFloat(facility.point_coordinates[1]);
                 } else if (typeof facility.point_coordinates === 'string') {
-                    // Jaga-jaga jika dari API terbaca sebagai string "[123.xxx, 0.xxx]"
                     const coords = JSON.parse(facility.point_coordinates);
                     fLng = parseFloat(coords[0]);
                     fLat = parseFloat(coords[1]);
                 }
 
-                if (isNaN(fLat) || isNaN(fLng)) {
-                    console.error("Format koordinat tidak valid", facility.point_coordinates);
-                    return; 
-                }
-
                 const facilityLatLng = L.latLng(fLat, fLng);
 
-                // --- A. EFEK KEDIP & SUARA PADA TITIK KUMPUL ---
-                let targetMarker = null;
+                // --- A. EFEK KEDIP (BLINKING) & AUDIO SIRINE ALARM ---
+                nearestMarker = null;
                 let minTargetDist = Infinity;
 
                 layers.evacuationFacilities.eachLayer(marker => {
                     const dist = facilityLatLng.distanceTo(marker.getLatLng());
                     if (dist < minTargetDist) {
                         minTargetDist = dist;
-                        targetMarker = marker;
+                        nearestMarker = marker;
                     }
                 });
 
-                if (targetMarker) {
-                    const el = targetMarker.getElement();
+                if (nearestMarker) {
+                    const el = nearestMarker.getElement();
                     if (el) {
                         el.classList.add('is-blinking');
-                        targetMarker.openPopup();
+                        nearestMarker.openPopup();
 
-                        // // Mainkan suara sirine/alert
-                        // const audio = document.getElementById('alert-sound');
-                        // if (audio) {
-                        //     audio.currentTime = 0;
-                        //     audio.play().catch(err => console.log('Audio play blocked:', err));
-                        // }
-                        
-                        // Mainkan suara sirine/alert hanya sekali
+                        // Mainkan suara alarm audio
                         const audio = document.getElementById('alert-sound');
-                        if (audio && !hasPlayedAlert) {
+                        if (audio) {
                             audio.currentTime = 0;
-                            audio.play().catch(err => console.log('Audio play blocked:', err));
-                            hasPlayedAlert = true; // ✅ tandai sudah bunyi
+                            audio.play().catch(err => console.log('Audio autoplay blocked by browser policy:', err));
+                            hasPlayedAlert = true;
                         }
 
+                        // Durasi kedip otomatis 30 detik
+                        if (blinkingTimer) clearTimeout(blinkingTimer);
                         blinkingTimer = setTimeout(() => {
                             if (el) el.classList.remove('is-blinking');
                         }, 30000);
                     }
                 }
 
-                // --- B. BUAT RUTE BARU DARI USER KE TITIK KUMPUL ---
-                const routeCoords = [[lat, lng], [fLat, fLng]];
-                
-                // 1. Gambar Garis Lurus (Biru Putus-putus)
-                const dashLine = L.polyline(routeCoords, {
-                    color: '#3b82f6', // Warna biru 
-                    weight: 4,
-                    dashArray: '8, 8' 
-                }).addTo(userRouteLayerGroup).bindPopup('Jarak Lurus ke Fasilitas');
-                
-                // Garis Lurus (Biru Putus-putus)
-                // const dashLine = L.polyline(routeCoords, {
-                //     color: '#41f63bff',
-                //     color: '#3b82f6',
-                //     weight: 4,
-                //     dashArray: '8, 8'
-                // }).addTo(userRouteLayerGroup).bindPopup('Jarak Lurus ke Fasilitas');
+                // --- B. GAMBAR RUTE HYBRID PADA userRouteLayerGroup ---
+                userRouteLayerGroup.clearLayers();
+                const fullRouteLatLngs = data.full_route_latlngs || [[lat, lng], [fLat, fLng]];
 
-                // // Tambahkan panah arah di sepanjang garis
-                // const arrowHead = L.polylineDecorator(dashLine, {
-                //     patterns: [
-                //         {
-                //             offset: 25, // jarak awal panah
-                //             repeat: 50, // jarak antar panah
-                //             symbol: L.Symbol.arrowHead({
-                //                 pixelSize: 12,
-                //                 polygon: false,
-                //                 pathOptions: { stroke: true, color: '#41f63bff', weight: 2 }
-                //             })
-                //         }
-                //     ]
-                // }).addTo(userRouteLayerGroup);
+                if (data.mode === 'jalur_resmi') {
+                    // MODE 1: Jalur Evakuasi Resmi (Hijau Emerald Tebal dengan Casing Kontras Tinggi)
+                    L.polyline(fullRouteLatLngs, {
+                        color: '#064e3b',
+                        weight: 9,
+                        opacity: 0.85
+                    }).addTo(userRouteLayerGroup);
 
-                // Zoom peta otomatis agar lokasi user dan titik kumpul terlihat sekaligus
-                map.fitBounds(dashLine.getBounds(), { padding: [50, 50] });
+                    const officialLine = L.polyline(fullRouteLatLngs, {
+                        color: '#10b981',
+                        weight: 6,
+                        opacity: 1.0,
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    }).addTo(userRouteLayerGroup);
 
-                // 2. (Opsional) Coba gambar rute mengikuti jalan jika L.Routing tersedia
+                    officialLine.bindPopup(`<b>🛣 Jalur Evakuasi Resmi BPBD</b><br>Menuju: ${facility.name}<br>Jarak: ${data.summary?.distance_formatted || ''}`);
+
+                } else {
+                    // MODE 2: Hybrid (Segmen 1: Jalan Umum via OSRM/ORS + Segmen 2: Jalur Evakuasi Resmi)
+                    const segs = data.segments || {};
+
+                    // 1. Rute Jalan Umum (Indigo beraksen jalan raya modern)
+                    if (segs.public_road && segs.public_road.coordinates && segs.public_road.coordinates.length > 0) {
+                        L.polyline(segs.public_road.coordinates, {
+                            color: '#312e81',
+                            weight: 8,
+                            opacity: 0.8
+                        }).addTo(userRouteLayerGroup);
+
+                        L.polyline(segs.public_road.coordinates, {
+                            color: '#6366f1',
+                            weight: 5,
+                            dashArray: '8, 8',
+                            opacity: 1.0
+                        }).addTo(userRouteLayerGroup).bindPopup(`<b>🛣 Jaringan Jalan Umum (${segs.public_road.source || 'OSRM'})</b><br>Jarak: ${segs.public_road.distance_formatted}`);
+                    }
+
+                    // 2. Waypoint Titik Masuk Jalur Evakuasi Resmi
+                    if (data.summary && data.summary.entry_point) {
+                        const junctionIcon = L.divIcon({
+                            className: 'junction-marker',
+                            html: '<div>🛡️</div>',
+                            iconSize: [26, 26],
+                            iconAnchor: [13, 13]
+                        });
+                        L.marker([data.summary.entry_point.lat, data.summary.entry_point.lng], { icon: junctionIcon })
+                            .addTo(userRouteLayerGroup)
+                            .bindPopup(`<b>Titik Masuk Jalur Evakuasi Resmi</b><br>${segs.official_evacuation?.route_name || 'Jalur Evakuasi BPBD'}`);
+                    }
+
+                    // 3. Rute Resmi BPBD Lanjutan ke Titik Kumpul
+                    if (segs.official_evacuation && segs.official_evacuation.coordinates && segs.official_evacuation.coordinates.length > 0) {
+                        L.polyline(segs.official_evacuation.coordinates, {
+                            color: '#064e3b',
+                            weight: 8,
+                            opacity: 0.85
+                        }).addTo(userRouteLayerGroup);
+
+                        L.polyline(segs.official_evacuation.coordinates, {
+                            color: '#10b981',
+                            weight: 5,
+                            opacity: 1.0
+                        }).addTo(userRouteLayerGroup).bindPopup(`<b>🛡️ Jalur Evakuasi Resmi BPBD</b><br>${segs.official_evacuation.route_name || ''}<br>Menuju: ${facility.name}`);
+                    }
+                }
+
+                // C. Zoom & Fit Bounds Otomatis
+                currentNavigationBounds = L.latLngBounds(fullRouteLatLngs);
+                map.fitBounds(currentNavigationBounds, { padding: [60, 60], maxZoom: 17 });
+
+                // D. Inisialisasi Integrasi Leaflet Routing Machine
                 try {
                     if (typeof L.Routing !== 'undefined') {
+                        if (userRoutingControl) {
+                            map.removeControl(userRoutingControl);
+                            userRoutingControl = null;
+                        }
                         userRoutingControl = L.Routing.control({
                             waypoints: [
                                 L.latLng(lat, lng),
                                 L.latLng(fLat, fLng)
                             ],
-                            lineOptions: {
-                                styles: [{color: '#ef4444', weight: 4, dashArray: '5, 10'}] // Warna merah untuk rute jalan
-                            },
                             show: false,
                             addWaypoints: false,
-                            routeWhileDragging: false
+                            routeWhileDragging: false,
+                            createMarker: () => null // Marker diatur oleh userMarker & nearestMarker
                         }).addTo(map);
                     }
                 } catch (e) {
-                    console.log("Leaflet Routing Machine tidak dijalankan.");
+                    console.log("LRM fallback: ", e);
                 }
+
+                // E. Render Panel Navigasi Modern (Tailwind)
+                renderNavigationPanel(data, lat, lng);
             })
-            .catch(err => console.error('Error fetching route:', err));
+            .catch(err => {
+                console.error('Error fetching hybrid evacuation route:', err);
+                alert("Gagal memuat rute navigasi evakuasi. Silakan periksa koneksi internet atau koordinat.");
+                if (statusElem) {
+                    statusElem.textContent = 'Gagal';
+                    statusElem.className = 'text-[10px] font-semibold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full';
+                }
+            });
     });
+
+    // Event Listener Interaktif untuk Panel Navigasi
+    document.getElementById('btnFocusNavigationRoute')?.addEventListener('click', function() {
+        if (currentNavigationBounds) {
+            map.fitBounds(currentNavigationBounds, { padding: [60, 60], maxZoom: 17 });
+        }
+    });
+
+    document.getElementById('btnResetNavFromPanel')?.addEventListener('click', function() {
+        resetUserLocation();
+    });
+
+    document.getElementById('btnCloseNavPanel')?.addEventListener('click', function() {
+        const panel = document.getElementById('evacuationNavigationPanel');
+        if (panel) panel.classList.add('hidden');
+    });
+
+    document.getElementById('btnToggleNavCollapse')?.addEventListener('click', function() {
+        const body = document.getElementById('navPanelBody');
+        const icon = document.getElementById('iconNavCollapse');
+        if (body) {
+            body.classList.toggle('hidden');
+            if (icon) {
+                icon.classList.toggle('rotate-180');
+            }
+        }
+    });
+    // =====================================================================
     // =====================================================================
     
 

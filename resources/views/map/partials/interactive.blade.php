@@ -54,8 +54,9 @@
         </div>
     </div>
 
-    <div class="map-container map-admin-viewport rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+    <div class="map-container map-admin-viewport rounded-lg overflow-hidden border border-gray-200 shadow-sm relative">
         <div id="map"></div>
+        @include('map.partials.navigation-panel')
         <div class="map-legend-inside" aria-label="Legenda peta">
             @include('map.partials.map-legend-content', ['legendLayout' => 'stack'])
         </div>

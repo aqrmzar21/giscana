@@ -46,6 +46,9 @@
     <!-- Peta Utama (Diakses Selalu Terbuka) -->
     <div id="map" class="absolute inset-0 h-screen w-screen z-0"></div>
 
+    <!-- Panel Navigasi Hybrid Evakuasi -->
+    @include('map.partials.navigation-panel')
+
     <!-- Tombol Pintas Quick Tool (Melayang di Kiri Atas Peta) -->
     <div class="absolute top-20 right-5 z-50">
         <button id="btnMapLocationTool" title="Input Lokasi Saat Ini" type="button" class="w-9 h-9 bg-white hover:bg-slate-50 text-slate-700 rounded-xl shadow-md border border-slate-200 flex items-center justify-center transition-all hover:scale-105 active:scale-95 group">

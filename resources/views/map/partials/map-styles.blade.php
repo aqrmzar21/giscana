@@ -1,6 +1,7 @@
 @php($mapUiVariant = $mapUiVariant ?? 'admin')
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
 <style>
     @if($mapUiVariant === 'admin')
     .map-ui--admin .map-admin-viewport {
@@ -328,6 +329,60 @@
         fill: none;
         width: 8px;
         height: 8px;
+    }
+
+    /* Sembunyikan default container LRM agar Tailwind Panel Navigasi yang tampil prima */
+    .leaflet-routing-container {
+        display: none !important;
+    }
+
+    /* User GPS Pulsing Marker */
+    .user-gps-marker {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .user-gps-marker .pulse-ring {
+        position: absolute;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: rgba(59, 130, 246, 0.4);
+        animation: userGpsPulse 2s infinite ease-out;
+    }
+    .user-gps-marker .dot-center {
+        position: relative;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #2563eb;
+        border: 2.5px solid #ffffff;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    @keyframes userGpsPulse {
+        0% { transform: scale(0.6); opacity: 1; }
+        100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* Waypoint Titik Masuk Jalur Evakuasi */
+    .junction-marker {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .junction-marker div {
+        background-color: #059669;
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: bold;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.3);
     }
 </style>
 @endpush
