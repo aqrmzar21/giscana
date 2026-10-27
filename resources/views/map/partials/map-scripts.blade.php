@@ -74,6 +74,12 @@
     let userRoutingControl = null;
     let blinkingTimer = null;
     let currentNavigationBounds = null;
+    let currentRoutingData = null;
+    let currentRoutePolylines = {
+        public: { casing: null, main: null, hit: null },
+        bpbd: { casing: null, main: null, hit: null }
+    };
+    let activeRouteKey = 'bpbd';
 
     // Fungsi Buka Modal
     function openLocationModal() {
@@ -110,6 +116,12 @@
             }
             userRoutingControl = null;
         }
+        currentRoutingData = null;
+        currentRoutePolylines = {
+            public: { casing: null, main: null, hit: null },
+            bpbd: { casing: null, main: null, hit: null }
+        };
+        activeRouteKey = 'bpbd';
 
         // 3. Matikan Efek Kedip pada Marker Fasilitas
         if (blinkingTimer) {
@@ -257,18 +269,26 @@
     }
 
     // Helper bangun konten HTML popup ringkas dan rapi untuk Marker Lokasi User saat Rute Evakuasi Aktif
-    function buildUserLocationPopupHtml(data, userLat, userLng) {
-        const facility = data.facility;
-        const summary = data.summary || {};
-        const isMode1 = data.mode === 'jalur_resmi';
+    function buildUserLocationPopupHtml(data, userLat, userLng, activeKey = null) {
+        const key = activeKey || activeRouteKey || data.selected_route_key || 'bpbd';
+        const facility = data.facility || {};
+        const options = data.route_options || {};
+        const optPublic = options.public;
+        const optBpbd = options.bpbd;
+        const activeOpt = (options && options[key]) ? options[key] : (optBpbd || optPublic || data.summary || {});
 
+        const isPublic = key === 'public';
+        const isBpbd = key === 'bpbd';
 
         return `
-            <div style="padding:10px 12px;font-family:system-ui,-apple-system,sans-serif;color:#1e293b;min-width:210px;">
+            <div style="padding:10px 12px;font-family:system-ui,-apple-system,sans-serif;color:#1e293b;min-width:230px;">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e2e8f0;">
                     <div style="font-weight:800;font-size:12px;color:#0f172a;display:flex;align-items:center;gap:4px;">
                         <span>📍</span> Lokasi Saat Ini
                     </div>
+                    <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px;background:${isBpbd ? '#f3e8ff' : '#dbeafe'};color:${isBpbd ? '#7e22ce' : '#1d4ed8'};">
+                        ${isBpbd ? '🛡️ Jalur BPBD' : '🛣️ Jalur Umum'}
+                    </span>
                 </div>
                 
                 <div style="font-size:11px;color:#64748b;margin-bottom:6px;">
@@ -279,11 +299,25 @@
                 <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:6px 8px;margin-bottom:8px;">
                     <span style="font-size:9px;font-weight:700;color:#15803d;text-transform:uppercase;display:block;">Tujuan Evakuasi</span>
                     <div style="font-weight:700;font-size:11px;color:#0f172a;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${facility.name || 'Titik Kumpul'}</div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;font-size:10px;font-weight:600;color:#4f46e5;">
-                        <span>Jarak: ${summary.distance_formatted || '–'}</span>
-                        <span>⏱ ${summary.duration_formatted || '–'}</span>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;font-size:10px;font-weight:600;color:${isBpbd ? '#7e22ce' : '#2563eb'};">
+                        <span>Jarak: ${activeOpt.distance_formatted || '–'}</span>
+                        <span>⏱ ${activeOpt.duration_formatted || '–'}</span>
                     </div>
                 </div>
+
+                ${optPublic && optBpbd ? `
+                    <div style="margin-bottom:8px;background:#f1f5f9;border-radius:8px;padding:5px;">
+                        <span style="font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;display:block;margin-bottom:4px;text-align:center;">Pilih Rute Aktif:</span>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                            <button type="button" onclick="window.selectEvacuationRoute && window.selectEvacuationRoute('public')" style="border:1.5px solid ${isPublic ? '#2563eb' : '#cbd5e1'};background:${isPublic ? '#eff6ff' : '#ffffff'};color:${isPublic ? '#1d4ed8' : '#64748b'};padding:4px 6px;border-radius:6px;font-size:9px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.2s;">
+                                🛣️ Jalur Umum
+                            </button>
+                            <button type="button" onclick="window.selectEvacuationRoute && window.selectEvacuationRoute('bpbd')" style="border:1.5px solid ${isBpbd ? '#9333ea' : '#cbd5e1'};background:${isBpbd ? '#faf5ff' : '#ffffff'};color:${isBpbd ? '#7e22ce' : '#64748b'};padding:4px 6px;border-radius:6px;font-size:9px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.2s;">
+                                🛡️ Jalur BPBD
+                            </button>
+                        </div>
+                    </div>
+                ` : ''}
 
                 <button type="button" onclick="const p = document.getElementById('evacuationNavigationPanel'); if(p){ p.classList.remove('hidden'); p.scrollIntoView({behavior:'smooth'}); }" style="width:100%;background:#4f46e5;color:#ffffff;border:none;border-radius:7px;padding:6px 8px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,0.1);">
                     <span>🧭</span> Panduan Rute di Panel Kiri
@@ -292,64 +326,104 @@
         `;
     }
 
+    // Helper update tampilan Popup pada Marker Lokasi User saat rute berganti
+    function updateUserMarkerPopupUI(data, selectedKey) {
+        if (userMarker) {
+            const popup = userMarker.getPopup();
+            if (popup) {
+                const html = buildUserLocationPopupHtml(data, userMarker.getLatLng().lat, userMarker.getLatLng().lng, selectedKey);
+                popup.setContent(html);
+            }
+        }
+    }
+
     // Helper update tampilan Panel Navigasi Modern (Tailwind)
-    function renderNavigationPanel(data, userLat, userLng) {
+    function renderNavigationPanel(data, userLat, userLng, activeKey = null) {
         const panel = document.getElementById('evacuationNavigationPanel');
         if (!panel) return;
 
-        const isMode1 = data.mode === 'jalur_resmi';
-        const summary = data.summary || {};
-        const instructions = data.instructions || [];
-
-        // 1. Badge Mode
-        const modeBadgeContainer = document.getElementById('navModeBadgeContainer');
-        const modePrefix = document.getElementById('navModePrefix');
-        const modeTitle = document.getElementById('navModeTitle');
-        const modeLabel = document.getElementById('navModeLabel');
-        const modeIcon = document.getElementById('navModeIcon');
-        const modeTag = document.getElementById('navModeTag');
-        const modeDesc = document.getElementById('navModeDescription');
-
-        // if (isMode1) {
-        //     modeBadgeContainer.className = 'p-3 rounded-xl border transition-all bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100';
-        //     if (modePrefix) modePrefix.textContent = 'MODE 1 (DEKAT < 100M)';
-        //     if (modeIcon) modeIcon.textContent = '🛡️';
-        //     if (modeLabel) modeLabel.textContent = 'Jalur Evakuasi Resmi';
-        //     if (modeTag) {
-        //         modeTag.textContent = 'JALUR RESMI';
-        //         modeTag.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-200';
-        //     }
-        //     if (modeDesc) modeDesc.textContent = 'Posisi Anda berada di/dekat jalur resmi. Mengikuti rute evakuasi resmi terverifikasi BPBD langsung ke titik kumpul.';
-        // } else {
-        //     modeBadgeContainer.className = 'p-3 rounded-xl border transition-all bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-800 text-indigo-950 dark:text-indigo-100';
-        //     if (modePrefix) modePrefix.textContent = 'MODE 2 (JAUH > 100M)';
-        //     if (modeIcon) modeIcon.textContent = '🛣';
-        //     if (modeLabel) modeLabel.textContent = 'Routing Jalan Umum (Hybrid)';
-        //     if (modeTag) {
-        //         modeTag.textContent = 'HYBRID OSRM';
-        //         modeTag.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-indigo-200 dark:bg-indigo-800 text-indigo-800 dark:text-indigo-200';
-        //     }
-        //     if (modeDesc) modeDesc.textContent = 'Menavigasikan rute via jalan umum menuju titik masuk jalur evakuasi resmi, kemudian diarahkan ke titik kumpul.';
-        // }
-
-        // 2. Metrik Jarak & Estimasi
-        const distElem = document.getElementById('navDistanceValue');
-        if (distElem) {
-            distElem.textContent = summary.distance_formatted || '–';
+        if (activeKey) {
+            activeRouteKey = activeKey;
+        } else {
+            activeKey = activeRouteKey || data.selected_route_key || 'bpbd';
         }
 
-        const durElem = document.getElementById('navDurationValue');
-        if (durElem) {
-            durElem.textContent = summary.duration_formatted || '–';
+        const facility = data.facility || {};
+        const options = data.route_options || {};
+        const optPublic = options.public;
+        const optBpbd = options.bpbd;
+        const currentOpt = (options && options[activeKey]) ? options[activeKey] : (optBpbd || optPublic || data.summary || {});
+
+        const isPublic = activeKey === 'public';
+        const isBpbd = activeKey === 'bpbd';
+
+        // 1. Nama Fasilitas Titik Kumpul
+        const destElem = document.getElementById('navDestinationName');
+        if (destElem) {
+            destElem.textContent = facility.name || 'Titik Kumpul Terdekat';
+            destElem.title = facility.name || 'Titik Kumpul';
         }
 
-        // 3. Update Badge Jumlah Langkah Instruksi
+        // 2. Subtitle Status di Header Panel
+        const subtitleElem = document.getElementById('navSubtitleStatus');
+        if (subtitleElem) {
+            subtitleElem.textContent = isBpbd 
+                ? 'Jalur Resmi BPBD (Terverifikasi)' 
+                : 'Jalur Umum (Google Maps Style)';
+        }
+
+        // 3. Tampilkan kartu opsi rute dan metriknya jika opsi rute tersedia
+        if (optPublic) {
+            const cardDist = document.getElementById('cardPublicDist');
+            const cardDur = document.getElementById('cardPublicDur');
+            if (cardDist) cardDist.textContent = optPublic.distance_formatted || '–';
+            if (cardDur) cardDur.textContent = optPublic.duration_formatted || '–';
+        }
+        if (optBpbd) {
+            const cardDist = document.getElementById('cardBpbdDist');
+            const cardDur = document.getElementById('cardBpbdDur');
+            if (cardDist) cardDist.textContent = optBpbd.distance_formatted || '–';
+            if (cardDur) cardDur.textContent = optBpbd.duration_formatted || '–';
+        }
+
+        // Highlight kartu yang aktif vs nonaktif
+        const btnPublic = document.getElementById('btnSelectRoutePublic');
+        const badgePublic = document.getElementById('badgeActivePublic');
+        const btnBpbd = document.getElementById('btnSelectRouteBpbd');
+        const badgeBpbd = document.getElementById('badgeActiveBpbd');
+
+        if (btnPublic && badgePublic) {
+            if (isPublic) {
+                btnPublic.className = 'p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-blue-50/80 dark:bg-blue-950/40 border-blue-500 ring-2 ring-blue-400/50 shadow-md';
+                badgePublic.textContent = 'Aktif ✓';
+                badgePublic.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-600 text-white';
+            } else {
+                btnPublic.className = 'p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-400 opacity-75';
+                badgePublic.textContent = 'Pilih';
+                badgePublic.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300';
+            }
+        }
+
+        if (btnBpbd && badgeBpbd) {
+            if (isBpbd) {
+                btnBpbd.className = 'p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-purple-50/80 dark:bg-purple-950/40 border-purple-500 ring-2 ring-purple-400/50 shadow-md';
+                badgeBpbd.textContent = 'Aktif ✓';
+                badgeBpbd.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-purple-600 text-white';
+            } else {
+                btnBpbd.className = 'p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-purple-400 opacity-75';
+                badgeBpbd.textContent = 'Pilih';
+                badgeBpbd.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300';
+            }
+        }
+
+        // 4. Update Badge Jumlah Langkah Instruksi
+        const instructions = currentOpt.instructions || data.instructions || [];
         const stepsBadge = document.getElementById('navStepsCount');
         if (stepsBadge) {
             stepsBadge.textContent = `${instructions.length} Langkah`;
         }
 
-        // 4. Render Daftar Instruksi Arah ke dalam Panel Body (Hasil Pertukaran dari Pop-up)
+        // 5. Render Daftar Instruksi Arah ke dalam Panel Body
         const instructionsContainer = document.getElementById('navInstructionsList');
         if (instructionsContainer) {
             if (instructions.length === 0) {
@@ -371,8 +445,11 @@
                         cardClass = 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100 font-semibold';
                         iconBgClass = 'bg-emerald-500 text-white';
                     } else if (isEnterOfficial) {
-                        cardClass = 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-800 text-indigo-950 dark:text-indigo-100 font-semibold';
-                        iconBgClass = 'bg-indigo-600 text-white';
+                        cardClass = 'bg-purple-50 dark:bg-purple-950/40 border-purple-300 dark:border-purple-800 text-purple-950 dark:text-purple-100 font-semibold';
+                        iconBgClass = 'bg-purple-600 text-white';
+                    } else if (isPublic) {
+                        cardClass = 'bg-blue-50/40 dark:bg-blue-950/30 border-blue-200/70 dark:border-blue-800/50 text-slate-800 dark:text-slate-200';
+                        iconBgClass = 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200';
                     }
 
                     html += `
@@ -401,6 +478,145 @@
         // Tampilkan panel
         panel.classList.remove('hidden');
     }
+
+    // Helper update visual polyline rute pada peta
+    function updateRoutePolylinesVisual(activeKey) {
+        if (!currentRoutingData || !currentRoutePolylines) return;
+        const opts = currentRoutingData.route_options || {};
+        const bpbd = currentRoutePolylines.bpbd;
+        const pub = currentRoutePolylines.public;
+        const optBpbd = opts.bpbd;
+        const optPublic = opts.public;
+
+        if (activeKey === 'bpbd') {
+            // BPBD Aktif: Tegas, solid, satu warna ungu
+            if (bpbd && bpbd.main && bpbd.casing) {
+                bpbd.casing.setStyle({
+                    color: '#581c87',
+                    weight: 9,
+                    opacity: 0.95
+                });
+                bpbd.main.setStyle({
+                    color: 'rgb(153, 0, 255)',
+                    weight: 6,
+                    opacity: 1.0,
+                    dashArray: null
+                });
+                bpbd.casing.bringToFront();
+                bpbd.main.bringToFront();
+                if (bpbd.hit) bpbd.hit.bringToFront();
+
+                const textDist = optBpbd ? optBpbd.distance_formatted : '';
+                const textDur = optBpbd ? optBpbd.duration_formatted : '';
+                bpbd.main.unbindTooltip();
+                bpbd.main.bindTooltip(`<b>🛡️ Jalur Resmi BPBD (Rute Aktif)</b><br>Jarak: ${textDist} • Waktu: ${textDur}`, {
+                    sticky: true,
+                    direction: 'top',
+                    className: 'route-tooltip'
+                });
+            }
+
+            // Public Alternatif: Muted Google Blue
+            if (pub && pub.main && pub.casing) {
+                pub.casing.setStyle({
+                    color: '#1e3a8a',
+                    weight: 5,
+                    opacity: 0.35
+                });
+                pub.main.setStyle({
+                    color: '#60a5fa',
+                    weight: 4,
+                    opacity: 0.7,
+                    dashArray: '6, 6'
+                });
+                const textDist = optPublic ? optPublic.distance_formatted : '';
+                const textDur = optPublic ? optPublic.duration_formatted : '';
+                pub.main.unbindTooltip();
+                pub.main.bindTooltip(`<b>🛣️ Jalur Umum (Google Maps)</b><br>Jarak: ${textDist} • Waktu: ${textDur}<br><span style="color:#2563eb;font-weight:700;">👉 Klik untuk pilih Jalur Umum</span>`, {
+                    sticky: true,
+                    direction: 'top',
+                    className: 'route-tooltip'
+                });
+            }
+        } else {
+            // Public Aktif: Gaya Google Maps Biru Vibrant
+            if (pub && pub.main && pub.casing) {
+                pub.casing.setStyle({
+                    color: '#174ea6',
+                    weight: 9,
+                    opacity: 0.95
+                });
+                pub.main.setStyle({
+                    color: '#4285F4',
+                    weight: 6,
+                    opacity: 1.0,
+                    dashArray: null
+                });
+                pub.casing.bringToFront();
+                pub.main.bringToFront();
+                if (pub.hit) pub.hit.bringToFront();
+
+                const textDist = optPublic ? optPublic.distance_formatted : '';
+                const textDur = optPublic ? optPublic.duration_formatted : '';
+                pub.main.unbindTooltip();
+                pub.main.bindTooltip(`<b>🛣️ Jalur Umum (Rute Aktif - Google Maps)</b><br>Jarak: ${textDist} • Waktu: ${textDur}`, {
+                    sticky: true,
+                    direction: 'top',
+                    className: 'route-tooltip'
+                });
+            }
+
+            // BPBD Alternatif: Muted Purple
+            if (bpbd && bpbd.main && bpbd.casing) {
+                bpbd.casing.setStyle({
+                    color: '#4c1d95',
+                    weight: 5,
+                    opacity: 0.35
+                });
+                bpbd.main.setStyle({
+                    color: '#c084fc',
+                    weight: 4,
+                    opacity: 0.7,
+                    dashArray: '6, 6'
+                });
+                const textDist = optBpbd ? optBpbd.distance_formatted : '';
+                const textDur = optBpbd ? optBpbd.duration_formatted : '';
+                bpbd.main.unbindTooltip();
+                bpbd.main.bindTooltip(`<b>🛡️ Jalur Resmi BPBD</b><br>Jarak: ${textDist} • Waktu: ${textDur}<br><span style="color:#9333ea;font-weight:700;">👉 Klik untuk pilih Jalur BPBD</span>`, {
+                    sticky: true,
+                    direction: 'top',
+                    className: 'route-tooltip'
+                });
+            }
+        }
+    }
+
+    // Fungsi global pemilihan rute evakuasi (Jalur Umum vs Jalur Resmi BPBD)
+    window.selectEvacuationRoute = function(selectedKey) {
+        if (!currentRoutingData) return;
+        activeRouteKey = selectedKey;
+
+        // 1. Update style visual garis rute pada peta
+        updateRoutePolylinesVisual(selectedKey);
+
+        // 2. Update panel navigasi langkah demi langkah
+        renderNavigationPanel(currentRoutingData, currentRoutingData.summary.user_location.lat, currentRoutingData.summary.user_location.lng, selectedKey);
+
+        // 3. Update popup marker lokasi user
+        updateUserMarkerPopupUI(currentRoutingData, selectedKey);
+
+        // 4. Update status badge di panel kontrol peta
+        const statusElem = document.getElementById('userLocationStatus');
+        if (statusElem) {
+            if (selectedKey === 'bpbd') {
+                statusElem.textContent = 'Jalur Resmi BPBD ✓';
+                statusElem.className = 'text-[10px] font-semibold text-purple-800 bg-purple-100 px-2 py-0.5 rounded-full';
+            } else {
+                statusElem.textContent = 'Jalur Umum (Google) ✓';
+                statusElem.className = 'text-[10px] font-semibold text-blue-800 bg-blue-100 px-2 py-0.5 rounded-full';
+            }
+        }
+    };
 
     // Proses "Set Lokasi" (Hybrid Routing Pipeline)
     document.getElementById('setLocation')?.addEventListener('click', function() {
@@ -517,114 +733,181 @@
                     }
                 }
 
-                // --- B. GAMBAR RUTE HYBRID PADA userRouteLayerGroup ---
+                // --- B. GAMBAR RUTE (PILIHAN JALUR UMUM GOOGLE MAPS VS JALUR RESMI BPBD UNGU) ---
                 userRouteLayerGroup.clearLayers();
-                const fullRouteLatLngs = data.full_route_latlngs || [[lat, lng], [fLat, fLng]];
+                currentRoutingData = data;
+                activeRouteKey = data.selected_route_key || 'bpbd';
 
-                if (data.mode === 'jalur_resmi') {
-                    // MODE 1: Jalur Evakuasi Resmi (Hijau Emerald Tebal dengan Casing Kontras Tinggi)
-                    L.polyline(fullRouteLatLngs, {
-                        color: '#064e3b',
+                const routeOpts = data.route_options || {};
+                const optBpbd = routeOpts.bpbd || {
+                    coordinates: data.full_route_latlngs || [[lat, lng], [fLat, fLng]],
+                    distance_formatted: data.summary?.distance_formatted || '',
+                    duration_formatted: data.summary?.duration_formatted || '',
+                    instructions: data.instructions || []
+                };
+                const optPublic = routeOpts.public || {
+                    coordinates: [[lat, lng], [fLat, fLng]],
+                    distance_formatted: data.summary?.distance_formatted || '',
+                    duration_formatted: data.summary?.duration_formatted || '',
+                    instructions: []
+                };
+
+                // Siapkan bounds untuk semua titik koordinat kedua rute
+                let allLatLngs = [];
+                if (optBpbd.coordinates && optBpbd.coordinates.length > 0) {
+                    allLatLngs = allLatLngs.concat(optBpbd.coordinates);
+                }
+                if (optPublic.coordinates && optPublic.coordinates.length > 0) {
+                    allLatLngs = allLatLngs.concat(optPublic.coordinates);
+                }
+                if (allLatLngs.length === 0) {
+                    allLatLngs = [[lat, lng], [fLat, fLng]];
+                }
+
+                currentRoutePolylines = {
+                    public: { casing: null, main: null, hit: null },
+                    bpbd: { casing: null, main: null, hit: null }
+                };
+
+                // 1. Gambar RUTE JALUR RESMI BPBD (SATU WARNA UNGU TERUNIFIKASI)
+                if (optBpbd.coordinates && optBpbd.coordinates.length > 1) {
+                    const bpbdCasing = L.polyline(optBpbd.coordinates, {
+                        color: '#581c87',
                         weight: 9,
-                        opacity: 0.85
+                        opacity: 0.95,
+                        lineCap: 'round',
+                        lineJoin: 'round'
                     }).addTo(userRouteLayerGroup);
 
-                    const officialLine = L.polyline(fullRouteLatLngs, {
-                        color: '#10b981',
+                    const bpbdMain = L.polyline(optBpbd.coordinates, {
+                        color: 'rgb(153, 0, 255)',
                         weight: 6,
                         opacity: 1.0,
                         lineCap: 'round',
                         lineJoin: 'round'
                     }).addTo(userRouteLayerGroup);
 
-                    officialLine.bindPopup(`<b>🛣 Jalur Evakuasi Resmi BPBD</b><br>Menuju: ${facility.name}<br>Jarak: ${data.summary?.distance_formatted || ''}`);
+                    const bpbdHit = L.polyline(optBpbd.coordinates, {
+                        weight: 22,
+                        opacity: 0,
+                        interactive: true,
+                        className: 'clickable-route-hit',
+                        bubblingMouseEvents: false
+                    }).addTo(userRouteLayerGroup);
 
-                } else {
-                    // MODE 2: Hybrid (Segmen 1: Jalan Umum via OSRM/ORS + Segmen 2: Jalur Evakuasi Resmi)
-                    const segs = data.segments || {};
+                    currentRoutePolylines.bpbd = {
+                        casing: bpbdCasing,
+                        main: bpbdMain,
+                        hit: bpbdHit
+                    };
 
-                    // 1. Rute Jalan Umum (Indigo beraksen jalan raya modern)
-                    if (segs.public_road && segs.public_road.coordinates && segs.public_road.coordinates.length > 0) {
-                        L.polyline(segs.public_road.coordinates, {
-                            color: '#312e81',
-                            weight: 8,
-                            opacity: 0.8
-                        }).addTo(userRouteLayerGroup);
+                    const handleBpbdClick = function(e) {
+                        if (e && e.originalEvent) L.DomEvent.stopPropagation(e);
+                        window.selectEvacuationRoute('bpbd');
+                    };
 
-                        L.polyline(segs.public_road.coordinates, {
-                            color: '#6366f1',
-                            weight: 5,
-                            dashArray: '8, 8',
-                            opacity: 1.0
-                        }).addTo(userRouteLayerGroup).bindPopup(`<b>🛣 Jaringan Jalan Umum (${segs.public_road.source || 'OSRM'})</b><br>Jarak: ${segs.public_road.distance_formatted}`);
-                    }
+                    bpbdHit.on('click', handleBpbdClick);
+                    bpbdMain.on('click', handleBpbdClick);
+                    bpbdCasing.on('click', handleBpbdClick);
 
-                    // 2. Waypoint Titik Masuk Jalur Evakuasi Resmi
-                    if (data.summary && data.summary.entry_point) {
+                    bpbdHit.on('mouseover', function() {
+                        if (activeRouteKey !== 'bpbd') {
+                            bpbdMain.setStyle({ opacity: 0.9, weight: 6 });
+                        }
+                    });
+                    bpbdHit.on('mouseout', function() {
+                        if (activeRouteKey !== 'bpbd') {
+                            updateRoutePolylinesVisual(activeRouteKey);
+                        }
+                    });
+
+                    // Waypoint Titik Masuk Jalur Evakuasi Resmi (jika ada)
+                    const entryPoint = optBpbd.entry_point || (data.summary && data.summary.entry_point);
+                    if (entryPoint && entryPoint.lat && entryPoint.lng) {
                         const junctionIcon = L.divIcon({
                             className: 'junction-marker',
-                            html: '<div>🛡️</div>',
+                            html: '<div title="Titik Masuk Jalur Evakuasi BPBD (Klik untuk pilih)">🛡️</div>',
                             iconSize: [26, 26],
                             iconAnchor: [13, 13]
                         });
-                        L.marker([data.summary.entry_point.lat, data.summary.entry_point.lng], { icon: junctionIcon })
+                        const jMarker = L.marker([entryPoint.lat, entryPoint.lng], { icon: junctionIcon })
                             .addTo(userRouteLayerGroup)
-                            .bindPopup(`<b>Titik Masuk Jalur Evakuasi Resmi</b><br>${segs.official_evacuation?.route_name || 'Jalur Evakuasi BPBD'}`);
-                    }
-
-                    // 3. Rute Resmi BPBD Lanjutan ke Titik Kumpul
-                    if (segs.official_evacuation && segs.official_evacuation.coordinates && segs.official_evacuation.coordinates.length > 0) {
-                        L.polyline(segs.official_evacuation.coordinates, {
-                            color: '#064e3b',
-                            weight: 8,
-                            opacity: 0.85
-                        }).addTo(userRouteLayerGroup);
-
-                        L.polyline(segs.official_evacuation.coordinates, {
-                            color: '#10b981',
-                            weight: 5,
-                            opacity: 1.0
-                        }).addTo(userRouteLayerGroup).bindPopup(`<b>🛡️ Jalur Evakuasi Resmi BPBD</b><br>${segs.official_evacuation.route_name || ''}<br>Menuju: ${facility.name}`);
+                            .bindPopup(`<b>Titik Masuk Jalur Evakuasi Resmi BPBD</b><br>${optBpbd.route_name || 'Jalur Evakuasi BPBD'}<br><button type="button" onclick="window.selectEvacuationRoute('bpbd')" style="margin-top:6px;padding:4px 8px;background:#7e22ce;color:white;border:none;border-radius:6px;font-size:10px;font-weight:bold;cursor:pointer;">Pilih Jalur Resmi BPBD</button>`);
+                        jMarker.on('click', handleBpbdClick);
                     }
                 }
 
-                // C. Zoom & Fit Bounds Otomatis
-                currentNavigationBounds = L.latLngBounds(fullRouteLatLngs);
+                // 2. Gambar RUTE JALUR UMUM (GAYA GOOGLE MAPS - BIRU)
+                if (optPublic.coordinates && optPublic.coordinates.length > 1) {
+                    const publicCasing = L.polyline(optPublic.coordinates, {
+                        color: '#174ea6',
+                        weight: 8,
+                        opacity: 0.8,
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    }).addTo(userRouteLayerGroup);
+
+                    const publicMain = L.polyline(optPublic.coordinates, {
+                        color: '#4285F4',
+                        weight: 5,
+                        opacity: 1.0,
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    }).addTo(userRouteLayerGroup);
+
+                    const publicHit = L.polyline(optPublic.coordinates, {
+                        weight: 22,
+                        opacity: 0,
+                        interactive: true,
+                        className: 'clickable-route-hit',
+                        bubblingMouseEvents: false
+                    }).addTo(userRouteLayerGroup);
+
+                    currentRoutePolylines.public = {
+                        casing: publicCasing,
+                        main: publicMain,
+                        hit: publicHit
+                    };
+
+                    const handlePublicClick = function(e) {
+                        if (e && e.originalEvent) L.DomEvent.stopPropagation(e);
+                        window.selectEvacuationRoute('public');
+                    };
+
+                    publicHit.on('click', handlePublicClick);
+                    publicMain.on('click', handlePublicClick);
+                    publicCasing.on('click', handlePublicClick);
+
+                    publicHit.on('mouseover', function() {
+                        if (activeRouteKey !== 'public') {
+                            publicMain.setStyle({ opacity: 0.9, weight: 6 });
+                        }
+                    });
+                    publicHit.on('mouseout', function() {
+                        if (activeRouteKey !== 'public') {
+                            updateRoutePolylinesVisual(activeRouteKey);
+                        }
+                    });
+                }
+
+                // Terapkan visual style rute aktif & alternatif
+                updateRoutePolylinesVisual(activeRouteKey);
+
+                // C. Zoom & Fit Bounds Otomatis (mencakup kedua rute)
+                currentNavigationBounds = L.latLngBounds(allLatLngs);
                 map.fitBounds(currentNavigationBounds, { padding: [60, 60], maxZoom: 17 });
 
-                // D. Inisialisasi Integrasi Leaflet Routing Machine
-                try {
-                    if (typeof L.Routing !== 'undefined') {
-                        if (userRoutingControl) {
-                            map.removeControl(userRoutingControl);
-                            userRoutingControl = null;
-                        }
-                        userRoutingControl = L.Routing.control({
-                            waypoints: [
-                                L.latLng(lat, lng),
-                                L.latLng(fLat, fLng)
-                            ],
-                            show: false,
-                            addWaypoints: false,
-                            routeWhileDragging: false,
-                            createMarker: () => null // Marker diatur oleh userMarker & nearestMarker
-                        }).addTo(map);
-                    }
-                } catch (e) {
-                    console.log("LRM fallback: ", e);
-                }
-
-                // E. Pasang Pop-up Lokasi Saat Ini (Rute Evakuasi Aktif) pada Marker Lokasi User
-                const userLocationPopupHtml = buildUserLocationPopupHtml(data, lat, lng);
+                // D. Pasang Pop-up Lokasi Saat Ini (Rute Evakuasi Aktif) pada Marker Lokasi User
+                const userLocationPopupHtml = buildUserLocationPopupHtml(data, lat, lng, activeRouteKey);
                 userMarker.bindPopup(userLocationPopupHtml, {
-                    maxWidth: 290,
-                    minWidth: 220,
+                    maxWidth: 300,
+                    minWidth: 230,
                     className: 'instruction-popup',
                     autoPan: false
                 }).openPopup();
 
-                // F. Render Panel Navigasi Modern (Tailwind) dengan Panduan Arah
-                renderNavigationPanel(data, lat, lng);
+                // E. Render Panel Navigasi Modern (Tailwind) dengan Panduan Arah
+                renderNavigationPanel(data, lat, lng, activeRouteKey);
             })
             .catch(err => {
                 console.error('Error fetching hybrid evacuation route:', err);

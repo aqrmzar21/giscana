@@ -198,6 +198,23 @@ class EvacuationRoutingService
 
         $officialRoutes = EvacuationRoute::where('evacuation_facility_id', $facility->id)->get();
 
+        $publicOption = $this->buildDirectPublicRoadOption($userLat, $userLng, $facilityCoords, $facility);
+        $bpbdOption = [
+            'key' => 'bpbd',
+            'name' => 'Jalur Evakuasi Resmi BPBD',
+            'label' => 'Jalur Resmi BPBD',
+            'route_name' => $route->name ?? 'Jalur Evakuasi Resmi BPBD',
+            'color' => 'rgb(153, 0, 255)',
+            'casing_color' => '#581c87',
+            'coordinates' => $fullPath,
+            'distance_meters' => round($totalDistance, 1),
+            'distance_formatted' => $this->formatDistance($totalDistance),
+            'duration_seconds' => $durationSeconds,
+            'duration_formatted' => $this->formatDuration($durationMinutes),
+            'instructions' => $instructions,
+            'entry_point' => ['lat' => $entryPoint['lat'], 'lng' => $entryPoint['lng']],
+        ];
+
         return [
             'success' => true,
             'mode' => 'jalur_resmi',
@@ -208,6 +225,11 @@ class EvacuationRoutingService
             'distance_to_official_route_meters' => round($distanceToRoute, 1),
             'facility' => $facility,
             'routes' => $officialRoutes,
+            'route_options' => [
+                'bpbd' => $bpbdOption,
+                'public' => $publicOption,
+            ],
+            'selected_route_key' => 'bpbd',
             'summary' => [
                 'distance_meters' => round($totalDistance, 1),
                 'distance_formatted' => $this->formatDistance($totalDistance),
@@ -358,6 +380,23 @@ class EvacuationRoutingService
 
         $officialRoutes = EvacuationRoute::where('evacuation_facility_id', $facility->id)->get();
 
+        $publicOption = $this->buildDirectPublicRoadOption($userLat, $userLng, $facilityCoords, $facility);
+        $bpbdOption = [
+            'key' => 'bpbd',
+            'name' => 'Jalur Evakuasi Resmi BPBD',
+            'label' => 'Jalur Resmi BPBD',
+            'route_name' => $route ? ($route->name ?? 'Jalur Evakuasi Resmi BPBD') : 'Jalur Evakuasi Resmi BPBD',
+            'color' => 'rgb(153, 0, 255)',
+            'casing_color' => '#581c87',
+            'coordinates' => $fullPath,
+            'distance_meters' => round($totalDistance, 1),
+            'distance_formatted' => $this->formatDistance($totalDistance),
+            'duration_seconds' => $durationSeconds,
+            'duration_formatted' => $this->formatDuration($durationMinutes),
+            'instructions' => $instructions,
+            'entry_point' => $hasOfficialRoute ? ['lat' => $entryPoint['lat'], 'lng' => $entryPoint['lng']] : null,
+        ];
+
         return [
             'success' => true,
             'mode' => 'jalan_umum',
@@ -368,6 +407,11 @@ class EvacuationRoutingService
             'distance_to_official_route_meters' => round($distanceToRoute, 1),
             'facility' => $facility,
             'routes' => $officialRoutes,
+            'route_options' => [
+                'bpbd' => $bpbdOption,
+                'public' => $publicOption,
+            ],
+            'selected_route_key' => 'bpbd',
             'summary' => [
                 'distance_meters' => round($totalDistance, 1),
                 'distance_formatted' => $this->formatDistance($totalDistance),
@@ -393,6 +437,73 @@ class EvacuationRoutingService
                 ] : null,
             ],
             'full_route_latlngs' => $fullPath,
+            'instructions' => $instructions,
+        ];
+    }
+
+    /**
+     * Bangun opsi rute Jalur Umum murni (Google Maps style) dari user langsung ke titik kumpul.
+     */
+    protected function buildDirectPublicRoadOption(
+        float $userLat,
+        float $userLng,
+        array $facilityCoords,
+        EvacuationFacility $facility
+    ): array {
+        $roadRoute = $this->fetchPublicRoadRoute($userLng, $userLat, $facilityCoords['lng'], $facilityCoords['lat']);
+        $totalDistance = (float) ($roadRoute['distance_meters'] ?? 0);
+        $durationMinutes = max(1, (int) ceil($totalDistance / self::WALKING_SPEED_METERS_PER_MIN));
+        $durationSeconds = $durationMinutes * 60;
+
+        $instructions = [];
+        $stepNumber = 1;
+
+        if (!empty($roadRoute['steps'])) {
+            foreach ($roadRoute['steps'] as $s) {
+                if (($s['type'] ?? '') === 'arrive') {
+                    continue;
+                }
+                $instructions[] = [
+                    'step' => $stepNumber++,
+                    'text' => $s['text'],
+                    'distance_meters' => $s['distance_meters'],
+                    'distance_formatted' => $this->formatDistance($s['distance_meters']),
+                    'type' => $s['type'] ?? 'straight',
+                    'icon' => $this->resolveStepIcon($s['type'] ?? 'straight'),
+                ];
+            }
+        } else {
+            $instructions[] = [
+                'step' => $stepNumber++,
+                'text' => "Ikuti jaringan jalan umum menuju {$facility->name} sejauh " . $this->formatDistance($totalDistance),
+                'distance_meters' => $totalDistance,
+                'distance_formatted' => $this->formatDistance($totalDistance),
+                'type' => 'straight',
+                'icon' => 'arrow-up',
+            ];
+        }
+
+        $instructions[] = [
+            'step' => $stepNumber++,
+            'text' => "Tiba di Titik Kumpul: {$facility->name}",
+            'distance_meters' => 0,
+            'distance_formatted' => '0 m',
+            'type' => 'arrive',
+            'icon' => 'flag',
+        ];
+
+        return [
+            'key' => 'public',
+            'name' => 'Jalur Umum (Google Maps)',
+            'label' => 'Jalur Umum',
+            'source' => $roadRoute['source'] ?? 'OSRM',
+            'color' => '#1a73e8', // Google Maps Blue
+            'casing_color' => '#174ea6',
+            'coordinates' => $roadRoute['coordinates'],
+            'distance_meters' => round($totalDistance, 1),
+            'distance_formatted' => $this->formatDistance($totalDistance),
+            'duration_seconds' => $durationSeconds,
+            'duration_formatted' => $this->formatDuration($durationMinutes),
             'instructions' => $instructions,
         ];
     }

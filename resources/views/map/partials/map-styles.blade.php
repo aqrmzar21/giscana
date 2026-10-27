@@ -371,18 +371,37 @@
         justify-content: center;
     }
     .junction-marker div {
-        background-color: #059669;
+        background-color: #7e22ce;
         color: white;
-        width: 24px;
-        height: 24px;
+        width: 26px;
+        height: 26px;
         border-radius: 50%;
         border: 2px solid white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 11px;
+        font-size: 13px;
         font-weight: bold;
         box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    }
+
+    /* Styling Kustom Tooltip Rute */
+    .route-tooltip {
+        background: rgba(15, 23, 42, 0.92);
+        color: #f8fafc;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+        padding: 6px 10px;
+        font-size: 11px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        line-height: 1.35;
+        pointer-events: none;
+    }
+    .route-tooltip::before {
+        border-top-color: rgba(15, 23, 42, 0.92) !important;
+    }
+    .clickable-route-hit {
+        cursor: pointer !important;
     }
 
     /* Styling Elegan untuk Popup Instruksi Arah di Lokasi Marker */
