@@ -672,10 +672,10 @@
                         return { color: borderColor, fillColor: '#f95e16ff' }; // Oranye Jingga
                     }
                     if (name.includes('bonepantai') || name.includes('bone pantai') || id === '4') {
-                        return { color: borderColor, fillColor: '#f43f5e' }; // Rose / Merah Muda Pekat
+                        return { color: borderColor, fillColor: '#f36e08ff' }; // Cokelat Terakota
                     }
                     if (name.includes('kabila bone') || id === '5') {
-                        return { color: borderColor, fillColor: '#f36e08ff' }; // Cokelat Terakota
+                        return { color: borderColor, fillColor: '#f43f5e' }; // Rose / Merah Muda Pekat
                     }
                     if (name.includes('bone') || id === '3') {
                         return { color: borderColor, fillColor: '#58ef44ff' }; // Merah

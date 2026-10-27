@@ -77,7 +77,7 @@
                 @click="openPanel = !openPanel" 
                 class="w-full flex flex-col items-center cursor-pointer pb-2 pt-1 md:hidden group">
                 <div class="w-12 h-1.5 bg-slate-300 group-hover:bg-slate-400 rounded-full transition-colors"></div>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1" x-text="openPanel ? 'Tutup Kontrol' : 'Tarik Kontrol Peta'"></span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1" x-text="openPanel ? 'Tutup Kontrol' : 'Buka Kontrol Peta'"></span>
             </div>
 
             <!-- 🗂️ Tombol Strip Geser Samping (Desktop Only) -->
