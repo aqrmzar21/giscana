@@ -123,21 +123,14 @@
             </div>
         </div>
 
-        {{-- Daftar Instruksi Langkah Demi Langkah --}}
-        <div>
-            <div class="flex items-center justify-between mb-2">
-                <h5 class="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                    <span>🧭</span> Instruksi Arah
-                </h5>
-                <span id="navStepsCount" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    0 Langkah
-                </span>
-            </div>
-
-            <div id="navInstructionsList" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs">
-                {{-- Diisi secara dinamis oleh JavaScript --}}
-            </div>
-        </div>
+        {{-- Tombol Buka Instruksi Arah di Popup Marker --}}
+        <button id="btnOpenInstructionPopup" type="button" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-sm active:scale-[0.98]">
+            <svg class="w-4 h-4 text-emerald-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+            </svg>
+            <span>🧭 Buka Instruksi Arah di Peta</span>
+            <span id="navStepsCountBadge" class="bg-white/20 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold ml-0.5">0</span>
+        </button>
 
         {{-- Tombol Aksi Bawah --}}
         <div class="pt-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2">

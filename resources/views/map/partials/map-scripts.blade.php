@@ -256,6 +256,89 @@
         }
     }
 
+    // Helper bangun konten HTML popup instruksi arah untuk Marker Lokasi User
+    function buildInstructionPopupHtml(data, userLat, userLng) {
+        const facility = data.facility;
+        const summary = data.summary || {};
+        const instructions = data.instructions || [];
+        const isMode1 = data.mode === 'jalur_resmi';
+
+        const modeBadge = isMode1
+            ? `<span style="font-size:10px;font-weight:700;color:#065f46;background:#d1fae5;padding:2px 8px;border-radius:9999px;border:1px solid #a7f3d0;">🛡️ Jalur Resmi BPBD</span>`
+            : `<span style="font-size:10px;font-weight:700;color:#3730a3;background:#e0e7ff;padding:2px 8px;border-radius:9999px;border:1px solid #c7d2fe;">🛣 Routing Jalan Umum</span>`;
+
+        let rowsHtml = '';
+        instructions.forEach(ins => {
+            const isArrival = ins.type === 'arrive';
+            const isEnterOfficial = ins.type === 'enter_official';
+
+            let rowBg = '#f8fafc';
+            let iconBg = '#e2e8f0';
+            let iconColor = '#334155';
+
+            if (isArrival) {
+                rowBg = '#ecfdf5';
+                iconBg = '#10b981';
+                iconColor = '#ffffff';
+            } else if (isEnterOfficial) {
+                rowBg = '#eef2ff';
+                iconBg = '#6366f1';
+                iconColor = '#ffffff';
+            }
+
+            rowsHtml += `
+                <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 9px;border-radius:10px;background:${rowBg};margin-bottom:6px;border:1px solid rgba(0,0,0,0.04);">
+                    <div style="width:22px;height:22px;border-radius:6px;background:${iconBg};color:${iconColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+                        ${getInstructionIconSvg(ins.type)}
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:600;font-size:11px;color:#1e293b;line-height:1.35;">
+                            ${ins.step}. ${ins.text}
+                        </div>
+                        ${ins.distance_meters > 0 ? `<div style="font-size:10px;color:#64748b;font-weight:500;margin-top:2px;">${ins.distance_formatted}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+
+        return `
+            <div style="padding:14px;font-family:system-ui,-apple-system,sans-serif;color:#1e293b;">
+                <!-- Header Popup -->
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid #f1f5f9;">
+                    <div style="flex:1;">
+                        <div style="font-size:12px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:4px;">
+                            <span>🧭</span> Instruksi Arah Evakuasi
+                        </div>
+                        <div style="margin-top:4px;">
+                            ${modeBadge}
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:13px;font-weight:900;color:#4f46e5;">${summary.distance_formatted || '–'}</div>
+                        <div style="font-size:10px;color:#64748b;font-weight:600;">⏱ ${summary.duration_formatted || '–'}</div>
+                    </div>
+                </div>
+
+                <!-- Info Titik Kumpul Tujuan -->
+                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:7px 10px;margin-bottom:10px;font-size:11px;">
+                    <div style="font-size:9px;font-weight:700;color:#15803d;text-transform:uppercase;letter-spacing:0.5px;">🏫 Titik Kumpul Tujuan</div>
+                    <div style="font-weight:700;color:#14532d;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                        ${facility.name}
+                    </div>
+                </div>
+
+                <!-- Daftar Instruksi -->
+                <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;display:flex;justify-content:space-between;">
+                    <span>Panduan Evakuasi</span>
+                    <span style="color:#94a3b8;font-weight:600;">${instructions.length} Langkah</span>
+                </div>
+                <div style="max-height:210px;overflow-y:auto;padding-right:4px;">
+                    ${rowsHtml}
+                </div>
+            </div>
+        `;
+    }
+
     // Helper update tampilan Panel Navigasi Modern (Tailwind)
     function renderNavigationPanel(data, userLat, userLng) {
         const panel = document.getElementById('evacuationNavigationPanel');
@@ -326,45 +409,10 @@
             durElem.textContent = summary.duration_formatted || '–';
         }
 
-        // 4. Instruksi Langkah Demi Langkah
-        const countElem = document.getElementById('navStepsCount');
-        if (countElem) {
-            countElem.textContent = `${instructions.length} Langkah`;
-        }
-
-        const listElem = document.getElementById('navInstructionsList');
-        if (listElem) {
-            listElem.innerHTML = '';
-            instructions.forEach((ins, idx) => {
-                const isArrival = ins.type === 'arrive';
-                const isEnterOfficial = ins.type === 'enter_official';
-
-                let bgClass = 'bg-slate-50 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-800';
-                let iconBg = 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200';
-
-                if (isArrival) {
-                    bgClass = 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800/70';
-                    iconBg = 'bg-emerald-500 text-white shadow-sm';
-                } else if (isEnterOfficial) {
-                    bgClass = 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-800/70';
-                    iconBg = 'bg-indigo-600 text-white shadow-sm';
-                }
-
-                const row = document.createElement('div');
-                row.className = `flex items-start gap-2.5 p-2 rounded-xl border transition-all ${bgClass}`;
-                row.innerHTML = `
-                    <div class="w-6 h-6 rounded-lg ${iconBg} font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
-                        ${getInstructionIconSvg(ins.type)}
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="font-semibold text-slate-800 dark:text-slate-100 text-[11px] leading-snug">
-                            ${ins.step}. ${ins.text}
-                        </div>
-                        ${ins.distance_meters > 0 ? `<span class="inline-block mt-0.5 text-[10px] font-medium text-slate-500 dark:text-slate-400 bg-slate-200/60 dark:bg-slate-700/60 px-1.5 py-0.2 rounded">${ins.distance_formatted}</span>` : ''}
-                    </div>
-                `;
-                listElem.appendChild(row);
-            });
+        // 4. Update Badge Jumlah Langkah Instruksi di Tombol Panel
+        const stepsBadge = document.getElementById('navStepsCountBadge');
+        if (stepsBadge) {
+            stepsBadge.textContent = `${instructions.length} Langkah`;
         }
 
         // Tampilkan panel
@@ -394,7 +442,7 @@
         });
         userMarker = L.marker([lat, lng], { icon: userIcon })
             .addTo(map)
-            .bindPopup(`<b>📍 Lokasi Anda</b><br><span style="font-size:11px;color:#64748b;">${lat.toFixed(5)}, ${lng.toFixed(5)}</span>`)
+            .bindPopup(`<div style="padding:10px 14px;font-size:12px;font-weight:600;color:#334155;display:flex;align-items:center;gap:6px;"><span>🧭</span><span>Menghitung instruksi arah ke titik kumpul...</span></div>`, { className: 'instruction-popup' })
             .openPopup();
 
         // Update status kontrol panel
@@ -467,8 +515,9 @@
                     const el = nearestMarker.getElement();
                     if (el) {
                         el.classList.add('is-blinking');
-                        nearestMarker.openPopup();
-
+                        // Popup titik kumpul tetap tersedia jika marker diklik,
+                        // namun tidak dipanggil openPopup() otomatis agar popup instruksi arah pada lokasi user tetap aktif di layar
+                        
                         // Mainkan suara alarm audio
                         const audio = document.getElementById('alert-sound');
                         if (audio) {
@@ -582,7 +631,16 @@
                     console.log("LRM fallback: ", e);
                 }
 
-                // E. Render Panel Navigasi Modern (Tailwind)
+                // E. Pasang Pop-up Instruksi Arah pada Marker Lokasi User (Bukan lagi hanya titik koordinat)
+                const instructionPopupHtml = buildInstructionPopupHtml(data, lat, lng);
+                userMarker.bindPopup(instructionPopupHtml, {
+                    maxWidth: 350,
+                    minWidth: 290,
+                    className: 'instruction-popup',
+                    autoPan: false
+                }).openPopup();
+
+                // F. Render Panel Navigasi Modern (Tailwind)
                 renderNavigationPanel(data, lat, lng);
             })
             .catch(err => {
@@ -596,6 +654,13 @@
     });
 
     // Event Listener Interaktif untuk Panel Navigasi
+    document.getElementById('btnOpenInstructionPopup')?.addEventListener('click', function() {
+        if (userMarker) {
+            map.panTo(userMarker.getLatLng());
+            userMarker.openPopup();
+        }
+    });
+
     document.getElementById('btnFocusNavigationRoute')?.addEventListener('click', function() {
         if (currentNavigationBounds) {
             map.fitBounds(currentNavigationBounds, { padding: [60, 60], maxZoom: 17 });

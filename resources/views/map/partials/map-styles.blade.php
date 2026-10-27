@@ -384,5 +384,33 @@
         font-weight: bold;
         box-shadow: 0 3px 8px rgba(0,0,0,0.3);
     }
+
+    /* Styling Elegan untuk Popup Instruksi Arah di Lokasi Marker */
+    .instruction-popup .leaflet-popup-content-wrapper {
+        border-radius: 18px;
+        padding: 0;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    }
+    .instruction-popup .leaflet-popup-content {
+        margin: 0;
+        line-height: 1.4;
+        width: 320px !important;
+        max-width: 88vw;
+    }
+    .instruction-popup .leaflet-popup-close-button {
+        top: 8px;
+        right: 8px;
+        color: #94a3b8;
+        padding: 4px;
+        font-size: 16px;
+    }
+    .instruction-popup .leaflet-popup-close-button:hover {
+        color: #ef4444;
+    }
+    .instruction-popup .leaflet-popup-tip {
+        background: #ffffff;
+    }
 </style>
 @endpush
