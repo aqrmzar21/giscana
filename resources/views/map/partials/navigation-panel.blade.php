@@ -58,7 +58,7 @@
                 <span class="text-[9px] text-slate-400">Klik rute atau kartu</span>
             </div>
 
-            <!-- <div class="grid grid-cols-2 gap-2" id="navRouteOptionCards">
+            <div class="grid grid-cols-2 gap-2" id="navRouteOptionCards">
                 {{-- Opsi 1: Jalur Umum (Google Maps Style - Biru) --}}
                 <button type="button" id="btnSelectRoutePublic" onclick="window.selectEvacuationRoute && window.selectEvacuationRoute('public')"
                     class="p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-400 shadow-xs">
@@ -94,7 +94,7 @@
                         </span>
                     </div>
                 </button>
-            </div> -->
+            </div>
 
             <!-- <p class="text-[9px] text-slate-400 dark:text-slate-500 italic flex items-center gap-1 pt-0.5">
                 <span>💡</span> Klik garis rute pada peta atau tombol di atas untuk beralih rute

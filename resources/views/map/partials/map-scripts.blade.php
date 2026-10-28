@@ -169,7 +169,7 @@
         const textElem = document.getElementById('btnToggleUserPositionText');
         const btnFind = document.getElementById('btnFindNearestFacility');
         if (btnToggle) {
-            btnToggle.className = 'w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold py-2.5 px-3 rounded-xl shadow-xs transition-all text-xs flex items-center justify-center gap-2 cursor-pointer';
+            btnToggle.className = 'w-9 h-9 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-2.5 px-3 rounded-xl shadow-xs transition-all text-xs flex items-center justify-center gap-2 cursor-pointer';
         }
         if (textElem) textElem.textContent = 'Posisi Aktif (Klik utk Matikan)';
         if (btnFind) {
