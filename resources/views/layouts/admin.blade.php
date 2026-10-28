@@ -128,6 +128,7 @@
                         <div x-show="sidebarCollapsed" class="my-2 border-t border-gray-200 dark:border-gray-700"></div>
 
                         <div class="mt-2 space-y-1">
+                            @role('admin')
                             <!-- Zona Bencana -->
                             <div x-data="{ open: {{ request()->routeIs('admin.disaster-zones.*') ? 'true' : 'false' }} }">
                                 <button @click="open = !open" 
@@ -146,7 +147,7 @@
                                 </button>
                                 <div x-show="open && !sidebarCollapsed" x-collapse class="ml-4 mt-1 space-y-1">
                                     <a href="{{ route('admin.disaster-zones.index') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.disaster-zones.index') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
-                                        Daftar Titik Rawan
+                                        Daftar Zona Bencana
                                     </a>
                                     @can('create data')
                                     <a href="{{ route('admin.disaster-zones.create') }}" class="flex items-center px-4 py-2 text-sm rounded-lg {{ request()->routeIs('admin.disaster-zones.create') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/40' }}">
@@ -155,6 +156,7 @@
                                     @endcan
                                 </div>
                             </div>
+                            @endrole
 
                             <!-- Fasilitas dan Rute Evakuasi -->
                             <div x-data="{ open: {{ request()->routeIs('admin.evacuation-facilities.*') || request()->routeIs('admin.evacuation-routes.*') ? 'true' : 'false' }} }">

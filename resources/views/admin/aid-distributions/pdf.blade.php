@@ -142,7 +142,7 @@
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $dist->distribution_date ? \Carbon\Carbon::parse($dist->distribution_date)->format('d/m/Y') : '-' }}</td>
                 <td><strong>{{ $dist->beneficiary?->recipient_name ?? '-' }}</strong></td>
-                <td>{{ $dist->beneficiary?->village?->full_name ?? $dist->village?->yard ?? '-' }}</td>
+                <td>{{ $dist->beneficiary?->village?->yard ?? $dist->beneficiary?->village?->name ?? $dist->village?->yard ?? '-' }}</td>
                 <td>{{ $dist->aidInventory?->item_name ?? '-' }}</td>
                 <td><strong>{{ number_format($dist->quantity_received) }} unit</strong></td>
                 <td>{{ $dist->user?->name ?? 'System' }}</td>

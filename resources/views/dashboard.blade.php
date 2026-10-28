@@ -14,49 +14,7 @@
 
 @section('content')
 
-{{-- 1. HERO & WELCOME BANNER --}}
-<div class="relative overflow-hidden bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl shadow-xl mb-8">
-    <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute right-1/3 -top-10 w-48 h-48 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
-
-    <div class="px-6 py-8 sm:px-8 sm:py-10 relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-        <div>
-            <div class="flex items-center gap-2 mb-2">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    Sistem Tanggap Darurat Aktif
-                </span>
-                <span class="text-xs text-indigo-200/80">| Bone Bolango GIS</span>
-            </div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                Selamat Datang, {{ Auth::user()?->name }}!
-            </h1>
-            <p class="mt-2 text-sm sm:text-base text-indigo-100/90 max-w-2xl leading-relaxed">
-                Pusat Komando dan Pengawasan Geografis Bencana Alam. Pantau rute evakuasi, fasilitas pengungsian, zona rawan, dan efisiensi penyaluran bantuan logistik secara *real-time*.
-            </p>
-        </div>
-
-        {{-- Quick Action Buttons --}}
-        <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-            <a href="{{ route('dashboard.map') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition-all duration-200 transform hover:-translate-y-0.5">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                </svg>
-                Peta SIG Interaktif
-            </a>
-            @if(Auth::user()?->isAdmin())
-            <a href="{{ route('admin.aid-distributions.create') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 transition-all duration-200">
-                <svg class="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Catat Distribusi
-            </a>
-            @endif
-        </div>
-    </div>
-</div>
-
-{{-- 2. OPERATIONAL SUMMARY STAT CARDS (GRID 6 CARDS) --}}
+{{-- 1. OPERATIONAL SUMMARY STAT CARDS (GRID 6 CARDS) --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-5 mb-8">
     
     {{-- 1. Zona Bencana --}}
@@ -217,6 +175,48 @@
 
 </div>
 
+{{-- 2. HERO & WELCOME BANNER --}}
+<div class="relative overflow-hidden bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl shadow-xl mb-8">
+    <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute right-1/3 -top-10 w-48 h-48 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+    <div class="px-6 py-8 sm:px-8 sm:py-10 relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        <div>
+            <div class="flex items-center gap-2 mb-2">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Sistem Tanggap Darurat Aktif
+                </span>
+                <span class="text-xs text-indigo-200/80">| Bone Bolango GIS</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                Selamat Datang, {{ Auth::user()?->name }}!
+            </h1>
+            <p class="mt-2 text-sm sm:text-base text-indigo-100/90 max-w-2xl leading-relaxed">
+                Pusat Komando dan Pengawasan Geografis Bencana Alam. Pantau rute evakuasi, fasilitas pengungsian, zona rawan, dan efisiensi penyaluran bantuan logistik secara *real-time*.
+            </p>
+        </div>
+
+        {{-- Quick Action Buttons --}}
+        <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+            <a href="{{ route('map.index') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition-all duration-200 transform hover:-translate-y-0.5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                Peta SIG Interaktif
+            </a>
+            @if(Auth::user()?->isAdmin())
+            <a href="{{ route('admin.aid-distributions.create') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 transition-all duration-200">
+                <svg class="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Catat Distribusi
+            </a>
+            @endif
+        </div>
+    </div>
+</div>
+
 {{-- 3. CHARTS & PROGRESS ROW (2 COLUMNS) --}}
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
@@ -353,7 +353,96 @@
 
 </div>
 
-{{-- 4. SECONDARY DATA ROW (LOGISTICS STATUS & RECENT DISTRIBUTIONS) --}}
+
+{{-- 4. KESIAPSIAGAAN INFRASTRUKTUR & TIPE BENCANA (3 CARDS GRID) --}}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    
+    {{-- Card 1: Fasilitas Pengungsian & Faskes --}}
+    <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700/60 rounded-2xl p-5">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="p-2.5 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-gray-900 dark:text-white">Kesiapsiagaan Posko</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Fasilitas penampungan pengungsi</p>
+            </div>
+        </div>
+        <div class="space-y-2 text-xs">
+            <div class="flex justify-between py-1.5 border-b border-gray-50 dark:border-gray-700/40">
+                <span class="text-gray-600 dark:text-gray-400">Total Daya Tampung:</span>
+                <strong class="text-gray-900 dark:text-white font-bold">{{ number_format($stats['total_facility_capacity']) }} Jiwa</strong>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-gray-50 dark:border-gray-700/40">
+                <span class="text-gray-600 dark:text-gray-400">Memiliki Posko Kesehatan:</span>
+                <strong class="text-emerald-600 dark:text-emerald-400 font-bold">{{ $stats['medical_facilities_count'] }} Posko</strong>
+            </div>
+            <div class="flex justify-between py-1.5">
+                <span class="text-gray-600 dark:text-gray-400">Memiliki Gudang Pangan:</span>
+                <strong class="text-blue-600 dark:text-blue-400 font-bold">{{ $stats['food_facilities_count'] }} Posko</strong>
+            </div>
+        </div>
+    </div>
+
+    {{-- Card 2: Status Aksesibilitas Rute --}}
+    <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700/60 rounded-2xl p-5">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-gray-900 dark:text-white">Akses Rute Evakuasi</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Kondisi jalan darurat ke posko</p>
+            </div>
+        </div>
+        <div class="space-y-2 text-xs">
+            <div class="flex justify-between py-1.5 border-b border-gray-50 dark:border-gray-700/40">
+                <span class="text-gray-600 dark:text-gray-400">Total Jalur Terdata:</span>
+                <strong class="text-gray-900 dark:text-white font-bold">{{ $stats['evacuation_routes_count'] }} Jalur</strong>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-gray-50 dark:border-gray-700/40">
+                <span class="text-gray-600 dark:text-gray-400">Rute Aman / Aksesibel:</span>
+                <strong class="text-emerald-600 dark:text-emerald-400 font-bold">{{ $stats['evacuation_routes_accessible'] }} Jalur</strong>
+            </div>
+            <div class="flex justify-between py-1.5">
+                <span class="text-gray-600 dark:text-gray-400">Rute Terhambat / Tertutup:</span>
+                <strong class="text-red-500 font-bold">{{ max(0, $stats['evacuation_routes_count'] - $stats['evacuation_routes_accessible']) }} Jalur</strong>
+            </div>
+        </div>
+    </div>
+
+    {{-- Card 3: Tipe Bencana Terdaftar --}}
+    <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700/60 rounded-2xl p-5">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="p-2.5 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-gray-900 dark:text-white">Jenis Bencana Rawan</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Kategori potensi bencana lokal</p>
+            </div>
+        </div>
+        <div class="space-y-2 text-xs">
+            @forelse($disasterTypes as $dt)
+                <div class="flex justify-between py-1.5 border-b border-gray-50 dark:border-gray-700/40 last:border-0">
+                    <span class="capitalize text-gray-700 dark:text-gray-300 font-medium">{{ $dt->disaster_type }}</span>
+                    <strong class="text-gray-900 dark:text-white font-bold">{{ $dt->count }} Lokasi ({{ number_format($dt->total_affected) }} Jiwa)</strong>
+                </div>
+            @empty
+                <p class="text-gray-400 dark:text-gray-500 py-2">Belum ada jenis bencana teridentifikasi.</p>
+            @endforelse
+        </div>
+    </div>
+
+</div>
+
+{{-- 5. SECONDARY DATA ROW (LOGISTICS STATUS & RECENT DISTRIBUTIONS) --}}
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
     {{-- Inventory Alert & Stock Status Card --}}
@@ -472,94 +561,6 @@
 
 </div>
 
-{{-- 5. KESIAPSIAGAAN INFRASTRUKTUR & TIPE BENCANA (3 CARDS GRID) --}}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-    
-    {{-- Card 1: Fasilitas Pengungsian & Faskes --}}
-    <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700/60 rounded-2xl p-5">
-        <div class="flex items-center gap-3 mb-3">
-            <div class="p-2.5 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-            </div>
-            <div>
-                <h4 class="text-sm font-bold text-gray-900 dark:text-white">Kesiapsiagaan Posko</h4>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Fasilitas penampungan pengungsi</p>
-            </div>
-        </div>
-        <div class="space-y-2 text-xs">
-            <div class="flex justify-between py-1.5 border-b border-gray-50 dark:border-gray-700/40">
-                <span class="text-gray-600 dark:text-gray-400">Total Daya Tampung:</span>
-                <strong class="text-gray-900 dark:text-white font-bold">{{ number_format($stats['total_facility_capacity']) }} Jiwa</strong>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-gray-50 dark:border-gray-700/40">
-                <span class="text-gray-600 dark:text-gray-400">Memiliki Posko Kesehatan:</span>
-                <strong class="text-emerald-600 dark:text-emerald-400 font-bold">{{ $stats['medical_facilities_count'] }} Posko</strong>
-            </div>
-            <div class="flex justify-between py-1.5">
-                <span class="text-gray-600 dark:text-gray-400">Memiliki Gudang Pangan:</span>
-                <strong class="text-blue-600 dark:text-blue-400 font-bold">{{ $stats['food_facilities_count'] }} Posko</strong>
-            </div>
-        </div>
-    </div>
-
-    {{-- Card 2: Status Aksesibilitas Rute --}}
-    <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700/60 rounded-2xl p-5">
-        <div class="flex items-center gap-3 mb-3">
-            <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                </svg>
-            </div>
-            <div>
-                <h4 class="text-sm font-bold text-gray-900 dark:text-white">Akses Rute Evakuasi</h4>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Kondisi jalan darurat ke posko</p>
-            </div>
-        </div>
-        <div class="space-y-2 text-xs">
-            <div class="flex justify-between py-1.5 border-b border-gray-50 dark:border-gray-700/40">
-                <span class="text-gray-600 dark:text-gray-400">Total Jalur Terdata:</span>
-                <strong class="text-gray-900 dark:text-white font-bold">{{ $stats['evacuation_routes_count'] }} Jalur</strong>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-gray-50 dark:border-gray-700/40">
-                <span class="text-gray-600 dark:text-gray-400">Rute Aman / Aksesibel:</span>
-                <strong class="text-emerald-600 dark:text-emerald-400 font-bold">{{ $stats['evacuation_routes_accessible'] }} Jalur</strong>
-            </div>
-            <div class="flex justify-between py-1.5">
-                <span class="text-gray-600 dark:text-gray-400">Rute Terhambat / Tertutup:</span>
-                <strong class="text-red-500 font-bold">{{ max(0, $stats['evacuation_routes_count'] - $stats['evacuation_routes_accessible']) }} Jalur</strong>
-            </div>
-        </div>
-    </div>
-
-    {{-- Card 3: Tipe Bencana Terdaftar --}}
-    <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700/60 rounded-2xl p-5">
-        <div class="flex items-center gap-3 mb-3">
-            <div class="p-2.5 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-            </div>
-            <div>
-                <h4 class="text-sm font-bold text-gray-900 dark:text-white">Jenis Bencana Rawan</h4>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Kategori potensi bencana lokal</p>
-            </div>
-        </div>
-        <div class="space-y-2 text-xs">
-            @forelse($disasterTypes as $dt)
-                <div class="flex justify-between py-1.5 border-b border-gray-50 dark:border-gray-700/40 last:border-0">
-                    <span class="capitalize text-gray-700 dark:text-gray-300 font-medium">{{ $dt->disaster_type }}</span>
-                    <strong class="text-gray-900 dark:text-white font-bold">{{ $dt->count }} Lokasi ({{ number_format($dt->total_affected) }} Jiwa)</strong>
-                </div>
-            @empty
-                <p class="text-gray-400 dark:text-gray-500 py-2">Belum ada jenis bencana teridentifikasi.</p>
-            @endforelse
-        </div>
-    </div>
-
-</div>
-
 {{-- Chart.js CDN & Doughnut Initialization --}}
 @if($aidByDistrict->isNotEmpty())
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
@@ -615,55 +616,55 @@
 @endif
 @if($inventories->isNotEmpty())
 <script>
-(function () {
-    const ctx = document.getElementById('logisticPieChart');
-    if (!ctx) return;
+    (function () {
+        const ctx = document.getElementById('logisticPieChart');
+        if (!ctx) return;
 
-    // Ambil label dan data dari koleksi inventories
-    const labels  = @json($inventories->take(5)->pluck('item_name'));
-    const data    = @json($inventories->take(5)->pluck('remaining_stock'));
-    const colors  = ['#6366f1','#22c55e','#f59e0b','#ef4444','#14b8a6'];
-    const hovers  = ['#4f46e5','#16a34a','#d97706','#dc2626','#0d9488'];
+        // Ambil label dan data dari koleksi inventories
+        const labels  = @json($inventories->take(5)->pluck('item_name'));
+        const data    = @json($inventories->take(5)->pluck('remaining_stock'));
+        const colors  = ['#6366f1','#22c55e','#f59e0b','#ef4444','#14b8a6'];
+        const hovers  = ['#4f46e5','#16a34a','#d97706','#dc2626','#0d9488'];
 
-    new Chart(ctx, {
-        type: 'pie', // Gunakan 'doughnut' jika ingin menggunakan opsi cutout
-        data: {
-            labels: labels,
-            datasets: [{
-                data: data,
-                backgroundColor: colors,
-                hoverBackgroundColor: hovers,
-                borderWidth: 2,
-                borderColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
-                hoverOffset: 8,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        // Menggunakan callback 'formattedValue' atau menyesuaikan baris 'label'
-                        label: function(context) {
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const pct   = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
-                            // Format ini mencegah label diulang oleh bawaan Chart.js
-                            return ` Stok: ${context.parsed.toLocaleString()} (${pct}%)`;
+        new Chart(ctx, {
+            type: 'pie', // Gunakan 'doughnut' jika ingin menggunakan opsi cutout
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors,
+                    hoverBackgroundColor: hovers,
+                    borderWidth: 2,
+                    borderColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+                    hoverOffset: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            // Menggunakan callback 'formattedValue' atau menyesuaikan baris 'label'
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const pct   = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                // Format ini mencegah label diulang oleh bawaan Chart.js
+                                return ` Stok: ${context.parsed.toLocaleString()} (${pct}%)`;
+                            }
                         }
                     }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true,
+                    duration: 800,
+                    easing: 'easeInOutQuart',
                 }
-            },
-            animation: {
-                animateScale: true,
-                animateRotate: true,
-                duration: 800,
-                easing: 'easeInOutQuart',
             }
-        }
-    });
-})();
+        });
+    })();
 </script>
 @endif
 @endsection

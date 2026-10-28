@@ -1,5 +1,6 @@
-{{-- Toggle Batas Administrasi (Kecamatan & Desa) --}}
-<div class="space-y-2">
+<!-- {{-- Toggle Batas Administrasi (Kecamatan & Desa) --}} -->
+<!-- <div class="space-y-2"> -->
+<div class="grid grid-cols-2 md:grid-cols-1 gap-2">
 
     <!-- Baris 1: Batas Kecamatan -->
     <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100/80 hover:bg-slate-100/50 transition-colors">

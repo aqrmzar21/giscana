@@ -41,9 +41,7 @@ class StaffController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+            $query->where(function($q) use ($search) {$q->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -110,8 +108,7 @@ class StaffController extends Controller
 
         // Cegah admin menurunkan role dirinya sendiri
         if ($staff->is(auth()->user()) && $request->role !== 'admin' && $staff->isAdmin()) {
-            return back()->withInput()
-                ->withErrors(['role' => 'Anda tidak dapat mengubah role akun Anda sendiri.']);
+            return back()->withInput()->withErrors(['role' => 'Anda tidak dapat mengubah role akun Anda sendiri.']);
         }
 
         $data = [
@@ -130,20 +127,17 @@ class StaffController extends Controller
         $staff->update($data);
         $staff->syncRoles([Role::findOrCreate($request->role, 'web')]);
 
-        return redirect()->route('admin.staff.index')
-            ->with('success', 'Data user berhasil diperbarui.');
+        return redirect()->route('admin.staff.index')->with('success', 'Data user berhasil diperbarui.');
     }
 
     public function destroy(User $staff)
     {
         if ($staff->is(auth()->user())) {
-            return redirect()->route('admin.staff.index')
-                ->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+            return redirect()->route('admin.staff.index')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
         $staff->delete();
 
-        return redirect()->route('admin.staff.index')
-            ->with('success', 'User berhasil dihapus.');
+        return redirect()->route('admin.staff.index')->with('success', 'User berhasil dihapus.');
     }
 }

@@ -144,6 +144,7 @@
                                 const matchesDistrict = selectedDistrictId && option.dataset.districtId === selectedDistrictId;
                                 option.hidden = !matchesDistrict;
                                 option.disabled = !matchesDistrict;
+                                option.style.display = matchesDistrict ? '' : 'none';
                             });
                 
                             const selectedVillageMatchesDistrict =

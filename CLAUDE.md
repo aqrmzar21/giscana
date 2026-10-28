@@ -277,3 +277,32 @@ public function getMapData()
 * **Responsivitas Layar:**
 * **Desktop (`md:`):** Memiliki tombol *strip handle* di sisi kiri panel untuk menggeser (*slide-out*) panel kontrol ke kanan layar (`translate-x-full`).
 * **Mobile:** *Bottom sheet* melayang yang dapat ditarik/ditutup dengan *handle bar* atas.
+
+PRINSIP UI/UX:
+
+1. Hindari informasi duplikat.
+
+2. Jika informasi sudah muncul pada Panel Rute Aktif:
+   - jangan tampilkan lagi pada popup.
+   - jangan tampilkan lagi pada panel kontrol.
+
+3. Jika tombol atau komponen sudah pernah dihapus pada revisi sebelumnya:
+   - jangan dibuat ulang.
+   - jangan menambahkan kembali fitur lama kecuali diminta eksplisit.
+
+4. Prioritaskan UI sederhana.
+
+5. Maksimal tiga aksi utama:
+   - Posisi Saya
+   - Cari Titik Kumpul
+   - Reset Rute
+
+6. Semua fitur tambahan harus ditempatkan sebagai alat pendukung, bukan aksi utama.
+
+7. Mobile-first.
+   Pada mobile gunakan:
+   - bottom sheet
+   - floating button
+   - collapsible legenda
+
+8. Jangan menambah popup baru jika informasi yang sama sudah tersedia pada panel aktif.

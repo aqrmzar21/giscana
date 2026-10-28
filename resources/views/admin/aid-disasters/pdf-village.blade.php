@@ -202,7 +202,7 @@
         @endphp
 
         <div class="district-header">
-            <h3>Kecamatan {{ $aid->district_name }}</h3>
+            <h3>Kecamatan {{ preg_replace('/^kecamatan\s+/i', '', $aid->district_name) }}</h3>
             <div class="subtitle">
                 Total Desa Terdata: <strong>{{ $vCount }} Desa</strong> &bull; Total Logistik Tersalur: <strong>{{ number_format($yearUnits) }} Unit</strong> &bull; Total Penerima: <strong>{{ number_format($yearRecipients) }} KK</strong>
             </div>
@@ -210,7 +210,7 @@
 
         @if($vCount === 0)
             <div class="empty-row">
-                Tidak ada data transaksi penyaluran logistik desa terdaftar di Kecamatan {{ $aid->district_name }} {{ $selectedYear !== 'all' ? 'pada tahun ' . $selectedYear : '' }}.
+                Tidak ada data master desa terdaftar di Kecamatan {{ $aid->district_name }}.
             </div>
         @else
             <table class="data">
@@ -227,19 +227,23 @@
                     @php $rowNo = 1; @endphp
                     @foreach($villages as $vName => $records)
                         @php
-                            $recipients = $records->pluck('beneficiary_id')->unique()->count();
+                            $recipients = $records->pluck('beneficiary_id')->filter()->unique()->count();
                             $qty = $records->sum('quantity_received');
                             $itemNames = $records->pluck('aidInventory.item_name')->filter()->unique();
                         @endphp
                         <tr>
                             <td style="text-align:center;">{{ $rowNo++ }}</td>
                             <td><strong>{{ $vName }}</strong></td>
-                            <td style="text-align:center; font-weight:bold;">{{ number_format($recipients) }} KK</td>
-                            <td style="text-align:center; color:#047857; font-weight:bold;">{{ number_format($qty) }} Unit</td>
+                            <td style="text-align:center; font-weight:bold;">{{ $recipients > 0 ? number_format($recipients) . ' KK' : '-' }}</td>
+                            <td style="text-align:center; color:#047857; font-weight:bold;">{{ $qty > 0 ? number_format($qty) . ' Unit' : '-' }}</td>
                             <td>
-                                @foreach($itemNames as $itemName)
-                                    <span class="item-tag">{{ $itemName }}</span>
-                                @endforeach
+                                @if($itemNames->isNotEmpty())
+                                    @foreach($itemNames as $itemName)
+                                        <span class="item-tag">{{ $itemName }}</span>
+                                    @endforeach
+                                @else
+                                    <span style="color:#9ca3af; font-style:italic;">-</span>
+                                @endif
                             </td>
                         </tr>
                     @endforeach

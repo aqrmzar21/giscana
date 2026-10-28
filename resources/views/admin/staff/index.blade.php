@@ -71,9 +71,12 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
-                    @forelse($staffs as $staff)
+                @forelse($staffs as $staff)
+                    @if($staff->id !== auth()->id()) {{-- 🚫 sembunyikan user yang sedang login --}}
                     <tr>
-                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ $loop->iteration }}</td>
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                            {{ $loop->iteration }}
+                        </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $staff->name }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $staff->email }}</td>
                         @php
@@ -85,15 +88,17 @@
                             ][$userRole] ?? 'bg-gray-100 text-gray-800';
                         @endphp
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <span class="inline-flex rounded-full px-2 py-1 leading-3 text-xs font-medium {{ $roleBadge }}">{{ $roles[$userRole] ?? ucfirst($userRole) }}</span>
+                            <span class="inline-flex rounded-full px-2 py-1 leading-3 text-xs font-medium {{ $roleBadge }}">
+                                {{ $roles[$userRole] ?? ucfirst($userRole) }}
+                            </span>
                         </td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $staff->phone ?? '-' }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $staff->organization ?? '-' }}</td>
                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             @if($staff->is_active)
-                            <span class="inline-flex rounded-full bg-green-100 px-2 py-1 leading-3 text-xs text-green-800">Aktif</span>
+                                <span class="inline-flex rounded-full bg-green-100 px-2 py-1 leading-3 text-xs text-green-800">Aktif</span>
                             @else
-                            <span class="inline-flex rounded-full bg-gray-100 px-2 py-1 leading-3 text-xs text-gray-800">Tidak Aktif</span>
+                                <span class="inline-flex rounded-full bg-gray-100 px-2 py-1 leading-3 text-xs text-gray-800">Tidak Aktif</span>
                             @endif
                         </td>
                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
@@ -115,14 +120,16 @@
                             </div>
                         </td>
                     </tr>
-                    @empty
+                    @endif
+                @empty
                     <tr>
                         <td colspan="8" class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 text-center sm:pl-6">
                             Tidak ada data user.
                         </td>
                     </tr>
-                    @endforelse
-                </tbody>
+                @endforelse
+            </tbody>
+
             </table>
         </div>
 

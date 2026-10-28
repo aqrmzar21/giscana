@@ -40,7 +40,7 @@
                            required 
                            autofocus 
                            autocomplete="username" 
-                           placeholder="uuername@gmail.com"
+                           placeholder="user@gmail.com"
                            class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-sm font-medium">
                     <x-input-error :messages="$errors->get('email')" class="mt-2 text-xs text-rose-500" />
                 </div>

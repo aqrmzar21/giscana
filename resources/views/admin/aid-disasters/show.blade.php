@@ -48,7 +48,7 @@
             </div>
 
             <div class="flex items-center gap-3">
-                @can('update data')
+                <!-- @can('update data')
                 <a href="{{ route('admin.aid-disasters.edit', $aidDisaster) }}"
                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,7 +56,7 @@
                     </svg>
                     Edit Data
                 </a>
-                @endcan
+                @endcan -->
                 <a href="{{ route('admin.aid-disasters.index') }}"
                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-colors">
                     &larr; Kembali
@@ -160,11 +160,17 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700/50">
                         @forelse($villageStats as $villageName => $records)
+                            @php
+                                $recipientsInVillage = $records->pluck('beneficiary_id')->filter()->unique()->count();
+                                $totalQtyInVillage = $records->sum('quantity_received');
+                            @endphp
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30">
                                 <td class="py-3 px-3 font-bold text-gray-800 dark:text-gray-200">{{ $villageName }}</td>
-                                <td class="py-3 px-3 text-center font-semibold text-gray-700 dark:text-gray-300">{{ $records->count() }} KK</td>
+                                <td class="py-3 px-3 text-center font-semibold text-gray-700 dark:text-gray-300">
+                                    {{ $recipientsInVillage > 0 ? number_format($recipientsInVillage) . ' KK' : '-' }}
+                                </td>
                                 <td class="py-3 px-3 text-center font-bold text-emerald-600 dark:text-emerald-400">
-                                    {{ number_format($records->sum('quantity_received')) }} Unit
+                                    {{ $totalQtyInVillage > 0 ? number_format($totalQtyInVillage) . ' Unit' : '-' }}
                                 </td>
                             </tr>
                         @empty

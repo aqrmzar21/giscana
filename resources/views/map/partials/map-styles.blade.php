@@ -1,6 +1,7 @@
 @php($mapUiVariant = $mapUiVariant ?? 'admin')
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
 <style>
     @if($mapUiVariant === 'admin')
     .map-ui--admin .map-admin-viewport {
@@ -284,28 +285,57 @@
         50% { opacity: 0.2; }
         100% { opacity: 1; }
     }
-    /* Animasi Pulsing / Kedip untuk Marker Terdekat */
+    // UPDATED FEATURE: Animasi Pulsing / Kedip Warna Hijau untuk Marker Titik Kumpul Tujuan (1 Menit)
     @keyframes facilityPulse {
         0% {
             transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(173, 239, 68, 0.8);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.85);
         }
         70% {
-            transform: scale(1.4);
-            box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+            transform: scale(1.35);
+            box-shadow: 0 0 0 16px rgba(16, 185, 129, 0);
         }
         100% {
             transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
         }
     }
 
-    /* Class dinamis yang dipasang lewat JS */
+    /* Class dinamis yang dipasang lewat JS pada marker tujuan */
     .evacuation-facility-marker.is-blinking div {
-        background-color: #44ef7dff !important; /* Berubah jadi merah agar mencolok */
+        background-color: #10b981 !important; /* Warna hijau menyala pembeda dari titik kumpul lain */
         animation: facilityPulse 1.2s infinite ease-in-out;
         border-color: #ffffff !important;
+        box-shadow: 0 0 16px rgba(16, 185, 129, 0.9) !important;
         z-index: 999;
+    }
+
+    /* // NEW FEATURE: Styling Popup Khusus Titik Kumpul Tujuan & Popup Analisis Risiko User */
+    .destination-marker-popup .leaflet-popup-content-wrapper {
+        border-radius: 16px;
+        padding: 0;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 15px 30px -10px rgba(16, 185, 129, 0.35), 0 0 0 1.5px rgba(16, 185, 129, 0.2);
+    }
+    .destination-marker-popup .leaflet-popup-content {
+        margin: 0;
+        line-height: 1.4;
+        width: 240px !important;
+        max-width: 85vw;
+    }
+    .user-risk-popup .leaflet-popup-content-wrapper {
+        border-radius: 16px;
+        padding: 0;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 18px 35px -10px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.06);
+    }
+    .user-risk-popup .leaflet-popup-content {
+        margin: 0;
+        line-height: 1.4;
+        width: 260px !important;
+        max-width: 88vw;
     }
 
     /* Tanda Centang (Checkmark) */
@@ -328,6 +358,107 @@
         fill: none;
         width: 8px;
         height: 8px;
+    }
+
+    /* Sembunyikan default container LRM agar Tailwind Panel Navigasi yang tampil prima */
+    .leaflet-routing-container {
+        display: none !important;
+    }
+
+    /* User GPS Pulsing Marker */
+    .user-gps-marker {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .user-gps-marker .pulse-ring {
+        position: absolute;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: rgba(59, 130, 246, 0.4);
+        animation: userGpsPulse 2s infinite ease-out;
+    }
+    .user-gps-marker .dot-center {
+        position: relative;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #2563eb;
+        border: 2.5px solid #ffffff;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    @keyframes userGpsPulse {
+        0% { transform: scale(0.6); opacity: 1; }
+        100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* Waypoint Titik Masuk Jalur Evakuasi */
+    .junction-marker {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .junction-marker div {
+        background-color: #7e22ce;
+        color: white;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 2px solid white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: bold;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    }
+
+    /* Styling Kustom Tooltip Rute */
+    .route-tooltip {
+        background: rgba(15, 23, 42, 0.92);
+        color: #f8fafc;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+        padding: 6px 10px;
+        font-size: 11px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        line-height: 1.35;
+        pointer-events: none;
+    }
+    .route-tooltip::before {
+        border-top-color: rgba(15, 23, 42, 0.92) !important;
+    }
+    .clickable-route-hit {
+        cursor: pointer !important;
+    }
+
+    /* Styling Elegan untuk Popup Instruksi Arah di Lokasi Marker */
+    .instruction-popup .leaflet-popup-content-wrapper {
+        border-radius: 18px;
+        padding: 0;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    }
+    .instruction-popup .leaflet-popup-content {
+        margin: 0;
+        line-height: 1.4;
+        width: 320px !important;
+        max-width: 88vw;
+    }
+    .instruction-popup .leaflet-popup-close-button {
+        top: 8px;
+        right: 8px;
+        color: #94a3b8;
+        padding: 4px;
+        font-size: 16px;
+    }
+    .instruction-popup .leaflet-popup-close-button:hover {
+        color: #ef4444;
+    }
+    .instruction-popup .leaflet-popup-tip {
+        background: #ffffff;
     }
 </style>
 @endpush

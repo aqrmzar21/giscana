@@ -22,7 +22,7 @@ class District extends Model
      */
     public function villages()
     {
-        return $this->hasMany(Village::class);
+        return $this->hasMany(Village::class)->orderBy('yard');
     }
 
     /**
