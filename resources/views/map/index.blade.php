@@ -50,12 +50,17 @@
     @include('map.partials.navigation-panel')
 
     <!-- Tombol Pintas Quick Tool (Melayang di Kiri Atas Peta) -->
-    <div class="absolute top-20 right-5 z-50">
+     <!-- Untuk tombol aksess modal input manual lokasi langtt dan longldt -->
+    <div class="absolute top-20 right-5 z-50 grid grid-rows-2 gap-2">
         <button id="btnMapLocationTool" title="Input Lokasi Saat Ini" type="button" class="w-9 h-9 bg-white hover:bg-slate-50 text-slate-700 rounded-xl shadow-md border border-slate-200 flex items-center justify-center transition-all hover:scale-105 active:scale-95 group">
-            <svg class="w-7 h-7 text-indigo-600 group-hover:text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-7 h-7 text-indigo-600 group-hover:text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
+        </button>
+        <!-- Tombol untuk Moadal  untuk custom dengan Posisi Saya -->
+        <button id="btnToggleUserPosition" type="button" class="w-9 h-9 bg-white hover:bg-slate-50 text-slate-700 rounded-xl shadow-md border border-slate-200 flex items-center justify-center transition-all hover:scale-105 active:scale-95 group">
+            <svg class="w-5 h-5 text-indigo-600 group-hover:text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
         </button>
     </div>
 
@@ -104,23 +109,32 @@
                 </button>
             </div>
             
-            <!-- 📍 SECTION BARU: Panel Opsi Navigasi Lokasi User -->
-            <div class="mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider">LOKASI SAYA</span>
-                    <span id="userLocationStatus" class="text-[10px] font-semibold text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded-full">Belum Diatur</span>
+            {{-- // UPDATED FEATURE: Bagian Lokasi Saya Sesuai Prinsip "One Information = One Place" --}}
+            {{-- // REMOVED DUPLICATE UI: Menghapus label status evakuasi/lokasi dari panel kanan karena informasi navigasi sudah dipusatkan di panel kiri --}}
+            <!-- <div class="mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-200/80"> -->
+            <div class="mb-4 bg-slate-50">
+                <div class="mb-2">
+                    <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">LOKASI SAYA</span>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2">
-                    <!-- 🎯 TOMBOL BARU: Deteksi GPS Otomatis -->
-                    <button id="btnGetCurrentLocation" type="button" class="w-full bg-emerald-50 hover:bg-emerald-100 active:scale-[0.98] text-emerald-700 font-bold py-2.5 px-3 rounded-xl border border-emerald-200 shadow-xs transition-all text-xs flex items-center justify-center gap-1"><svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
-                        <span>Set Lokasi</span>
+                <div class="grid grid-cols-[auto_1fr_1fr] gap-2 items-center">
+                    <!-- // Tombol 1: Posisi Saya (Toggle ON/OFF) -->
+                    <button id="btnToggleUserPosition" type="button" class="w-9 h-9 bg-white hover:bg-slate-50 text-slate-700 rounded-xl shadow-md border border-slate-200 flex items-center justify-center transition-all hover:scale-105 active:scale-95 group">
+                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+                        <!-- <span id="btnToggleUserPositionText">Posisi Saya</span> -->
                     </button>
-                    <!-- <button id="btnOpenLocationModal" type="button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1">
-                        <span>📍 Atur Lokasi</span>
-                    </button> -->
-                    <button id="btnResetLocation" type="button" class="w-full bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-600 font-semibold text-xs py-2 px-3 rounded-xl border border-slate-200 hover:border-rose-200 transition-all flex items-center justify-center gap-1 opacity-50 cursor-not-allowed" disabled>
-                        <span>❌ Reset</span>
+                    <!-- // Tombol 2: Cari Titik Kumpul (Hanya aktif jika lokasi user tersedia) -->
+                    <button id="btnFindNearestFacility" type="button" class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-2.5 px-3 rounded-xl shadow-xs transition-all text-xs flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" disabled>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.414 10l4.244 4.243a1 1 0 01-.707 1.707l-8.486 0M13.414 10l2.122-2.122a1 1 0 011.414 0L20 10"/>
+                        </svg>
+                        <span class="text-sm">Cari</span>
+                    </button>
+
+                    <!-- // Tombol 3: Reset Rute (Menghapus routing tanpa menghapus marker user) -->
+                    <button id="btnResetRoute" type="button" class="w-full bg-white hover:bg-slate-100 active:scale-[0.98] text-slate-600 font-semibold py-2 px-3 rounded-xl border border-slate-200 shadow-xs transition-all text-xs flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" disabled>
+                        <span class="text-sm">⟲</span>
+                        <span>Reset</span>
                     </button>
                 </div>
             </div>

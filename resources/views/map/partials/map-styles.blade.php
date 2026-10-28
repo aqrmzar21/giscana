@@ -285,28 +285,57 @@
         50% { opacity: 0.2; }
         100% { opacity: 1; }
     }
-    /* Animasi Pulsing / Kedip untuk Marker Terdekat */
+    // UPDATED FEATURE: Animasi Pulsing / Kedip Warna Hijau untuk Marker Titik Kumpul Tujuan (1 Menit)
     @keyframes facilityPulse {
         0% {
             transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(173, 239, 68, 0.8);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.85);
         }
         70% {
-            transform: scale(1.4);
-            box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+            transform: scale(1.35);
+            box-shadow: 0 0 0 16px rgba(16, 185, 129, 0);
         }
         100% {
             transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
         }
     }
 
-    /* Class dinamis yang dipasang lewat JS */
+    /* Class dinamis yang dipasang lewat JS pada marker tujuan */
     .evacuation-facility-marker.is-blinking div {
-        background-color: #44ef7dff !important; /* Berubah jadi merah agar mencolok */
+        background-color: #10b981 !important; /* Warna hijau menyala pembeda dari titik kumpul lain */
         animation: facilityPulse 1.2s infinite ease-in-out;
         border-color: #ffffff !important;
+        box-shadow: 0 0 16px rgba(16, 185, 129, 0.9) !important;
         z-index: 999;
+    }
+
+    /* // NEW FEATURE: Styling Popup Khusus Titik Kumpul Tujuan & Popup Analisis Risiko User */
+    .destination-marker-popup .leaflet-popup-content-wrapper {
+        border-radius: 16px;
+        padding: 0;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 15px 30px -10px rgba(16, 185, 129, 0.35), 0 0 0 1.5px rgba(16, 185, 129, 0.2);
+    }
+    .destination-marker-popup .leaflet-popup-content {
+        margin: 0;
+        line-height: 1.4;
+        width: 240px !important;
+        max-width: 85vw;
+    }
+    .user-risk-popup .leaflet-popup-content-wrapper {
+        border-radius: 16px;
+        padding: 0;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 18px 35px -10px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.06);
+    }
+    .user-risk-popup .leaflet-popup-content {
+        margin: 0;
+        line-height: 1.4;
+        width: 260px !important;
+        max-width: 88vw;
     }
 
     /* Tanda Centang (Checkmark) */

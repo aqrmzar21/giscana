@@ -8,16 +8,11 @@
             bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 flex flex-col overflow-hidden text-slate-800 dark:text-slate-100"
      style="box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.25);">
 
-    {{-- Header Panel --}}
+    {{-- // UPDATED FEATURE: Header Panel Navigasi Evakuasi Aktif --}}
     <div class="px-4 py-3 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex items-center justify-between border-b border-white/10 shrink-0">
         <div class="flex items-center gap-2.5">
-            <span class="relative flex h-3 w-3">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-            </span>
             <div>
-                <h3 class="text-xs font-black tracking-wider uppercase text-emerald-400">RUTE EVAKUASI AKTIF</h3>
-                <p id="navSubtitleStatus" class="text-[10px] text-slate-300 font-medium">Panduan Arah Menuju Titik Aman</p>
+                <h3 class="text-xs font-black tracking-wider uppercase text-emerald-400">EVAKUASI AKTIF</h3>
             </div>
         </div>
         
@@ -35,17 +30,24 @@
         </div>
     </div>
 
-    {{-- Body Panel: Berisi Panduan Arah Evakuasi (Hasil Pertukaran dari Pop-up) --}}
+    {{-- Body Panel: Berisi Panduan Arah Evakuasi --}}
     <div id="navPanelBody" class="p-4 space-y-3 overflow-y-auto max-h-[calc(82vh-4rem)] md:max-h-[calc(86vh-4.5rem)] scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700">
 
-        {{-- Kartu Info Tujuan --}}
+        {{-- // UPDATED FEATURE: Ringkasan Metrik Navigasi (Jarak & Estimasi Waktu) --}}
+        {{-- // REMOVED DUPLICATE UI: Nama titik kumpul tujuan DIHAPUS dari panel kiri karena sudah menempel pada popup marker tujuan --}}
         <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between">
-            <div class="min-w-0 pr-2">
-                <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">TITIK KUMPUL TUJUAN</span>
-                <div id="navDestinationName" class="text-xs font-black text-slate-800 dark:text-slate-100 truncate">Titik Kumpul</div>
+            <div class="flex items-center gap-4">
+                <div>
+                    <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">📏 Jarak</span>
+                    <span id="navDistanceValue" class="text-xs font-black text-slate-800 dark:text-slate-100">--</span>
+                </div>
+                <div class="border-l border-slate-200 dark:border-slate-700 pl-4">
+                    <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">⏱ Estimasi</span>
+                    <span id="navDurationValue" class="text-xs font-black text-slate-800 dark:text-slate-100">--</span>
+                </div>
             </div>
-            <button id="btnFocusNavigationRoute" type="button" title="Fokuskan Rute pada Peta" class="px-2 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300 text-[10px] font-bold flex items-center gap-1 border border-indigo-200 dark:border-indigo-800 transition-colors shrink-0">
-                <span>🎯</span> Fokus
+            <button id="btnFocusNavigationRoute" type="button" title="Fokuskan Rute pada Peta" class="px-2.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300 text-[10px] font-bold flex items-center gap-1 border border-indigo-200 dark:border-indigo-800 transition-colors shrink-0 cursor-pointer">
+                <span>🎯</span> Fokus Rute
             </button>
         </div>
 
@@ -56,7 +58,7 @@
                 <span class="text-[9px] text-slate-400">Klik rute atau kartu</span>
             </div>
 
-            <div class="grid grid-cols-2 gap-2" id="navRouteOptionCards">
+            <!-- <div class="grid grid-cols-2 gap-2" id="navRouteOptionCards">
                 {{-- Opsi 1: Jalur Umum (Google Maps Style - Biru) --}}
                 <button type="button" id="btnSelectRoutePublic" onclick="window.selectEvacuationRoute && window.selectEvacuationRoute('public')"
                     class="p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-400 shadow-xs">
@@ -92,11 +94,11 @@
                         </span>
                     </div>
                 </button>
-            </div>
+            </div> -->
 
-            <p class="text-[9px] text-slate-400 dark:text-slate-500 italic flex items-center gap-1 pt-0.5">
+            <!-- <p class="text-[9px] text-slate-400 dark:text-slate-500 italic flex items-center gap-1 pt-0.5">
                 <span>💡</span> Klik garis rute pada peta atau tombol di atas untuk beralih rute
-            </p>
+            </p> -->
         </div>
 
         {{-- Panduan Arah (Daftar Instruksi Langkah Demi Langkah) --}}

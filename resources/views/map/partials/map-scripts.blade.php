@@ -68,6 +68,8 @@
     // =====================================================================
     // MANAJEMEN MODAL & KONTROL LOKASI USER (HYBRID EVACUATION SYSTEM)
     // =====================================================================
+    // STATE MANAGEMENT: NAVIGASI & MULTI-HAZARD ANALYSIS
+    // =====================================================================
     let userMarker = null;
     let nearestMarker = null;
     let userRouteLayerGroup = L.layerGroup().addTo(map); // Layer khusus rute user
@@ -80,8 +82,12 @@
         bpbd: { casing: null, main: null, hit: null }
     };
     let activeRouteKey = 'bpbd';
+    let currentUserLat = null;
+    let currentUserLng = null;
+    let isUserPositionActive = false;
+    let hasPlayedAlert = false;
 
-    // Fungsi Buka Modal
+    // Fungsi Buka Modal (Opsional untuk input koordinat manual)
     function openLocationModal() {
         const modal = document.getElementById('locationModal');
         if (modal) {
@@ -98,15 +104,233 @@
         invalidateMapSize();
     }
 
-    // Fungsi Reset Lokasi User (Kembalikan Peta ke Tampilan Awal)
-    function resetUserLocation() {
-        // 1. Hapus Marker User
-        if (userMarker) {
-            map.removeLayer(userMarker);
-            userMarker = null;
+    // =====================================================================
+    // // NEW FEATURE: ENGINE ANALISIS RISIKO SPASIAL MULTI-HAZARD
+    // Menggunakan Ray-Casting Point-in-Polygon dengan In-Memory Cache
+    // Menerapkan Prinsip "Collect All Matches" (Membaca SEMUA layer hazard tanpa break/first-match)
+    // =====================================================================
+    window.giscanaGeojsonCache = window.giscanaGeojsonCache || {};
+
+    async function fetchGeojsonWithCache(url) {
+        if (window.giscanaGeojsonCache[url]) {
+            return window.giscanaGeojsonCache[url];
+        }
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status} saat memuat ${url}`);
+            const data = await res.json();
+            window.giscanaGeojsonCache[url] = data;
+            return data;
+        } catch (err) {
+            console.error('Gagal memuat GeoJSON untuk analisis spasial:', url, err);
+            return null;
+        }
+    }
+
+    // Algoritma Ray-Casting Point in Ring
+    function isPointInRing(point, ring) {
+        const x = point[0], y = point[1];
+        let inside = false;
+        for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+            const xi = ring[i][0], yi = ring[i][1];
+            const xj = ring[j][0], yj = ring[j][1];
+            const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+            if (intersect) inside = !inside;
+        }
+        return inside;
+    }
+
+    // Pengecekan Geometri Polygon / MultiPolygon (mendukung holes)
+    function isPointInGeoJsonGeometry(lng, lat, geometry) {
+        if (!geometry || !geometry.coordinates) return false;
+        const pt = [lng, lat];
+        if (geometry.type === 'Polygon') {
+            const rings = geometry.coordinates;
+            if (!rings || rings.length === 0) return false;
+            // Harus berada di dalam exterior ring
+            if (!isPointInRing(pt, rings[0])) return false;
+            // Dan tidak boleh berada di dalam lubang (interior ring / holes)
+            for (let i = 1; i < rings.length; i++) {
+                if (isPointInRing(pt, rings[i])) return false;
+            }
+            return true;
+        } else if (geometry.type === 'MultiPolygon') {
+            for (let p = 0; p < geometry.coordinates.length; p++) {
+                const rings = geometry.coordinates[p];
+                if (rings && rings.length > 0 && isPointInRing(pt, rings[0])) {
+                    let inHole = false;
+                    for (let h = 1; h < rings.length; h++) {
+                        if (isPointInRing(pt, rings[h])) {
+                            inHole = true;
+                            break;
+                        }
+                    }
+                    if (!inHole) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // // NEW FEATURE: Identifikasi Wilayah (Desa & Kecamatan) dari Batas Administrasi Resmi
+    async function identifyUserRegion(lat, lng) {
+        const districtUrls = [
+            '/geojson/Kecamatan Kabila Bone-KEL_DESA.geojson',
+            '/geojson/Kecamatan Bulawa-KEL_DESA.geojson',
+            '/geojson/Kecamatan Bonepantai-KEL_DESA.geojson',
+            '/geojson/Kecamatan Bone-KEL_DESA.geojson',
+            '/geojson/Kecamatan Bone Raya-KEL_DESA.geojson'
+        ];
+        for (const url of districtUrls) {
+            const data = await fetchGeojsonWithCache(url);
+            if (data && data.features) {
+                for (const feat of data.features) {
+                    if (isPointInGeoJsonGeometry(lng, lat, feat.geometry)) {
+                        const p = feat.properties || {};
+                        const namaDesa = p.nama || (p.kel_desa ? `Desa ${p.kel_desa}` : (p.ori_name ? `Desa ${p.ori_name}` : 'Kawasan Pesisir'));
+                        const namaKec = p.kecamatan ? `Kecamatan ${p.kecamatan}` : 'Kabupaten Bone Bolango';
+                        return { desa: namaDesa, kecamatan: namaKec };
+                    }
+                }
+            }
+        }
+        return { desa: 'Kawasan Pesisir Bone Bolango', kecamatan: 'Kabupaten Bone Bolango' };
+    }
+
+    // // NEW FEATURE: Analisis Multi Hazard ("Collect All Matches")
+    // Membaca SEMUA 4 layer rawan bencana: Banjir, Longsor, Gempa, Gelombang
+    async function collectAllHazardMatches(lat, lng) {
+        const hazardDefs = [
+            { name: 'Banjir',    field: 'Bhy_Bjr',   url: '/geojson/rawan_banjir.geojson' },
+            { name: 'Longsor',   field: 'Bhy_Lsr',   url: '/geojson/rawan_longsor.geojson' },
+            { name: 'Gempa',     field: 'Bhy_GmpBm', url: '/geojson/rawan_gempa.geojson' },
+            { name: 'Gelombang', field: 'Bhy_GEA',   url: '/geojson/rawan_gelombang.geojson' }
+        ];
+
+        const matches = [];
+
+        // Evaluasi setiap layer hazard secara independen (Collect All Matches)
+        for (const h of hazardDefs) {
+            const geojson = await fetchGeojsonWithCache(h.url);
+            if (geojson && geojson.features) {
+                for (const feat of geojson.features) {
+                    if (isPointInGeoJsonGeometry(lng, lat, feat.geometry)) {
+                        const level = feat.properties ? (feat.properties[h.field] || 'Tinggi') : 'Tinggi';
+                        matches.push({
+                            name: h.name,
+                            level: level
+                        });
+                        break; // Ditemukan ancaman pada layer ini, lanjut ke jenis layer hazard lainnya
+                    }
+                }
+            }
         }
 
-        // 2. Hapus Garis Rute Khusus User & LRM
+        return matches;
+    }
+
+    // // NEW FEATURE: Builder Konten Popup Lokasi User (Khusus Analisis Risiko Multi-Hazard)
+    function buildUserRiskPopupHtml(region, hazards) {
+        const count = hazards.length;
+
+        // Kondisi 0 Hazard: 🟢 AMAN
+        if (count === 0) {
+            // <div style="margin-bottom:8px;">
+            //     <div style="font-weight:700;font-size:12px;color:#0f172a;">${region.desa}</div>
+            //     <div style="font-size:11px;color:#64748b;">${region.kecamatan}</div>
+            // </div>
+            return `
+                <div style="padding:12px 14px;font-family:system-ui,-apple-system,sans-serif;color:#1e293b;min-width:220px;">
+                    <div style="font-weight:800;font-size:12px;color:#0f172a;display:flex;align-items:center;gap:6px;border-bottom:1px solid #e2e8f0;padding-bottom:6px;margin-bottom:8px;">
+                        <span>📍</span> POSISI SAYA
+                    </div>
+                    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:8px 10px;">
+                        <div style="font-size:10px;font-weight:700;color:#15803d;margin-top:6px;display:flex;align-items:center;gap:4px;">
+                            <span>Status:</span>
+                            <span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:999px;font-weight:800;">🟢 AMAN</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Kategori Risiko berdasarkan Jumlah Hazard
+        let catBadge = '🟡 WASPADA';
+        let catColor = '#854d0e';
+        let catBg = '#fef9c3';
+
+        if (count === 2) {
+            catBadge = '🟠 RISIKO TINGGI';
+            catColor = '#c2410c';
+            catBg = '#ffedd5';
+        } else if (count >= 3) {
+            catBadge = '🔴 RISIKO SANGAT TINGGI';
+            catColor = '#b91c1c';
+            catBg = '#fee2e2';
+        }
+
+        let hazardRows = '';
+        hazards.forEach(hz => {
+            hazardRows += `
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;font-size:11px;border-bottom:1px dashed #f1f5f9;">
+                    <span style="font-weight:700;color:#1e293b;">• ${hz.name}</span>
+                    <span style="font-weight:600;font-size:10px;color:#dc2626;">Risiko ${hz.level}</span>
+                </div>
+            `;
+        });
+
+        return `
+            <div style="padding:12px 14px;font-family:system-ui,-apple-system,sans-serif;color:#1e293b;min-width:240px;">
+                <div style="font-weight:800;font-size:12px;color:#0f172a;display:flex;align-items:center;gap:6px;border-bottom:1px solid #e2e8f0;padding-bottom:6px;margin-bottom:8px;">
+                    <span>📍</span> POSISI SAYA
+                </div>
+                <div style="margin-bottom:8px;">
+                    <div style="font-weight:700;font-size:12px;color:#0f172a;">${region.desa}</div>
+                    <div style="font-size:11px;color:#64748b;">${region.kecamatan}</div>
+                </div>
+                <div style="border-top:1px solid #f1f5f9;border-bottom:1px solid #f1f5f9;padding:6px 0;margin-bottom:8px;">
+                    <div style="font-weight:800;font-size:10px;text-transform:uppercase;color:#dc2626;margin-bottom:4px;display:flex;align-items:center;gap:4px;">
+                        <span>⚠</span> Ancaman Terdeteksi
+                    </div>
+                    ${hazardRows}
+                </div>
+                <div style="margin-bottom:8px;font-size:11px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                        <span style="color:#64748b;font-size:10px;font-weight:600;">Jumlah Ancaman:</span>
+                        <span style="font-weight:800;color:#0f172a;">${count}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="color:#64748b;font-size:10px;font-weight:600;">Kategori Risiko:</span>
+                        <span style="font-weight:800;font-size:10px;padding:2px 8px;border-radius:999px;background:${catBg};color:${catColor};">${catBadge}</span>
+                    </div>
+                </div>
+                <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:6px 8px;font-size:10px;color:#9f1239;">
+                    <span style="font-weight:700;display:block;margin-bottom:1px;">Saran:</span>
+                    Segera menuju titik kumpul terdekat.
+                </div>
+            </div>
+        `;
+    }
+
+    // // NEW FEATURE: Builder Konten Popup Titik Kumpul Tujuan (Menempel pada Marker Tujuan)
+    // Tidak menampilkan langkah navigasi, estimasi waktu, atau informasi lokasi user (karena sudah di Panel Navigasi)
+    function buildDestinationMarkerPopupHtml(facilityName) {
+        return `
+            <div style="padding:10px 12px;font-family:system-ui,-apple-system,sans-serif;color:#1e293b;min-width:200px;">
+                <div style="font-weight:800;font-size:12px;color:#059669;display:flex;align-items:center;gap:5px;margin-bottom:6px;border-bottom:1px solid #e2e8f0;padding-bottom:5px;">
+                    <span>🏫</span> TITIK KUMPUL TUJUAN
+                </div>
+                <div style="font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700;margin-bottom:1px;">Nama Lokasi:</div>
+                <div style="font-weight:800;font-size:12px;color:#0f172a;margin-bottom:6px;">${facilityName || 'Titik Kumpul'}</div>
+            </div>
+        `;
+    }
+
+    // // UPDATED FEATURE: Fungsi Reset Rute Evakuasi
+    // Menghapus: routing, polyline, panel navigasi aktif, audio, blinking marker.
+    // PENTING: JANGAN menghapus marker user!
+    function resetEvacuationRoute() {
+        // 1. Hapus Garis Polyline Rute Khusus User & LRM
         userRouteLayerGroup.clearLayers();
         if (userRoutingControl) {
             try {
@@ -123,7 +347,7 @@
         };
         activeRouteKey = 'bpbd';
 
-        // 3. Matikan Efek Kedip pada Marker Fasilitas
+        // 2. Matikan Efek Kedip Hijau pada Marker Fasilitas & Tutup Popup Tujuan
         if (blinkingTimer) {
             clearTimeout(blinkingTimer);
             blinkingTimer = null;
@@ -132,6 +356,7 @@
         if (nearestMarker) {
             const el = nearestMarker.getElement();
             if (el) el.classList.remove('is-blinking');
+            nearestMarker.closePopup();
             nearestMarker = null;
         }
 
@@ -140,7 +365,7 @@
             if (el) el.classList.remove('is-blinking');
         });
 
-        // 4. Hentikan dan Reset Audio Alarm
+        // 3. Hentikan dan Reset Audio Alarm Sirine
         const audio = document.getElementById('alert-sound');
         if (audio) {
             audio.pause();
@@ -148,81 +373,137 @@
         }
         hasPlayedAlert = false;
 
-        // 5. Sembunyikan Panel Navigasi Modern
+        // 4. Sembunyikan Panel Navigasi Aktif
         const navPanel = document.getElementById('evacuationNavigationPanel');
         if (navPanel) {
             navPanel.classList.add('hidden');
         }
 
-        // 6. Update UI Status Kontrol
-        const statusElem = document.getElementById('userLocationStatus');
-        const resetBtn = document.getElementById('btnResetLocation');
-
-        if (statusElem) {
-            statusElem.textContent = 'Belum Diatur';
-            statusElem.className = 'text-[10px] font-semibold text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded-full';
-        }
-
-        if (resetBtn) {
-            resetBtn.disabled = true;
-            resetBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        // 5. Nonaktifkan Tombol Reset Rute
+        const resetRouteBtn = document.getElementById('btnResetRoute');
+        if (resetRouteBtn) {
+            resetRouteBtn.disabled = true;
+            resetRouteBtn.classList.add('opacity-50', 'cursor-not-allowed');
         }
 
         currentNavigationBounds = null;
         invalidateMapSize();
     }
 
-    // Event Listener Modal & Reset
-    document.getElementById('btnMapLocationTool')?.addEventListener('click', openLocationModal);
-    document.getElementById('btnOpenLocationModal')?.addEventListener('click', openLocationModal);
-    document.getElementById('closeLocationModal')?.addEventListener('click', closeLocationModal);
-    document.getElementById('btnResetLocation')?.addEventListener('click', resetUserLocation);
+    // // UPDATED FEATURE: Fungsi Toggle Posisi Saya (Toggle ON/OFF)
+    // Klik pertama: aktifkan GPS, tampilkan marker user, lakukan analisis multi-hazard
+    // Klik kedua: hapus marker user, hapus popup analisis risiko (tidak menghapus rute, titik kumpul, atau layer lain)
+    async function toggleUserPosition() {
+        const btnToggle = document.getElementById('btnToggleUserPosition');
+        const textElem = document.getElementById('btnToggleUserPositionText');
+        const btnFind = document.getElementById('btnFindNearestFacility');
 
-    document.getElementById('locationModal')?.addEventListener('click', function (e) {
-        if (e.target.id === 'locationModal') closeLocationModal();
-    });
+        // KASUS 1: Klik Kedua -> Toggle OFF (Matikan posisi user)
+        if (isUserPositionActive) {
+            if (userMarker) {
+                map.removeLayer(userMarker);
+                userMarker = null;
+            }
+            isUserPositionActive = false;
+            currentUserLat = null;
+            currentUserLng = null;
 
-    // =====================================================================
-    // DETEKSI LOKASI OTOMATIS VIA GPS BROWSER
-    // =====================================================================
-    document.getElementById('btnGetCurrentLocation')?.addEventListener('click', function() {
+            if (textElem) textElem.textContent = 'Posisi Saya';
+            if (btnToggle) {
+                btnToggle.className = 'w-full bg-blue-50 hover:bg-blue-100 active:scale-[0.98] text-blue-700 font-bold py-2.5 px-3 rounded-xl border border-blue-200 shadow-xs transition-all text-xs flex items-center justify-center gap-2 cursor-pointer';
+            }
+
+            // Nonaktifkan tombol Cari Titik Kumpul
+            if (btnFind) {
+                btnFind.disabled = true;
+                btnFind.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            return;
+        }
+
+        // KASUS 2: Klik Pertama -> Toggle ON (Aktifkan GPS & Analisis Multi-Hazard)
         if (!navigator.geolocation) {
             alert('Fitur Geolocation/GPS tidak didukung oleh browser Anda.');
             return;
         }
 
-        const btn = this;
-        const originalContent = btn.innerHTML;
-
-        // Ubah tampilan tombol jadi loading
-        btn.disabled = true;
-        btn.innerHTML = `
-            <svg class="animate-spin h-4 w-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span>Mendeteksi Lokasi GPS...</span>
-        `;
+        if (textElem) textElem.textContent = 'Mendeteksi GPS...';
+        if (btnToggle) btnToggle.disabled = true;
 
         navigator.geolocation.getCurrentPosition(
-            (position) => {
+            async (position) => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
+                currentUserLat = lat;
+                currentUserLng = lng;
+                isUserPositionActive = true;
 
-                // Isi otomatis ke input form
-                document.getElementById('lat').value = lat.toFixed(6);
-                document.getElementById('lng').value = lng.toFixed(6);
+                // Isi koordinat form jika modal manual dibuka
+                const inputLat = document.getElementById('lat');
+                const inputLng = document.getElementById('lng');
+                if (inputLat) inputLat.value = lat.toFixed(6);
+                if (inputLng) inputLng.value = lng.toFixed(6);
 
-                // Kembalikan tombol ke kondisi normal
-                btn.innerHTML = originalContent;
-                btn.disabled = false;
+                // Buat Marker Lokasi User (Radar Pulsing)
+                if (userMarker) map.removeLayer(userMarker);
+                const userIcon = L.divIcon({
+                    className: 'user-gps-marker',
+                    html: '<div class="pulse-ring"></div><div class="dot-center"></div>',
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                });
 
-                // Langsung jalankan proses Set Lokasi
-                document.getElementById('setLocation').click();
+                userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
+
+                // Pasang popup sementara selagi proses analisis spasial berlangsung
+                userMarker.bindPopup(`
+                    <div style="padding:10px 14px;font-size:11px;font-weight:600;color:#334155;display:flex;align-items:center;gap:6px;">
+                        <svg class="animate-spin h-3.5 w-3.5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span>Menganalisis ancaman multi-hazard...</span>
+                    </div>
+                `, { className: 'user-risk-popup' }).openPopup();
+
+                map.panTo([lat, lng]);
+
+                // Jalankan Analisis Multi-Hazard & Identifikasi Wilayah
+                try {
+                    const [region, matchedHazards] = await Promise.all([
+                        identifyUserRegion(lat, lng),
+                        collectAllHazardMatches(lat, lng)
+                    ]);
+
+                    // Update Popup Lokasi User dengan Hasil Analisis Multi Hazard
+                    const popupHtml = buildUserRiskPopupHtml(region, matchedHazards);
+                    userMarker.bindPopup(popupHtml, { className: 'user-risk-popup', maxWidth: 280 }).openPopup();
+                } catch (e) {
+                    console.error('Error saat analisis multi hazard:', e);
+                    userMarker.bindPopup(`
+                        <div style="padding:10px 12px;font-size:11px;color:#0f172a;">
+                            <b>📍 POSISI SAYA</b><br>
+                            Koordinat: ${lat.toFixed(5)}, ${lng.toFixed(5)}
+                        </div>
+                    `, { className: 'user-risk-popup' }).openPopup();
+                }
+
+                // Update UI Tombol Toggle ON
+                if (btnToggle) {
+                    btnToggle.disabled = false;
+                    btnToggle.className = 'w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold py-2.5 px-3 rounded-xl shadow-xs transition-all text-xs flex items-center justify-center gap-2 cursor-pointer';
+                }
+                if (textElem) textElem.textContent = 'Posisi Aktif (Klik utk Matikan)';
+
+                // Aktifkan Tombol Cari Titik Kumpul
+                if (btnFind) {
+                    btnFind.disabled = false;
+                    btnFind.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
             },
             (error) => {
-                btn.innerHTML = originalContent;
-                btn.disabled = false;
+                if (btnToggle) {
+                    btnToggle.disabled = false;
+                    btnToggle.className = 'w-full bg-emerald-50 hover:bg-emerald-100 active:scale-[0.98] text-emerald-700 font-bold py-2.5 px-3 rounded-xl border border-emerald-200 shadow-xs transition-all text-xs flex items-center justify-center gap-2 cursor-pointer';
+                }
+                if (textElem) textElem.textContent = 'Posisi Saya';
 
                 switch(error.code) {
                     case error.PERMISSION_DENIED:
@@ -232,23 +513,28 @@
                         alert("Informasi lokasi GPS tidak tersedia.");
                         break;
                     case error.TIMEOUT:
-                        alert("Waktu permintaan lokasi habis (Timeout).");
+                        alert("Waktu permintaan lokasi GPS habis (Timeout).");
                         break;
                     default:
                         alert("Gagal mendeteksi lokasi GPS.");
                         break;
                 }
             },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            }
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
-    });
+    }
 
-    // 🚫 Flag status audio alarm
-    let hasPlayedAlert = false; 
+    // Event Listener Tombol Panel Kontrol Peta
+    document.getElementById('btnToggleUserPosition')?.addEventListener('click', toggleUserPosition);
+    document.getElementById('btnResetRoute')?.addEventListener('click', resetEvacuationRoute);
+
+    // Event Listener Modal Cadangan
+    document.getElementById('btnMapLocationTool')?.addEventListener('click', openLocationModal);
+    document.getElementById('btnOpenLocationModal')?.addEventListener('click', openLocationModal);
+    document.getElementById('closeLocationModal')?.addEventListener('click', closeLocationModal);
+    document.getElementById('locationModal')?.addEventListener('click', function (e) {
+        if (e.target.id === 'locationModal') closeLocationModal();
+    });
 
     // Helper render icon SVG instruksi navigasi
     function getInstructionIconSvg(type) {
@@ -268,76 +554,8 @@
         }
     }
 
-    // Helper bangun konten HTML popup ringkas dan rapi untuk Marker Lokasi User saat Rute Evakuasi Aktif
-    function buildUserLocationPopupHtml(data, userLat, userLng, activeKey = null) {
-        const key = activeKey || activeRouteKey || data.selected_route_key || 'bpbd';
-        const facility = data.facility || {};
-        const options = data.route_options || {};
-        const optPublic = options.public;
-        const optBpbd = options.bpbd;
-        const activeOpt = (options && options[key]) ? options[key] : (optBpbd || optPublic || data.summary || {});
-
-        const isPublic = key === 'public';
-        const isBpbd = key === 'bpbd';
-
-        return `
-            <div style="padding:10px 12px;font-family:system-ui,-apple-system,sans-serif;color:#1e293b;min-width:230px;">
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e2e8f0;">
-                    <div style="font-weight:800;font-size:12px;color:#0f172a;display:flex;align-items:center;gap:4px;">
-                        <span>📍</span> Lokasi Saat Ini
-                    </div>
-                    <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px;background:${isBpbd ? '#f3e8ff' : '#dbeafe'};color:${isBpbd ? '#7e22ce' : '#1d4ed8'};">
-                        ${isBpbd ? '🛡️ Jalur BPBD' : '🛣️ Jalur Umum'}
-                    </span>
-                </div>
-                
-                <div style="font-size:11px;color:#64748b;margin-bottom:6px;">
-                    <span style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;display:block;">Koordinat GPS</span>
-                    <span style="font-weight:600;color:#334155;">${userLat.toFixed(5)}, ${userLng.toFixed(5)}</span>
-                </div>
-
-                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:6px 8px;margin-bottom:8px;">
-                    <span style="font-size:9px;font-weight:700;color:#15803d;text-transform:uppercase;display:block;">Tujuan Evakuasi</span>
-                    <div style="font-weight:700;font-size:11px;color:#0f172a;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${facility.name || 'Titik Kumpul'}</div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;font-size:10px;font-weight:600;color:${isBpbd ? '#7e22ce' : '#2563eb'};">
-                        <span>Jarak: ${activeOpt.distance_formatted || '–'}</span>
-                        <span>⏱ ${activeOpt.duration_formatted || '–'}</span>
-                    </div>
-                </div>
-
-                ${optPublic && optBpbd ? `
-                    <div style="margin-bottom:8px;background:#f1f5f9;border-radius:8px;padding:5px;">
-                        <span style="font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;display:block;margin-bottom:4px;text-align:center;">Pilih Rute Aktif:</span>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
-                            <button type="button" onclick="window.selectEvacuationRoute && window.selectEvacuationRoute('public')" style="border:1.5px solid ${isPublic ? '#2563eb' : '#cbd5e1'};background:${isPublic ? '#eff6ff' : '#ffffff'};color:${isPublic ? '#1d4ed8' : '#64748b'};padding:4px 6px;border-radius:6px;font-size:9px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.2s;">
-                                🛣️ Jalur Umum
-                            </button>
-                            <button type="button" onclick="window.selectEvacuationRoute && window.selectEvacuationRoute('bpbd')" style="border:1.5px solid ${isBpbd ? '#9333ea' : '#cbd5e1'};background:${isBpbd ? '#faf5ff' : '#ffffff'};color:${isBpbd ? '#7e22ce' : '#64748b'};padding:4px 6px;border-radius:6px;font-size:9px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.2s;">
-                                🛡️ Jalur BPBD
-                            </button>
-                        </div>
-                    </div>
-                ` : ''}
-
-                <button type="button" onclick="const p = document.getElementById('evacuationNavigationPanel'); if(p){ p.classList.remove('hidden'); p.scrollIntoView({behavior:'smooth'}); }" style="width:100%;background:#4f46e5;color:#ffffff;border:none;border-radius:7px;padding:6px 8px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,0.1);">
-                    <span>🧭</span> Panduan Rute di Panel Kiri
-                </button>
-            </div>
-        `;
-    }
-
-    // Helper update tampilan Popup pada Marker Lokasi User saat rute berganti
-    function updateUserMarkerPopupUI(data, selectedKey) {
-        if (userMarker) {
-            const popup = userMarker.getPopup();
-            if (popup) {
-                const html = buildUserLocationPopupHtml(data, userMarker.getLatLng().lat, userMarker.getLatLng().lng, selectedKey);
-                popup.setContent(html);
-            }
-        }
-    }
-
-    // Helper update tampilan Panel Navigasi Modern (Tailwind)
+    // // UPDATED FEATURE: Helper update tampilan Panel Navigasi Modern (Tailwind)
+    // Sesuai prinsip "One Information = One Place", nama titik kumpul tidak ditampilkan di panel kiri karena sudah ada pada popup marker tujuan
     function renderNavigationPanel(data, userLat, userLng, activeKey = null) {
         const panel = document.getElementById('evacuationNavigationPanel');
         if (!panel) return;
@@ -357,12 +575,11 @@
         const isPublic = activeKey === 'public';
         const isBpbd = activeKey === 'bpbd';
 
-        // 1. Nama Fasilitas Titik Kumpul
-        const destElem = document.getElementById('navDestinationName');
-        if (destElem) {
-            destElem.textContent = facility.name || 'Titik Kumpul Terdekat';
-            destElem.title = facility.name || 'Titik Kumpul';
-        }
+        // 1. // UPDATED FEATURE: Update Metrik Ringkasan (Jarak & Estimasi Durasi)
+        const distElem = document.getElementById('navDistanceValue');
+        const durElem = document.getElementById('navDurationValue');
+        if (distElem) distElem.textContent = currentOpt.distance_formatted || '–';
+        if (durElem) durElem.textContent = currentOpt.duration_formatted || '–';
 
         // 2. Subtitle Status di Header Panel
         const subtitleElem = document.getElementById('navSubtitleStatus');
@@ -565,7 +782,7 @@
         }
     }
 
-    // Fungsi global pemilihan rute evakuasi (Jalur Umum vs Jalur Resmi BPBD)
+    // // UPDATED FEATURE: Fungsi global pemilihan rute evakuasi (Jalur Umum vs Jalur Resmi BPBD)
     window.selectEvacuationRoute = function(selectedKey) {
         if (!currentRoutingData) return;
         activeRouteKey = selectedKey;
@@ -573,86 +790,46 @@
         // 1. Update style visual garis rute pada peta
         updateRoutePolylinesVisual(selectedKey);
 
-        // 2. Update panel navigasi langkah demi langkah
+        // 2. Update panel navigasi langkah demi langkah di panel kiri
         renderNavigationPanel(currentRoutingData, currentRoutingData.summary.user_location.lat, currentRoutingData.summary.user_location.lng, selectedKey);
 
-        // 3. Update popup marker lokasi user
-        updateUserMarkerPopupUI(currentRoutingData, selectedKey);
-
-        // 4. Update status badge di panel kontrol peta
-        const statusElem = document.getElementById('userLocationStatus');
-        if (statusElem) {
-            if (selectedKey === 'bpbd') {
-                statusElem.textContent = 'Jalur Resmi BPBD ✓';
-                statusElem.className = 'text-[10px] font-semibold text-purple-800 bg-purple-100 px-2 py-0.5 rounded-full';
-            } else {
-                statusElem.textContent = 'Jalur Umum (Google) ✓';
-                statusElem.className = 'text-[10px] font-semibold text-blue-800 bg-blue-100 px-2 py-0.5 rounded-full';
-            }
-        }
+        // // REMOVED DUPLICATE UI: Tidak lagi memperbarui popup tengah atau status teks panel kanan
+        // karena informasi rute sudah dipusatkan secara eksklusif di Panel Navigasi (kiri)
     };
 
-    // Proses "Set Lokasi" (Hybrid Routing Pipeline)
-    document.getElementById('setLocation')?.addEventListener('click', function() {
-        const lat = parseFloat(document.getElementById('lat').value);
-        const lng = parseFloat(document.getElementById('lng').value);
-
-        if (isNaN(lat) || isNaN(lng)) {
-            alert('Silakan masukkan nilai Latitude dan Longitude yang valid.');
-            return;
-        }
-
-        // 1. Bersihkan state lokasi lama & tutup modal
-        resetUserLocation();
+    // // NEW FEATURE: Eksekusi Pencarian Titik Kumpul & Rute Hybrid Evakuasi
+    function executeFindNearestEvacuation(lat, lng) {
+        // 1. Bersihkan rute evakuasi sebelumnya (jika ada) tanpa menghapus marker user
+        resetEvacuationRoute();
         closeLocationModal();
 
-        // 2. Tambahkan Marker Lokasi User Berdesain Modern (Radar Pulsing)
-        const userIcon = L.divIcon({
-            className: 'user-gps-marker',
-            html: '<div class="pulse-ring"></div><div class="dot-center"></div>',
-            iconSize: [32, 32],
-            iconAnchor: [16, 16]
-        });
-        userMarker = L.marker([lat, lng], { icon: userIcon })
-            .addTo(map)
-            .bindPopup(`<div style="padding:10px 14px;font-size:12px;font-weight:600;color:#334155;display:flex;align-items:center;gap:6px;"><span>🧭</span><span>Menghitung instruksi arah ke titik kumpul...</span></div>`, { className: 'instruction-popup' })
-            .openPopup();
-
-        // Update status kontrol panel
-        const statusElem = document.getElementById('userLocationStatus');
-        const resetBtn = document.getElementById('btnResetLocation');
-
-        if (statusElem) {
-            statusElem.textContent = 'Mencari Rute...';
-            statusElem.className = 'text-[10px] font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full';
+        // Indikator loading pada tombol cari titik kumpul
+        const btnFind = document.getElementById('btnFindNearestFacility');
+        let origBtnFindHtml = '';
+        if (btnFind) {
+            origBtnFindHtml = btnFind.innerHTML;
+            btnFind.disabled = true;
+            btnFind.innerHTML = `
+                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <span>Mencari Titik Kumpul...</span>
+            `;
         }
 
-        // 3. Panggil API Hybrid Evacuation Routing
+        // 2. Panggil API Hybrid Evacuation Routing
         fetch(`/api/nearest-evacuation-with-route?lat=${lat}&lng=${lng}`)
             .then(res => {
                 if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
                 return res.json();
             })
             .then(data => {
-                if (!data.success || !data.facility) {
-                    alert(data.message || "Gagal menemukan titik kumpul terdekat.");
-                    if (statusElem) {
-                        statusElem.textContent = 'Gagal';
-                        statusElem.className = 'text-[10px] font-semibold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full';
-                    }
-                    return;
+                if (btnFind) {
+                    btnFind.disabled = false;
+                    btnFind.innerHTML = origBtnFindHtml;
                 }
 
-                // Update Status Kontrol Aktif
-                if (statusElem) {
-                    statusElem.textContent = data.mode === 'jalur_resmi' ? 'Jalur Resmi ✓' : 'Jalan Umum ✓';
-                    statusElem.className = data.mode === 'jalur_resmi' 
-                        ? 'text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full'
-                        : 'text-[10px] font-semibold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full';
-                }
-                if (resetBtn) {
-                    resetBtn.disabled = false;
-                    resetBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                if (!data.success || !data.facility) {
+                    alert(data.message || "Gagal menemukan titik kumpul terdekat.");
+                    return;
                 }
 
                 const facility = data.facility;
@@ -672,7 +849,7 @@
 
                 const facilityLatLng = L.latLng(fLat, fLng);
 
-                // --- A. EFEK KEDIP (BLINKING) & AUDIO SIRINE ALARM ---
+                // --- A. // UPDATED FEATURE: BLINKING MARKER HIJAU (1 MENIT / 60s) & AUDIO ALARM ---
                 nearestMarker = null;
                 let minTargetDist = Infinity;
 
@@ -687,27 +864,34 @@
                 if (nearestMarker) {
                     const el = nearestMarker.getElement();
                     if (el) {
+                        // Class is-blinking beranimasi pulsing warna hijau cerah
                         el.classList.add('is-blinking');
-                        // Popup titik kumpul tetap tersedia jika marker diklik,
-                        // namun tidak dipanggil openPopup() otomatis agar popup instruksi arah pada lokasi user tetap aktif di layar
-                        
-                        // Mainkan suara alarm audio
+
+                        // Putar audio alarm
                         const audio = document.getElementById('alert-sound');
                         if (audio) {
                             audio.currentTime = 0;
-                            audio.play().catch(err => console.log('Audio autoplay blocked by browser policy:', err));
+                            audio.play().catch(err => console.log('Audio autoplay policy catch:', err));
                             hasPlayedAlert = true;
                         }
 
-                        // Durasi kedip otomatis 30 detik
+                        // Durasi kedip otomatis tepat 1 menit (60 detik)
                         if (blinkingTimer) clearTimeout(blinkingTimer);
                         blinkingTimer = setTimeout(() => {
                             if (el) el.classList.remove('is-blinking');
-                        }, 30000);
+                        }, 60000);
                     }
+
+                    // --- // UPDATED FEATURE: POPUP TITIK KUMPUL TUJUAN MENEMPEL PADA MARKER TUJUAN ---
+                    // Sesuai arsitektur "One Information = One Place", popup ini hanya menjelaskan tujuan
+                    const destPopupHtml = buildDestinationMarkerPopupHtml(facility.name);
+                    nearestMarker.bindPopup(destPopupHtml, {
+                        className: 'destination-marker-popup',
+                        autoPan: false
+                    }).openPopup();
                 }
 
-                // --- B. GAMBAR RUTE (PILIHAN JALUR UMUM GOOGLE MAPS VS JALUR RESMI BPBD UNGU) ---
+                // --- B. GAMBAR DUAL RUTE HYBRID (SATU WARNA UNGU BPBD VS BIRU GOOGLE MAPS) ---
                 userRouteLayerGroup.clearLayers();
                 currentRoutingData = data;
                 activeRouteKey = data.selected_route_key || 'bpbd';
@@ -726,7 +910,6 @@
                     instructions: []
                 };
 
-                // Siapkan bounds untuk semua titik koordinat kedua rute
                 let allLatLngs = [];
                 if (optBpbd.coordinates && optBpbd.coordinates.length > 0) {
                     allLatLngs = allLatLngs.concat(optBpbd.coordinates);
@@ -743,7 +926,7 @@
                     bpbd: { casing: null, main: null, hit: null }
                 };
 
-                // 1. Gambar RUTE JALUR RESMI BPBD (SATU WARNA UNGU TERUNIFIKASI)
+                // 1. Gambar Jalur Resmi BPBD (Warna Ungu Terunifikasi)
                 if (optBpbd.coordinates && optBpbd.coordinates.length > 1) {
                     const bpbdCasing = L.polyline(optBpbd.coordinates, {
                         color: '#581c87',
@@ -795,7 +978,7 @@
                         }
                     });
 
-                    // Waypoint Titik Masuk Jalur Evakuasi Resmi (jika ada)
+                    // Titik Masuk Jalur Evakuasi Resmi
                     const entryPoint = optBpbd.entry_point || (data.summary && data.summary.entry_point);
                     if (entryPoint && entryPoint.lat && entryPoint.lng) {
                         const junctionIcon = L.divIcon({
@@ -811,7 +994,7 @@
                     }
                 }
 
-                // 2. Gambar RUTE JALUR UMUM (GAYA GOOGLE MAPS - BIRU)
+                // 2. Gambar Jalur Umum (Gaya Google Maps - Biru)
                 if (optPublic.coordinates && optPublic.coordinates.length > 1) {
                     const publicCasing = L.polyline(optPublic.coordinates, {
                         color: '#174ea6',
@@ -867,37 +1050,88 @@
                 // Terapkan visual style rute aktif & alternatif
                 updateRoutePolylinesVisual(activeRouteKey);
 
-                // C. Zoom & Fit Bounds Otomatis (mencakup kedua rute)
+                // C. Zoom & Fit Bounds Otomatis mencakup seluruh rute
                 currentNavigationBounds = L.latLngBounds(allLatLngs);
                 map.fitBounds(currentNavigationBounds, { padding: [60, 60], maxZoom: 17 });
 
-                // D. Pasang Pop-up Lokasi Saat Ini (Rute Evakuasi Aktif) pada Marker Lokasi User
-                const userLocationPopupHtml = buildUserLocationPopupHtml(data, lat, lng, activeRouteKey);
-                userMarker.bindPopup(userLocationPopupHtml, {
-                    maxWidth: 300,
-                    minWidth: 230,
-                    className: 'instruction-popup',
-                    autoPan: false
-                }).openPopup();
+                // // REMOVED DUPLICATE UI: Menghapus popup tengah pada lokasi user saat rute aktif
+                // Informasi arah dan metrik evakuasi sudah tersaji di panel navigasi (kiri)
+                // dan popup tujuan menempel pada marker tujuan (nearestMarker).
 
-                // E. Render Panel Navigasi Modern (Tailwind) dengan Panduan Arah
+                // D. Buka Panel Navigasi Modern (Tailwind) dengan Panduan Arah
                 renderNavigationPanel(data, lat, lng, activeRouteKey);
+
+                // E. Aktifkan Tombol Reset Rute
+                const btnReset = document.getElementById('btnResetRoute');
+                if (btnReset) {
+                    btnReset.disabled = false;
+                    btnReset.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
             })
             .catch(err => {
-                console.error('Error fetching hybrid evacuation route:', err);
-                alert("Gagal memuat rute navigasi evakuasi. Silakan periksa koneksi internet atau koordinat.");
-                if (statusElem) {
-                    statusElem.textContent = 'Gagal';
-                    statusElem.className = 'text-[10px] font-semibold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full';
+                if (btnFind) {
+                    btnFind.disabled = false;
+                    btnFind.innerHTML = origBtnFindHtml;
                 }
+                console.error('Error fetching hybrid evacuation route:', err);
+                alert("Gagal memuat rute navigasi evakuasi. Silakan periksa koneksi internet.");
             });
+    }
+
+    // Tombol Cari Titik Kumpul (Panel Kontrol Kanan)
+    document.getElementById('btnFindNearestFacility')?.addEventListener('click', function() {
+        if (!currentUserLat || !currentUserLng) {
+            alert('Silakan aktifkan Posisi Saya terlebih dahulu.');
+            return;
+        }
+        executeFindNearestEvacuation(currentUserLat, currentUserLng);
+    });
+
+    // Proses "Set Lokasi" dari Modal Input Koordinat Manual (Jika Digunakan)
+    document.getElementById('setLocation')?.addEventListener('click', function() {
+        const lat = parseFloat(document.getElementById('lat').value);
+        const lng = parseFloat(document.getElementById('lng').value);
+
+        if (isNaN(lat) || isNaN(lng)) {
+            alert('Silakan masukkan nilai Latitude dan Longitude yang valid.');
+            return;
+        }
+
+        currentUserLat = lat;
+        currentUserLng = lng;
+        isUserPositionActive = true;
+
+        if (userMarker) map.removeLayer(userMarker);
+        const userIcon = L.divIcon({
+            className: 'user-gps-marker',
+            html: '<div class="pulse-ring"></div><div class="dot-center"></div>',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+        });
+        userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
+
+        // Update tombol panel
+        const btnToggle = document.getElementById('btnToggleUserPosition');
+        const textElem = document.getElementById('btnToggleUserPositionText');
+        const btnFind = document.getElementById('btnFindNearestFacility');
+        if (btnToggle) {
+            btnToggle.className = 'w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold py-2.5 px-3 rounded-xl shadow-xs transition-all text-xs flex items-center justify-center gap-2 cursor-pointer';
+        }
+        if (textElem) textElem.textContent = 'Posisi Aktif (Klik utk Matikan)';
+        if (btnFind) {
+            btnFind.disabled = false;
+            btnFind.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        // Jalankan pencarian rute
+        executeFindNearestEvacuation(lat, lng);
     });
 
     // Event Listener Interaktif untuk Panel Navigasi
     document.getElementById('btnOpenInstructionPopup')?.addEventListener('click', function() {
-        if (userMarker) {
-            map.panTo(userMarker.getLatLng());
-            userMarker.openPopup();
+        if (nearestMarker) {
+            map.panTo(nearestMarker.getLatLng());
+            nearestMarker.openPopup();
         }
     });
 
@@ -908,7 +1142,7 @@
     });
 
     document.getElementById('btnResetNavFromPanel')?.addEventListener('click', function() {
-        resetUserLocation();
+        resetEvacuationRoute();
     });
 
     document.getElementById('btnCloseNavPanel')?.addEventListener('click', function() {
