@@ -43,14 +43,50 @@
         </div>
     </div>
 
+    <!-- Modal Uji Coba Cek Kawasan Aman / Rawan Bencana (Input Manual Koordinat) -->
+    <div id="userHazardModal" class="fixed inset-0 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm z-[9999] hidden">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 w-80 md:w-96 relative border border-slate-100">
+            <!-- Tombol Close (X) Modal -->
+            <button id="closeUserHazardModal" type="button" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-xl leading-none">
+                &times;
+            </button>
+
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-base font-bold text-slate-800">Cek Status Kawasan</h2>
+                    <p class="text-xs text-slate-500">Uji coba simulasi koordinat posisi Anda</p>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="hazardLat" class="block text-xs font-semibold text-slate-600 mb-1">Latitude</label>
+                <input type="text" id="hazardLat" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all" value="0.45" placeholder="Contoh: 0.45">
+            </div>
+
+            <div class="mb-5">
+                <label for="hazardLng" class="block text-xs font-semibold text-slate-600 mb-1">Longitude</label>
+                <input type="text" id="hazardLng" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all" value="123.2" placeholder="Contoh: 123.2">
+            </div>
+
+            <button id="btnCheckHazardStatus" type="button" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-semibold py-2.5 rounded-xl shadow-md transition-all text-sm flex items-center justify-center gap-2 cursor-pointer">
+                <span>🛡️ Cek Status Kawasan</span>
+            </button>
+        </div>
+    </div>
+
     <!-- Peta Utama (Diakses Selalu Terbuka) -->
     <div id="map" class="absolute inset-0 h-screen w-screen z-0"></div>
 
     <!-- Panel Navigasi Hybrid Evakuasi -->
     @include('map.partials.navigation-panel')
 
-    <!-- Tombol Pintas Quick Tool (Melayang di Kiri Atas Peta) -->
-     <!-- Untuk tombol aksess modal input manual lokasi langtt dan longldt -->
+    <!-- Tombol Pintas Quick Tool (Melayang di Kanan Atas Peta) -->
+    <!-- Untuk tombol akses modal input manual lokasi dan modal status kawasan -->
     <div class="absolute top-20 right-5 z-50 grid grid-rows-2 gap-2">
         <button id="btnMapLocationTool" title="Input Lokasi Saat Ini" type="button" class="w-9 h-9 bg-white hover:bg-slate-50 text-slate-700 rounded-xl shadow-md border border-slate-200 flex items-center justify-center transition-all hover:scale-105 active:scale-95 group">
             <svg class="w-7 h-7 text-indigo-600 group-hover:text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,8 +94,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
         </button>
-        <!-- Tombol untuk Moadal  untuk custom dengan Posisi Saya -->
-        <button id="btnToggleUserPosition" type="button" class="w-9 h-9 bg-white hover:bg-slate-50 text-slate-700 rounded-xl shadow-md border border-slate-200 flex items-center justify-center transition-all hover:scale-105 active:scale-95 group">
+        <!-- Tombol untuk Modal Status Kawasan Aman / Rawan Bencana -->
+        <button id="btnOpenUserHazardModal" title="Status Kawasan Aman / Rawan Bencana" type="button" class="w-9 h-9 bg-white hover:bg-slate-50 text-slate-700 rounded-xl shadow-md border border-slate-200 flex items-center justify-center transition-all hover:scale-105 active:scale-95 group">
             <svg class="w-5 h-5 text-indigo-600 group-hover:text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
         </button>
     </div>

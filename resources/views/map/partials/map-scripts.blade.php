@@ -86,8 +86,11 @@
     let currentUserLng = null;
     let isUserPositionActive = false;
     let hasPlayedAlert = false;
+    let lastUserRegion = null;
+    let lastUserHazards = null;
+    let isAnalyzingHazards = false;
 
-    // Fungsi Buka Modal (Opsional untuk input koordinat manual)
+    // Fungsi Buka Modal Input Koordinat Manual
     function openLocationModal() {
         const modal = document.getElementById('locationModal');
         if (modal) {
@@ -95,13 +98,107 @@
         }
     }
 
-    // Fungsi Tutup Modal
+    // Fungsi Tutup Modal Input Koordinat Manual
     function closeLocationModal() {
         const modal = document.getElementById('locationModal');
         if (modal) {
             modal.classList.add('hidden');
         }
         invalidateMapSize();
+    }
+
+    // =====================================================================
+    // MANAJEMEN MODAL UJI COBA INPUT KOORDINAT CEK KAWASAN (TESTING SIMULASI)
+    // =====================================================================
+    function openUserHazardModal() {
+        const modal = document.getElementById('userHazardModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            const inputLat = document.getElementById('hazardLat');
+            const inputLng = document.getElementById('hazardLng');
+            if (currentUserLat && inputLat) inputLat.value = currentUserLat.toFixed(6);
+            if (currentUserLng && inputLng) inputLng.value = currentUserLng.toFixed(6);
+        }
+    }
+
+    function closeUserHazardModal() {
+        const modal = document.getElementById('userHazardModal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+        invalidateMapSize();
+    }
+
+    // Fungsi Pengujian & Analisis Lokasi Simulasi (Cek Kawasan Aman / Rawan Bencana)
+    async function executeCheckHazardStatus(lat, lng) {
+        closeUserHazardModal();
+
+        currentUserLat = lat;
+        currentUserLng = lng;
+        isUserPositionActive = true;
+
+        // Sinkronisasi input form pada modal rute manual
+        const inputRouteLat = document.getElementById('lat');
+        const inputRouteLng = document.getElementById('lng');
+        if (inputRouteLat) inputRouteLat.value = lat.toFixed(6);
+        if (inputRouteLng) inputRouteLng.value = lng.toFixed(6);
+
+        // Buat Marker Lokasi User (Radar Pulsing)
+        if (userMarker) map.removeLayer(userMarker);
+        const userIcon = L.divIcon({
+            className: 'user-gps-marker',
+            html: '<div class="pulse-ring"></div><div class="dot-center"></div>',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+        });
+
+        userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
+
+        // Pasang popup loading sementara di peta
+        userMarker.bindPopup(`
+            <div style="padding:10px 14px;font-size:11px;font-weight:600;color:#334155;display:flex;align-items:center;gap:6px;">
+                <svg class="animate-spin h-3.5 w-3.5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <span>Menganalisis status kawasan aman/rawan...</span>
+            </div>
+        `, { className: 'user-risk-popup' }).openPopup();
+
+        map.panTo([lat, lng]);
+
+        // Update tombol panel kontrol kanan agar tombol Cari Titik Kumpul aktif
+        const btnToggle = document.getElementById('btnToggleUserPosition');
+        const textElem = document.getElementById('btnToggleUserPositionText');
+        const btnFind = document.getElementById('btnFindNearestFacility');
+        if (btnToggle) {
+            btnToggle.className = 'w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold py-2.5 px-3 rounded-xl shadow-xs transition-all text-xs flex items-center justify-center gap-2 cursor-pointer';
+        }
+        if (textElem) textElem.textContent = 'Posisi Aktif (Klik utk Matikan)';
+        if (btnFind) {
+            btnFind.disabled = false;
+            btnFind.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        // Jalankan Analisis Multi-Hazard & Identifikasi Wilayah
+        try {
+            const [region, matchedHazards] = await Promise.all([
+                identifyUserRegion(lat, lng),
+                collectAllHazardMatches(lat, lng)
+            ]);
+
+            lastUserRegion = region;
+            lastUserHazards = matchedHazards;
+
+            // Buka Popup Status Aman / Rawan Bencana langsung di titik marker user
+            const popupHtml = buildUserRiskPopupHtml(region, matchedHazards);
+            userMarker.bindPopup(popupHtml, { className: 'user-risk-popup', maxWidth: 280 }).openPopup();
+        } catch (e) {
+            console.error('Error saat analisis multi hazard:', e);
+            userMarker.bindPopup(`
+                <div style="padding:10px 12px;font-size:11px;color:#0f172a;">
+                    <b>📍 POSISI SAYA</b><br>
+                    Koordinat: ${lat.toFixed(5)}, ${lng.toFixed(5)}
+                </div>
+            `, { className: 'user-risk-popup' }).openPopup();
+        }
     }
 
     // =====================================================================
@@ -407,6 +504,8 @@
             isUserPositionActive = false;
             currentUserLat = null;
             currentUserLng = null;
+            lastUserRegion = null;
+            lastUserHazards = null;
 
             if (textElem) textElem.textContent = 'Posisi Saya';
             if (btnToggle) {
@@ -472,6 +571,9 @@
                         collectAllHazardMatches(lat, lng)
                     ]);
 
+                    lastUserRegion = region;
+                    lastUserHazards = matchedHazards;
+
                     // Update Popup Lokasi User dengan Hasil Analisis Multi Hazard
                     const popupHtml = buildUserRiskPopupHtml(region, matchedHazards);
                     userMarker.bindPopup(popupHtml, { className: 'user-risk-popup', maxWidth: 280 }).openPopup();
@@ -534,6 +636,26 @@
     document.getElementById('closeLocationModal')?.addEventListener('click', closeLocationModal);
     document.getElementById('locationModal')?.addEventListener('click', function (e) {
         if (e.target.id === 'locationModal') closeLocationModal();
+    });
+
+    // Event Listener Modal Informasi Status Kawasan (Aman / Rawan Bencana)
+    document.getElementById('btnOpenUserHazardModal')?.addEventListener('click', openUserHazardModal);
+    document.getElementById('closeUserHazardModal')?.addEventListener('click', closeUserHazardModal);
+    document.getElementById('userHazardModal')?.addEventListener('click', function (e) {
+        if (e.target.id === 'userHazardModal') closeUserHazardModal();
+    });
+
+    // Event Listener Tombol Cek Status Kawasan (Uji Coba Input Manual)
+    document.getElementById('btnCheckHazardStatus')?.addEventListener('click', function() {
+        const lat = parseFloat(document.getElementById('hazardLat').value);
+        const lng = parseFloat(document.getElementById('hazardLng').value);
+
+        if (isNaN(lat) || isNaN(lng)) {
+            alert('Silakan masukkan nilai Latitude dan Longitude yang valid untuk uji coba.');
+            return;
+        }
+
+        executeCheckHazardStatus(lat, lng);
     });
 
     // Helper render icon SVG instruksi navigasi
@@ -1122,6 +1244,21 @@
             btnFind.disabled = false;
             btnFind.classList.remove('opacity-50', 'cursor-not-allowed');
         }
+
+        // Jalankan Analisis Multi-Hazard & Identifikasi Wilayah untuk koordinat manual
+        Promise.all([
+            identifyUserRegion(lat, lng),
+            collectAllHazardMatches(lat, lng)
+        ]).then(([region, matchedHazards]) => {
+            lastUserRegion = region;
+            lastUserHazards = matchedHazards;
+            if (userMarker) {
+                const popupHtml = buildUserRiskPopupHtml(region, matchedHazards);
+                userMarker.bindPopup(popupHtml, { className: 'user-risk-popup', maxWidth: 280 });
+            }
+        }).catch(err => {
+            console.error('Error analisis multi hazard manual:', err);
+        });
 
         // Jalankan pencarian rute
         executeFindNearestEvacuation(lat, lng);
