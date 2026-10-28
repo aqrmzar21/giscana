@@ -46,9 +46,8 @@
                         </div>
                     </div>
                     {{-- Desa/Bencana --}}
-                    <!-- <
                     <div>
-                         label for="village_id" class="block text-sm font-medium text-gray-700">Desa / Wilayah Bencana <span class="text-red-500">*</span></label>
+                        <label for="village_id" class="block text-sm font-medium text-gray-700">Desa / Wilayah Bencana <span class="text-red-500">*</span></label>
                         <div class="mt-1">
                             <select id="village_id" name="village_id" required
                                     class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('village_id') border-red-300 @enderror">
@@ -64,7 +63,6 @@
                             @enderror
                         </div> 
                     </div>
-                    -->
                      
                 </div>
                 

@@ -59,7 +59,7 @@
                         <div class="mt-1">
                             <select id="district_id" name="district_id" required
                                     class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('district_id') border-red-300 @enderror">
-                                <option value="">Pilih Kecamatan</option>
+                                <option value="" hidden>Pilih Kecamatan</option>
                                 @foreach($districts as $district)
                                     <option value="{{ $district->id }}" {{ (string) $selectedDistrictId === (string) $district->id ? 'selected' : '' }}>
                                         {{ $district->name }}
@@ -76,7 +76,7 @@
                         <div class="mt-1">
                             <select id="village_id" name="village_id" required
                                     class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('village_id') border-red-300 @enderror">
-                                <option value="">Pilih Desa/Kelurahan</option>
+                                <option value="" hidden>Pilih Desa/Kelurahan</option>
                                 @foreach($districts as $district)
                                     @foreach($district->villages as $village)
                                         <option value="{{ $village->id }}" data-district-id="{{ $district->id }}"
