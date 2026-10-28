@@ -91,25 +91,6 @@ Giscana is a comprehensive disaster management system that focuses on natural di
    php artisan serve
    ```
 
-# GISCANA_PROJECT_FRAMEWORK.md
-
-Dokumen panduan arsitektur, skema basis data, logika bisnis, dan standar UI/UX untuk proyek **GIScana (Sistem Informasi Geografis & Manajemen Bantuan Bencana Bone Bolango)**. Dokumen ini dapat digunakan sebagai berkas patokan (*context standard*) untuk pengembang maupun kolaborator AI (seperti Claude, ChatGPT, atau Gemini).
-
-
-
-## Usage
-
-### For Public Users
-1. Visit the main page to view the interactive map
-2. Use filters to view specific disaster types or risk levels
-3. Click on map features to view detailed information
-4. Use the search functionality to find specific locations
-
-### For BPBD Staff and Administrators
-1. Log in to access data management features
-2. Use the API endpoints to manage spatial data
-3. Update evacuation routes and facility information
-4. Monitor aid distribution points
 
 ## Development
 

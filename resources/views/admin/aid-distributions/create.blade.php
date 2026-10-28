@@ -35,7 +35,10 @@
                                     class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_disaster_id') border-red-300 @enderror">
                                 <option value="" hidden>-- Pilih Kecamatan --</option>
                                 @foreach($aidDisasters as $disaster)
-                                    <option value="{{ $disaster->id }}" {{ old('aid_disaster_id') == $disaster->id ? 'selected' : '' }}>
+                                    <option value="{{ $disaster->id }}"
+                                        data-district-id="{{ $disaster->district_id ?? $disaster->district?->id ?? '' }}"
+                                        data-district-name="{{ strtolower(trim($disaster->district_name)) }}"
+                                        {{ old('aid_disaster_id') == $disaster->id ? 'selected' : '' }}>
                                         {{ $disaster->district_name }}
                                     </option>
                                 @endforeach
@@ -52,9 +55,12 @@
                             <select id="village_id" name="village_id" required
                                     class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('village_id') border-red-300 @enderror">
                                 <option value="" hidden>-- Pilih Desa --</option>
-                                @foreach($aidDisasters as $disaster)
-                                    <option value="{{ $disaster->id }}" {{ old('village_id') == $disaster->id ? 'selected' : '' }}>
-                                        {{ $disaster->zone }}
+                                @foreach($villages as $village)
+                                    <option value="{{ $village->id }}"
+                                        data-district-id="{{ $village->district_id }}"
+                                        data-district-name="{{ strtolower(trim($village->district?->name ?? '')) }}"
+                                        {{ old('village_id') == $village->id ? 'selected' : '' }}>
+                                        {{ $village->full_name ?? $village->yard }}
                                     </option>
                                 @endforeach
                             </select>
@@ -76,11 +82,13 @@
                                 <option value="" hidden>-- Pilih Warga --</option>
                                 @foreach($beneficiaries as $beneficiary)
                                     <option value="{{ $beneficiary->id }}"
-                                    data-status="{{ $beneficiary->aid_status }}"
-                                    data-village="{{ $beneficiary->village?->yard ?? '-' }}"
-                                    data-district="{{ $beneficiary->district?->name ?? '-' }}"
-                                    {{ old('beneficiary_id') == $beneficiary->id ? 'selected' : '' }}>
-                                    {{ $beneficiary->recipient_name }}
+                                        data-village-id="{{ $beneficiary->village_id }}"
+                                        data-district-id="{{ $beneficiary->district_id ?? $beneficiary->village?->district_id ?? '' }}"
+                                        data-status="{{ $beneficiary->aid_status }}"
+                                        data-village="{{ $beneficiary->village?->yard ?? '-' }}"
+                                        data-district="{{ $beneficiary->district?->name ?? '-' }}"
+                                        {{ old('beneficiary_id') == $beneficiary->id ? 'selected' : '' }}>
+                                        {{ $beneficiary->recipient_name }}
                                     </option>                        
                                 @endforeach
                             </select>
@@ -197,7 +205,7 @@ function updateStockInfo(select) {
 function updateBeneficiaryInfo(select) {
     const option = select.options[select.selectedIndex];
     const info = document.getElementById('beneficiary-info');
-    if (option && option.dataset.status !== undefined) {
+    if (option && option.value && option.dataset.status !== undefined) {
         const status = option.dataset.status;
         const village = option.dataset.village;
         const district = option.dataset.district;
@@ -213,17 +221,113 @@ function updateBeneficiaryInfo(select) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const selBeneficiary = document.getElementById('beneficiary_id');
-    if (selBeneficiary) {
-        selBeneficiary.addEventListener('change', () => updateBeneficiaryInfo(selBeneficiary));
-        updateBeneficiaryInfo(selBeneficiary);
+    const disasterSelect = document.getElementById('aid_disaster_id');
+    const villageSelect = document.getElementById('village_id');
+    const beneficiarySelect = document.getElementById('beneficiary_id');
+    const stockSelect = document.getElementById('aid_inventory_id');
+
+    const villageOptions = villageSelect ? Array.from(villageSelect.querySelectorAll('option[data-district-id]')) : [];
+    const beneficiaryOptions = beneficiarySelect ? Array.from(beneficiarySelect.querySelectorAll('option[data-village-id]')) : [];
+
+    function filterVillages(keepSelection = false) {
+        if (!disasterSelect || !villageSelect) return;
+
+        const selOption = disasterSelect.options[disasterSelect.selectedIndex];
+        const districtId = selOption ? (selOption.dataset.districtId || '') : '';
+        const districtName = selOption ? (selOption.dataset.districtName || '').toLowerCase().trim() : '';
+
+        let validSelected = false;
+
+        villageOptions.forEach(opt => {
+            const matches = Boolean(
+                (districtId && opt.dataset.districtId === districtId) ||
+                (!districtId && districtName && opt.dataset.districtName && opt.dataset.districtName === districtName)
+            );
+
+            opt.hidden = !matches;
+            opt.disabled = !matches;
+            opt.style.display = matches ? '' : 'none';
+
+            if (matches && opt.value === villageSelect.value) {
+                validSelected = true;
+            }
+        });
+
+        if (!districtId && !districtName) {
+            villageSelect.options[0].textContent = '-- Pilih Kecamatan Terlebih Dahulu --';
+        } else {
+            villageSelect.options[0].textContent = '-- Pilih Desa --';
+        }
+
+        if (!keepSelection || !validSelected) {
+            if (!validSelected) {
+                villageSelect.value = '';
+            }
+        }
+
+        filterBeneficiaries(keepSelection);
     }
 
-    const selStock = document.getElementById('aid_inventory_id');
-    if (selStock) {
-        selStock.addEventListener('change', () => updateStockInfo(selStock));
-        updateStockInfo(selStock);
+    function filterBeneficiaries(keepSelection = false) {
+        if (!villageSelect || !beneficiarySelect) return;
+
+        const selectedVillageId = villageSelect.value;
+        let validSelected = false;
+
+        beneficiaryOptions.forEach(opt => {
+            const matches = Boolean(selectedVillageId && opt.dataset.villageId === selectedVillageId);
+
+            opt.hidden = !matches;
+            opt.disabled = !matches;
+            opt.style.display = matches ? '' : 'none';
+
+            if (matches && opt.value === beneficiarySelect.value) {
+                validSelected = true;
+            }
+        });
+
+        if (!selectedVillageId) {
+            beneficiarySelect.options[0].textContent = '-- Pilih Desa Terlebih Dahulu --';
+        } else {
+            beneficiarySelect.options[0].textContent = '-- Pilih Warga --';
+        }
+
+        if (!keepSelection || !validSelected) {
+            if (!validSelected) {
+                beneficiarySelect.value = '';
+            }
+        }
+
+        updateBeneficiaryInfo(beneficiarySelect);
     }
+
+    if (disasterSelect) {
+        disasterSelect.addEventListener('change', function() {
+            filterVillages(false);
+        });
+    }
+
+    if (villageSelect) {
+        villageSelect.addEventListener('change', function() {
+            filterBeneficiaries(false);
+        });
+    }
+
+    if (beneficiarySelect) {
+        beneficiarySelect.addEventListener('change', function() {
+            updateBeneficiaryInfo(beneficiarySelect);
+        });
+    }
+
+    if (stockSelect) {
+        stockSelect.addEventListener('change', function() {
+            updateStockInfo(stockSelect);
+        });
+        updateStockInfo(stockSelect);
+    }
+
+    // Inisialisasi awal
+    filterVillages(true);
 });
 </script>
 @endpush

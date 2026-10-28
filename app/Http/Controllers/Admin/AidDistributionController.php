@@ -8,6 +8,8 @@ use App\Models\AidBeneficiary;
 use App\Models\AidDisaster;
 use App\Models\AidDistribution;
 use App\Models\AidInventory;
+use App\Models\District;
+use App\Models\Village;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -132,9 +134,23 @@ class AidDistributionController extends Controller
             ->orderBy('recipient_name')
             ->get();
         $inventories  = AidInventory::active()->where('remaining_stock', '>', 0)->orderBy('item_name')->get();
-        $aidDisasters = AidDisaster::where('is_active', true)->orderBy('district_name')->get();
+        $aidDisasters = AidDisaster::with('district')->where('is_active', true)->orderBy('district_name')->get();
 
-        return $this->partialView('admin.aid-distributions.create', compact('beneficiaries', 'inventories', 'aidDisasters'));
+        // Pastikan relasi district_id terisi jika sebelumnya hanya ada district_name
+        foreach ($aidDisasters as $ad) {
+            if (!$ad->district_id) {
+                $d = District::where('name', $ad->district_name)->first();
+                if ($d) {
+                    $ad->district_id = $d->id;
+                    $ad->save();
+                    $ad->setRelation('district', $d);
+                }
+            }
+        }
+
+        $villages = Village::with('district')->orderBy('yard')->get();
+
+        return $this->partialView('admin.aid-distributions.create', compact('beneficiaries', 'inventories', 'aidDisasters', 'villages'));
     }
 
     public function store(Request $request)
@@ -143,6 +159,7 @@ class AidDistributionController extends Controller
             'beneficiary_id'    => 'required|exists:aid_beneficiaries,id',
             'aid_inventory_id'  => 'required|exists:aid_inventories,id',
             'aid_disaster_id'   => 'required|exists:aid_disasters,id',
+            'village_id'        => 'required|exists:villages,id',
             'quantity_received' => 'required|integer|min:1',
             'distribution_date' => 'required|date',
             'description'       => 'nullable|string|max:1000',
@@ -177,7 +194,7 @@ class AidDistributionController extends Controller
             AidDistribution::create([
                 'beneficiary_id'    => $beneficiary->id,
                 'aid_inventory_id'  => $stock->id,
-                'village_id'        => $beneficiary->village_id,
+                'village_id'        => $validated['village_id'] ?? $beneficiary->village_id,
                 'aid_disaster_id'   => $aidDisaster->id,
                 'quantity_received' => $validated['quantity_received'],
                 'distribution_date' => $validated['distribution_date'],
@@ -208,13 +225,27 @@ class AidDistributionController extends Controller
     public function edit(AidDistribution $aidDistribution)
     {
         abort_if(!auth()->user()->can('update data'), 403);
-        $aidDistribution->load(['beneficiary', 'aidInventory', 'aidDisaster']);
+        $aidDistribution->load(['beneficiary.village.district', 'aidInventory', 'aidDisaster.district']);
 
         $beneficiaries = AidBeneficiary::with(['village.district'])->orderBy('recipient_name')->get();
         $inventories   = AidInventory::active()->orderBy('item_name')->get();
-        $aidDisasters  = AidDisaster::orderBy('district_name')->get();
+        $aidDisasters  = AidDisaster::with('district')->orderBy('district_name')->get();
 
-        return $this->partialView('admin.aid-distributions.edit', compact('aidDistribution', 'beneficiaries', 'inventories', 'aidDisasters'));
+        // Pastikan relasi district_id terisi jika sebelumnya hanya ada district_name
+        foreach ($aidDisasters as $ad) {
+            if (!$ad->district_id) {
+                $d = District::where('name', $ad->district_name)->first();
+                if ($d) {
+                    $ad->district_id = $d->id;
+                    $ad->save();
+                    $ad->setRelation('district', $d);
+                }
+            }
+        }
+
+        $villages = Village::with('district')->orderBy('yard')->get();
+
+        return $this->partialView('admin.aid-distributions.edit', compact('aidDistribution', 'beneficiaries', 'inventories', 'aidDisasters', 'villages'));
     }
 
     public function update(Request $request, AidDistribution $aidDistribution)
@@ -225,6 +256,7 @@ class AidDistributionController extends Controller
             'beneficiary_id'    => 'required|exists:aid_beneficiaries,id',
             'aid_inventory_id'  => 'required|exists:aid_inventories,id',
             'aid_disaster_id'   => 'required|exists:aid_disasters,id',
+            'village_id'        => 'required|exists:villages,id',
             'quantity_received' => 'required|integer|min:1',
             'distribution_date' => 'required|date',
             'description'       => 'nullable|string|max:1000',
@@ -277,7 +309,7 @@ class AidDistributionController extends Controller
             $aidDistribution->update([
                 'beneficiary_id'    => $newBeneficiary->id,
                 'aid_inventory_id'  => $newStock->id,
-                'village_id'        => $newBeneficiary->village_id,
+                'village_id'        => $validated['village_id'] ?? $newBeneficiary->village_id,
                 'aid_disaster_id'   => $newAidDisaster->id,
                 'quantity_received' => $validated['quantity_received'],
                 'distribution_date' => $validated['distribution_date'],

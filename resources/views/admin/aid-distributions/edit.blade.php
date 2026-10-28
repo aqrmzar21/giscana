@@ -27,72 +27,111 @@
             @method('PUT')
             <div class="space-y-6">
 
-                {{-- Kecamatan/Bencana --}}
-                <div>
-                    <label for="aid_disaster_id" class="block text-sm font-medium text-gray-700">Kecamatan / Wilayah Bencana <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <select id="aid_disaster_id" name="aid_disaster_id" required
-                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_disaster_id') border-red-300 @enderror">
-                            <option value="" hidden>-- Pilih Kecamatan --</option>
-                            @foreach($aidDisasters as $disaster)
-                                <option value="{{ $disaster->id }}"
-                                    {{ old('aid_disaster_id', $aidDistribution->aid_disaster_id) == $disaster->id ? 'selected' : '' }}>
-                                    {{ $disaster->district_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('aid_disaster_id')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                {{-- Warga Penerima --}}
-                <div>
-                    <label for="beneficiary_id" class="block text-sm font-medium text-gray-700">Warga Penerima Bantuan <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <select id="beneficiary_id" name="beneficiary_id" required
-                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('beneficiary_id') border-red-300 @enderror">
-                            <option value="" hidden>-- Pilih Warga --</option>
-                            @foreach($beneficiaries as $beneficiary)
-                                <option value="{{ $beneficiary->id }}"
-                                    {{ old('beneficiary_id', $aidDistribution->beneficiary_id) == $beneficiary->id ? 'selected' : '' }}>
-                                    {{ $beneficiary->recipient_name }}
-                                    ({{ $beneficiary->village?->full_name ?? '-' }}, {{ $beneficiary->district?->name ?? '-' }})
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('beneficiary_id')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                {{-- Barang Logistik --}}
-                <div>
-                    <label for="aid_inventory_id" class="block text-sm font-medium text-gray-700">Barang Logistik <span class="text-red-500">*</span></label>
-                    <div class="mt-1">
-                        <select id="aid_inventory_id" name="aid_inventory_id" required
-                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_inventory_id') border-red-300 @enderror"
-                                onchange="updateStockInfo(this)">
-                            <option value="" hidden>-- Pilih Barang --</option>
-                            @foreach($inventories as $inventory)
-                                <option value="{{ $inventory->id }}"
-                                        data-stock="{{ $inventory->remaining_stock }}"
-                                        {{ old('aid_inventory_id', $aidDistribution->aid_inventory_id) == $inventory->id ? 'selected' : '' }}>
-                                    {{ $inventory->item_name }} ({{ $inventory->category }}) — Sisa: {{ number_format($inventory->remaining_stock) }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <p id="stock-info" class="mt-1 text-sm text-gray-500"></p>
-                        @error('aid_inventory_id')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                {{-- Jumlah & Tanggal --}}
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    {{-- Kecamatan/Bencana --}}
+                    <div>
+                        <label for="aid_disaster_id" class="block text-sm font-medium text-gray-700">Kecamatan / Wilayah Bencana <span class="text-red-500">*</span></label>
+                        <div class="mt-1">
+                            <select id="aid_disaster_id" name="aid_disaster_id" required
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_disaster_id') border-red-300 @enderror">
+                                <option value="" hidden>-- Pilih Kecamatan --</option>
+                                @foreach($aidDisasters as $disaster)
+                                    <option value="{{ $disaster->id }}"
+                                        data-district-id="{{ $disaster->district_id ?? $disaster->district?->id ?? '' }}"
+                                        data-district-name="{{ strtolower(trim($disaster->district_name)) }}"
+                                        {{ old('aid_disaster_id', $aidDistribution->aid_disaster_id) == $disaster->id ? 'selected' : '' }}>
+                                        {{ $disaster->district_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('aid_disaster_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Desa/Bencana --}}
+                    <div>
+                        <label for="village_id" class="block text-sm font-medium text-gray-700">Desa / Wilayah Bencana <span class="text-red-500">*</span></label>
+                        <div class="mt-1">
+                            @php
+                                $selectedVillageId = old('village_id', $aidDistribution->village_id ?? $aidDistribution->beneficiary?->village_id);
+                            @endphp
+                            <select id="village_id" name="village_id" required
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('village_id') border-red-300 @enderror">
+                                <option value="" hidden>-- Pilih Desa --</option>
+                                @foreach($villages as $village)
+                                    <option value="{{ $village->id }}"
+                                        data-district-id="{{ $village->district_id }}"
+                                        data-district-name="{{ strtolower(trim($village->district?->name ?? '')) }}"
+                                        {{ (string) $selectedVillageId === (string) $village->id ? 'selected' : '' }}>
+                                        {{ $village->full_name ?? $village->yard }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('village_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    {{-- Warga Penerima --}}
+                    <div>
+                        <label for="beneficiary_id" class="block text-sm font-medium text-gray-700">Warga Penerima Bantuan <span class="text-red-500">*</span></label>
+                        <div class="mt-1">
+                            <select id="beneficiary_id" name="beneficiary_id" required
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('beneficiary_id') border-red-300 @enderror">
+                                <option value="" hidden>-- Pilih Warga --</option>
+                                @foreach($beneficiaries as $beneficiary)
+                                    <option value="{{ $beneficiary->id }}"
+                                        data-village-id="{{ $beneficiary->village_id }}"
+                                        data-district-id="{{ $beneficiary->district_id ?? $beneficiary->village?->district_id ?? '' }}"
+                                        data-status="{{ $beneficiary->aid_status }}"
+                                        data-village="{{ $beneficiary->village?->yard ?? '-' }}"
+                                        data-district="{{ $beneficiary->district?->name ?? '-' }}"
+                                        {{ old('beneficiary_id', $aidDistribution->beneficiary_id) == $beneficiary->id ? 'selected' : '' }}>
+                                        {{ $beneficiary->recipient_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p id="beneficiary-info" class="mt-1 text-sm text-gray-600 font-medium"></p>
+                            @error('beneficiary_id')
+                                <p class="text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Barang Logistik --}}
+                    <div>
+                        <label for="aid_inventory_id" class="block text-sm font-medium text-gray-700">Barang Logistik <span class="text-red-500">*</span></label>
+                        <div class="mt-1">
+                            <select id="aid_inventory_id" name="aid_inventory_id" required
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_inventory_id') border-red-300 @enderror"
+                                    onchange="updateStockInfo(this)">
+                                <option value="" hidden>-- Pilih Barang --</option>
+                                @foreach($inventories as $inventory)
+                                    @php
+                                        $isCurrentItem = $inventory->id == $aidDistribution->aid_inventory_id;
+                                        $effectiveStock = $isCurrentItem ? ($inventory->remaining_stock + $aidDistribution->quantity_received) : $inventory->remaining_stock;
+                                    @endphp
+                                    <option value="{{ $inventory->id }}"
+                                            data-stock="{{ $effectiveStock }}"
+                                            data-category="{{ $inventory->category }}"
+                                            {{ old('aid_inventory_id', $aidDistribution->aid_inventory_id) == $inventory->id ? 'selected' : '' }}>
+                                        {{ $inventory->item_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p id="stock-info" class="text-xs text-gray-500"></p>
+                            @error('aid_inventory_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Jumlah & Tanggal --}}
                     <div>
                         <label for="quantity_received" class="block text-sm font-medium text-gray-700">Jumlah Diterima <span class="text-red-500">*</span></label>
                         <div class="mt-1">
@@ -149,15 +188,148 @@ function updateStockInfo(select) {
     const stockInfo = document.getElementById('stock-info');
     if (option && option.dataset.stock !== undefined) {
         const stock = parseInt(option.dataset.stock);
-        stockInfo.textContent = 'Sisa stok tersedia: ' + stock.toLocaleString('id-ID') + ' unit';
-        stockInfo.className = stock > 0 ? 'mt-1 text-sm text-green-600 font-medium' : 'mt-1 text-sm text-red-600 font-medium';
+        const category = option.dataset.category;
+
+        let text = `<span class="text-black">Kategori: ${category}</span>`;
+        if (stock > 0) {
+            text += ` | <span class="text-green-600 font-medium">Sisa stok: ${stock.toLocaleString('id-ID')} unit</span>`;
+        } else {
+            text += ` | <span class="text-red-600 font-medium">Sisa stok: ${stock.toLocaleString('id-ID')} unit</span>`;
+        }
+
+        stockInfo.innerHTML = text;
+        stockInfo.className = 'text-xs';
     } else {
         stockInfo.textContent = '';
     }
 }
+
+function updateBeneficiaryInfo(select) {
+    const option = select.options[select.selectedIndex];
+    const info = document.getElementById('beneficiary-info');
+    if (option && option.value && option.dataset.status !== undefined) {
+        const status = option.dataset.status;
+        const village = option.dataset.village;
+        const district = option.dataset.district;
+        let text = `Desa: ${village}, Kecamatan: ${district}`;
+        if (status === 'received') {
+            text += ` | <span class="text-green-600 font-medium">Sudah menerima bantuan</span>`;
+        }
+        info.innerHTML = text;
+        info.className = 'text-xs text-gray-600 font-medium';
+    } else {
+        info.textContent = '';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    const sel = document.getElementById('aid_inventory_id');
-    if (sel) updateStockInfo(sel);
+    const disasterSelect = document.getElementById('aid_disaster_id');
+    const villageSelect = document.getElementById('village_id');
+    const beneficiarySelect = document.getElementById('beneficiary_id');
+    const stockSelect = document.getElementById('aid_inventory_id');
+
+    const villageOptions = villageSelect ? Array.from(villageSelect.querySelectorAll('option[data-district-id]')) : [];
+    const beneficiaryOptions = beneficiarySelect ? Array.from(beneficiarySelect.querySelectorAll('option[data-village-id]')) : [];
+
+    function filterVillages(keepSelection = false) {
+        if (!disasterSelect || !villageSelect) return;
+
+        const selOption = disasterSelect.options[disasterSelect.selectedIndex];
+        const districtId = selOption ? (selOption.dataset.districtId || '') : '';
+        const districtName = selOption ? (selOption.dataset.districtName || '').toLowerCase().trim() : '';
+
+        let validSelected = false;
+
+        villageOptions.forEach(opt => {
+            const matches = Boolean(
+                (districtId && opt.dataset.districtId === districtId) ||
+                (!districtId && districtName && opt.dataset.districtName && opt.dataset.districtName === districtName)
+            );
+
+            opt.hidden = !matches;
+            opt.disabled = !matches;
+            opt.style.display = matches ? '' : 'none';
+
+            if (matches && opt.value === villageSelect.value) {
+                validSelected = true;
+            }
+        });
+
+        if (!districtId && !districtName) {
+            villageSelect.options[0].textContent = '-- Pilih Kecamatan Terlebih Dahulu --';
+        } else {
+            villageSelect.options[0].textContent = '-- Pilih Desa --';
+        }
+
+        if (!keepSelection || !validSelected) {
+            if (!validSelected) {
+                villageSelect.value = '';
+            }
+        }
+
+        filterBeneficiaries(keepSelection);
+    }
+
+    function filterBeneficiaries(keepSelection = false) {
+        if (!villageSelect || !beneficiarySelect) return;
+
+        const selectedVillageId = villageSelect.value;
+        let validSelected = false;
+
+        beneficiaryOptions.forEach(opt => {
+            const matches = Boolean(selectedVillageId && opt.dataset.villageId === selectedVillageId);
+
+            opt.hidden = !matches;
+            opt.disabled = !matches;
+            opt.style.display = matches ? '' : 'none';
+
+            if (matches && opt.value === beneficiarySelect.value) {
+                validSelected = true;
+            }
+        });
+
+        if (!selectedVillageId) {
+            beneficiarySelect.options[0].textContent = '-- Pilih Desa Terlebih Dahulu --';
+        } else {
+            beneficiarySelect.options[0].textContent = '-- Pilih Warga --';
+        }
+
+        if (!keepSelection || !validSelected) {
+            if (!validSelected) {
+                beneficiarySelect.value = '';
+            }
+        }
+
+        updateBeneficiaryInfo(beneficiarySelect);
+    }
+
+    if (disasterSelect) {
+        disasterSelect.addEventListener('change', function() {
+            filterVillages(false);
+        });
+    }
+
+    if (villageSelect) {
+        villageSelect.addEventListener('change', function() {
+            filterBeneficiaries(false);
+        });
+    }
+
+    if (beneficiarySelect) {
+        beneficiarySelect.addEventListener('change', function() {
+            updateBeneficiaryInfo(beneficiarySelect);
+        });
+    }
+
+    if (stockSelect) {
+        stockSelect.addEventListener('change', function() {
+            updateStockInfo(stockSelect);
+        });
+        updateStockInfo(stockSelect);
+    }
+
+    // Inisialisasi awal dengan mempertahankan data yang sudah terpilih
+    filterVillages(true);
 });
 </script>
 @endpush
