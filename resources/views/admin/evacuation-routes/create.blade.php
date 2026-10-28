@@ -34,7 +34,7 @@
                         <div class="mt-1">
                             <select name="evacuation_facility_id" id="evacuation_facility_id"
                                 class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('evacuation_facility_id') border-red-300 @enderror">
-                                <option value="">-- Pilih Fasilitas Evakuasi --</option>
+                                <option value="" hidden>-- Pilih Fasilitas Evakuasi --</option>
                                 @foreach($facilities as $f)
                                     <option value="{{ $f->id }}"
                                         data-coords='@json($f->point_coordinates)'
@@ -64,7 +64,7 @@
                         <label for="route_type" class="block text-sm font-medium text-gray-700">Tipe Rute <span class="text-red-500">*</span></label>
                         <div class="mt-1">
                             <select id="route_type" name="route_type" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('route_type') border-red-300 @enderror">
-                                <option value="">Pilih Tipe Rute</option>
+                                <option value="" hidden>Pilih Tipe Rute</option>
                                 <option value="primary" {{ old('route_type') === 'primary' ? 'selected' : '' }}>Utama</option>
                                 <option value="secondary" {{ old('route_type') === 'secondary' ? 'selected' : '' }}>Sekunder</option>
                                 <option value="emergency" {{ old('route_type') === 'emergency' ? 'selected' : '' }}>Darurat</option>

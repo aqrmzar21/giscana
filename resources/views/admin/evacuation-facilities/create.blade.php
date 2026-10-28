@@ -30,7 +30,7 @@
                     <label for="aid_disaster_id" class="block text-sm font-medium text-gray-700">Kecamatan (Bantuan Bencana)</label>
                     <div class="mt-1">
                         <select name="aid_disaster_id" id="aid_disaster_id" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('aid_disaster_id') border-red-300 @enderror">
-                            <option value="">-- Pilih Kecamatan --</option>
+                            <option value="" hidden>-- Pilih Kecamatan --</option>
                             @foreach($aidDisasters as $ad)
                                 <option value="{{ $ad->id }}" {{ old('aid_disaster_id') == $ad->id ? 'selected' : '' }}>{{ $ad->district_name }}</option>
                             @endforeach
