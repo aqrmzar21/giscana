@@ -389,32 +389,6 @@
         // Highlight kartu yang aktif vs nonaktif
         const btnPublic = document.getElementById('btnSelectRoutePublic');
         const badgePublic = document.getElementById('badgeActivePublic');
-        const btnBpbd = document.getElementById('btnSelectRouteBpbd');
-        const badgeBpbd = document.getElementById('badgeActiveBpbd');
-
-        if (btnPublic && badgePublic) {
-            if (isPublic) {
-                btnPublic.className = 'p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-blue-50/80 dark:bg-blue-950/40 border-blue-500 ring-2 ring-blue-400/50 shadow-md';
-                badgePublic.textContent = 'Aktif ✓';
-                badgePublic.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-600 text-white';
-            } else {
-                btnPublic.className = 'p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-400 opacity-75';
-                badgePublic.textContent = 'Pilih';
-                badgePublic.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300';
-            }
-        }
-
-        if (btnBpbd && badgeBpbd) {
-            if (isBpbd) {
-                btnBpbd.className = 'p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-purple-50/80 dark:bg-purple-950/40 border-purple-500 ring-2 ring-purple-400/50 shadow-md';
-                badgeBpbd.textContent = 'Aktif ✓';
-                badgeBpbd.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-purple-600 text-white';
-            } else {
-                btnBpbd.className = 'p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-purple-400 opacity-75';
-                badgeBpbd.textContent = 'Pilih';
-                badgeBpbd.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300';
-            }
-        }
 
         // 4. Update Badge Jumlah Langkah Instruksi
         const instructions = currentOpt.instructions || data.instructions || [];
