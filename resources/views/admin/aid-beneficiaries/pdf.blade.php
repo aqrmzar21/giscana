@@ -140,7 +140,7 @@
                 <td>{{ $i + 1 }}</td>
                 <td><strong>{{ $b->recipient_name }}</strong></td>
                 <td>{{ $b->identity_card_number ?? '-' }}</td>
-                <td>Kec. {{ $b->district?->name ?? '-' }} &bull; Desa {{ $b->village?->full_name ?? $b->village?->yard ?? '-' }}</td>
+                <td>Kec. {{ $b->district?->name ?? '-' }} &bull; Desa {{ $b->village?->yard ?? '-' }}</td>
                 <td>
                     @if($b->aid_status === 'received')
                         <strong>Sudah Menerima</strong>

@@ -110,7 +110,7 @@
                             <a href="{{ route('login') }}" class="relative group overflow-hidden rounded-xl p-px font-semibold text-sm">
                                 <span class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl transition-all duration-300 group-hover:opacity-100"></span>
                                 <span class="relative block px-6 py-2.5 rounded-[11px] bg-white dark:bg-slate-900 text-slate-800 dark:text-white transition-colors duration-200 group-hover:bg-opacity-0 group-hover:text-white">
-                                    Login Sistem
+                                    Login
                                 </span>
                             </a>
                         @endauth

@@ -14,23 +14,24 @@
             <!-- Badge -->
             <div class="scroll-reveal delay-75 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100/80 dark:bg-slate-800/80 border border-blue-200/80 dark:border-slate-700/80 backdrop-blur-md mb-8 shadow-md">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">WebGIS & SIMBA Bencana Bone Bolango</span>
+                <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">WebGIS Destana & SIMBA Bone Bolango</span>
                 <span class="text-slate-400 dark:text-slate-500">•</span>
                 <span class="text-xs sm:text-sm text-blue-600 dark:text-blue-400 font-bold">BPBD Gorontalo</span>
             </div>
 
             <!-- Title -->
             <h1 class="scroll-reveal delay-100 text-4xl sm:text-6xl lg:text-7xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.15] mb-6">
-                Kesiapsiagaan & Mitigasi Bencana
+                Sistem Informasi Geografis 
+                <span class="block mt-2">Tanggap Darurat Bencana</span>
                 <span class="block mt-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-300 dark:to-purple-400 bg-clip-text text-transparent">
-                    Kawasan Pesisir Bone
+                    Kawasan Bone Pesisir 
                 </span>
             </h1>
 
             <!-- Subtitle -->
             <p class="scroll-reveal delay-150 text-lg sm:text-xl text-slate-600 dark:text-slate-300 font-normal leading-relaxed mb-10 max-w-3xl mx-auto">
-                Sistem Informasi Geografis cerdas dan Manajemen Bantuan terpadu untuk percepatan evakuasi, 
-                pemetaan zona rawan banjir & longsor, serta pencegahan <span class="text-slate-900 dark:text-white font-semibold">double claim</span> logistik di 5 Kecamatan Fokus Kabupaten Bone Bolango.
+                Kesiapsiagaan Mitigasi cerdas & Manajemen Bantuan terpadu untuk percepatan evakuasi, 
+                pemetaan zona rawan banjir & longsor berfokus 5 kecamatan wilayah pesisir di Kabupaten Bone Bolango.
             </p>
 
             <!-- Action Buttons -->

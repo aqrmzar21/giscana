@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'routing' => [
+        'osrm_url' => env('OSRM_BASE_URL', 'https://router.project-osrm.org'),
+        'ors_api_key' => env('OPENROUTESERVICE_API_KEY', null),
+        'mode_threshold_meters' => (float) env('EVACUATION_OFFICIAL_THRESHOLD_METERS', 100.0),
+    ],
+
 ];

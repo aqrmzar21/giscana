@@ -12,6 +12,8 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // API Routes for geospatial data
+Route::get('nearest-evacuation-with-route', [EvacuationRouteController::class, 'getNearestWithRoute']);
+Route::get('evacuation-hybrid-route', [EvacuationRouteController::class, 'hybridRoute']);
 Route::apiResource('disaster-zones', DisasterZoneController::class);
 Route::apiResource('evacuation-routes', EvacuationRouteController::class);
 Route::apiResource('evacuation-facilities', EvacuationFacilityController::class);
