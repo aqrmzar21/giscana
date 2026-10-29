@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             AidRecipientSeeder::class,
             AidDisasterSeeder::class,
             DisasterHazardLayerSeeder::class,
+            RolePermissionSeeder::class,
         ]);
     }
 }

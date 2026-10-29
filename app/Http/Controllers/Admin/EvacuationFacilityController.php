@@ -42,6 +42,7 @@ class EvacuationFacilityController extends Controller
      */
     public function print(Request $request)
     {
+        abort_if(!auth()->user()->can('export data'), 403);
         $query = EvacuationFacility::with('aidDisaster');
 
         if ($request->filled('district_name')) {
@@ -76,6 +77,7 @@ class EvacuationFacilityController extends Controller
      */
     public function create()
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         $aidDisasters = AidDisaster::active()->orderBy('district_name')->get();
         return $this->partialView('admin.evacuation-facilities.create', compact('aidDisasters'));
     }
@@ -85,6 +87,7 @@ class EvacuationFacilityController extends Controller
      */
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         $validated = $request->validate([
             'aid_disaster_id' => 'nullable|exists:aid_disasters,id',
             'name' => 'required|string|max:255',

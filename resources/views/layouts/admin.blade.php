@@ -109,7 +109,7 @@
                         </a>
 
                         <!-- Statistik Admin -->
-                        @hasanyrole('admin|pimpinan')
+                        @hasanyrole('admin|staff|pimpinan')
                         <a href="{{ route('admin.aid-disasters.index') }}" 
                            :title="sidebarCollapsed ? 'Statistik' : ''"
                            class="flex items-center py-2.5 px-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.aid-disasters.index') ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60' }}"
@@ -128,7 +128,6 @@
                         <div x-show="sidebarCollapsed" class="my-2 border-t border-gray-200 dark:border-gray-700"></div>
 
                         <div class="mt-2 space-y-1">
-                            @role('admin')
                             <!-- Zona Bencana -->
                             <div x-data="{ open: {{ request()->routeIs('admin.disaster-zones.*') ? 'true' : 'false' }} }">
                                 <button @click="open = !open" 
@@ -156,7 +155,6 @@
                                     @endcan
                                 </div>
                             </div>
-                            @endrole
 
                             <!-- Fasilitas dan Rute Evakuasi -->
                             <div x-data="{ open: {{ request()->routeIs('admin.evacuation-facilities.*') || request()->routeIs('admin.evacuation-routes.*') ? 'true' : 'false' }} }">

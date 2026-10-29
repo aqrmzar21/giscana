@@ -49,6 +49,7 @@ class DisasterZoneController extends Controller
      */
     public function print(Request $request)
     {
+        abort_if(!auth()->user()->can('export data'), 403);
         $query = DisasterZone::query();
 
         if ($request->filled('search')) {

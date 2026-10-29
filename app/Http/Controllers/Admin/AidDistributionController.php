@@ -130,6 +130,7 @@ class AidDistributionController extends Controller
 
     public function create()
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         $beneficiaries = AidBeneficiary::with(['village.district'])
             ->orderBy('recipient_name')
             ->get();
@@ -155,6 +156,7 @@ class AidDistributionController extends Controller
 
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         $validated = $request->validate([
             'beneficiary_id'    => 'required|exists:aid_beneficiaries,id',
             'aid_inventory_id'  => 'required|exists:aid_inventories,id',

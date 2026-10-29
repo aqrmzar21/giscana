@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,12 +20,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
-        // Memberikan hak akses penuh (Super Power) untuk role 'admin'
-        //     Gate::before(function ($user, $ability) {
-        //         if ($user->role === 'admin') {
-        //             return true; // Bypass semua pengecekan izin
-        //         }
-        //     });
+        // Memberikan hak akses penuh (Super Admin) untuk role 'admin'
+        Gate::before(function ($user, $ability) {
+            if ($user->role === 'admin' || $user->hasRole('admin')) {
+                return true; // Bypass semua pengecekan izin
+            }
+            return null;
+        });
     }
 }

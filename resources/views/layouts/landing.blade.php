@@ -47,13 +47,16 @@
                 <div class="flex justify-between h-20 items-center">
                     <div class="flex items-center space-x-3">
                         <a href="{{ route('home') }}" class="flex items-center space-x-3 group">
+                            <!-- 
                             <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-300">
                                 <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-                                </svg>
+                                </svg> 
                             </div>
+                                -->
+                            <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-6 h-6 text-white">
                             <span class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                                GIScana
+                            Giscana
                             </span>
                         </a>
                         
@@ -160,7 +163,7 @@
                         Fitur Utama
                     </a>
                     <a href="#about" class="block text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 px-4 py-2.5 rounded-xl text-base font-medium">
-                        Tentang GIScana
+                        Tentang Giscana
                     </a>
                 </div>
                 <div class="pt-4 pb-5 border-t border-slate-200 dark:border-slate-800 px-4">
@@ -202,10 +205,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
                     <div class="md:col-span-5">
                         <div class="flex items-center space-x-3 mb-4">
-                            <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">
+                            <!-- <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">
                                 G
-                            </div>
-                            <span class="text-xl font-bold text-white">GIScana</span>
+                            </div> -->
+                            <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-6 h-6 text-white">
+                            <span class="text-xl font-bold text-white">Giscana</span>
                         </div>
                         <p class="text-slate-400 text-sm leading-relaxed mb-4 max-w-md">
                             WebGIS & SIMBA — Sistem Informasi Geografis & Manajemen Bantuan Bencana Bencana Alam 
@@ -213,7 +217,7 @@
                         </p>
                         <div class="flex items-center space-x-2 text-xs text-slate-500">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span>Sistem Aktif & Terhubung</span>
+                            <span>BPBD Kabupaten Bone Bolango.</span>
                         </div>
                     </div>
                     
@@ -246,7 +250,7 @@
                     </div>
                 </div>
                 <div class="border-t border-slate-800 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500">
-                    <p>&copy; {{ date('Y') }} GIScana. BPBD Kabupaten Bone Bolango. Hak Cipta Dilindungi.</p>
+                    <p>&copy; {{ date('Y') }} Giscana | Hak Cipta Dilindungi.</p>
                     <p class="mt-2 sm:mt-0">Sistem Informasi Geografis & Management Logistics</p>
                 </div>
             </div>

@@ -55,6 +55,7 @@
                 @endif
             </form>
             {{-- Tombol Cetak PDF --}}
+            @can('export data')
             @php
                 $printUrl = route('admin.evacuation-facilities.print');
                 $printParams = [];
@@ -71,6 +72,7 @@
                 </svg>
                 Cetak PDF{{ request('district_name') ? ' ('.request('district_name').')' : ' (Semua)' }}
             </a>
+            @endcan
         </div>
         
         <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">

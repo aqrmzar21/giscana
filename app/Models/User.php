@@ -54,6 +54,28 @@ class User extends Authenticatable
     }
 
     /**
+     * Otomatis sinkronkan kolom `role` ke Spatie Role saat user disimpan
+     */
+    protected static function booted(): void
+    {
+        static::saved(function (User $user) {
+            if (!empty($user->role)) {
+                try {
+                    $role = \Spatie\Permission\Models\Role::firstOrCreate([
+                        'name' => $user->role,
+                        'guard_name' => 'web'
+                    ]);
+                    if (!$user->hasRole($role->name)) {
+                        $user->assignRole($role);
+                    }
+                } catch (\Throwable $e) {
+                    // Abaikan bila tabel permissions belum dimigrasi (misal awal setup)
+                }
+            }
+        });
+    }
+
+    /**
      * Check if user has admin role
      */
     public function isAdmin(): bool

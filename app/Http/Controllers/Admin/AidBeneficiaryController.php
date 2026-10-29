@@ -90,12 +90,14 @@ class AidBeneficiaryController extends Controller
 
     public function create()
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         $districts = District::with('villages')->orderBy('name')->get();
         return $this->partialView('admin.aid-beneficiaries.create', compact('districts'));
     }
 
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         $validated = $request->validate([
             'district_id'          => 'required|exists:districts,id',
             'village_id'           => 'required|exists:villages,id',

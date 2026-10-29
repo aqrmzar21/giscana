@@ -32,26 +32,32 @@ class RolePermissionSeeder extends Seeder
         }
 
         // 2. Role Admin -> Akses Penuh (Semua Permission)
-        $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
-        $roleAdmin->givePermissionTo(Permission::all());
+        $roleAdmin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $roleAdmin->syncPermissions(Permission::all());
 
-        // 3. Role Staff -> Create & Read & Export
-        $roleStaff = Role::firstOrCreate(['name' => 'staff']);
-        $roleStaff->syncPermissions(['create data', 'read data', 'export data']);
+        // 3. Role Staff -> Akses Operasional CRUD Lengkap (Create, Read, Update, Delete & Export)
+        $roleStaff = Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'web']);
+        $roleStaff->syncPermissions([
+            'create data',
+            'read data',
+            'update data',
+            'delete data',
+            'export data',
+        ]);
 
         // 4. Role Pimpinan -> HANYA Read & Export (Read-Only & Print)
-        $rolePimpinan = Role::firstOrCreate(['name' => 'pimpinan']);
+        $rolePimpinan = Role::firstOrCreate(['name' => 'pimpinan', 'guard_name' => 'web']);
         $rolePimpinan->syncPermissions(['read data', 'export data']);
 
-        // 5. Sinkronkan role pengguna berdasarkan kolom `role` di tabel users
+        // 5. Role Public -> Akses Publik (Tanpa izin operasional backend)
+        $rolePublic = Role::firstOrCreate(['name' => 'public', 'guard_name' => 'web']);
+        $rolePublic->syncPermissions([]);
+
+        // 6. Sinkronkan role pengguna berdasarkan kolom `role` di tabel users
         $users = User::all();
         foreach ($users as $user) {
-            if ($user->role === 'admin') {
-                $user->syncRoles(['admin']);
-            } elseif ($user->role === 'staff') {
-                $user->syncRoles(['staff']);
-            } elseif ($user->role === 'pimpinan') {
-                $user->syncRoles(['pimpinan']);
+            if (!empty($user->role)) {
+                $user->syncRoles([$user->role]);
             }
         }
     }

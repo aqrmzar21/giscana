@@ -37,6 +37,7 @@ class AidRecipientController extends Controller
 
     public function print(Request $request)
     {
+        abort_if(!auth()->user()->can('export data'), 403);
         $query = \App\Models\AidRecipient::with(['village'])->latest('date');
 
         if ($search = $request->input('search')) {
@@ -67,6 +68,7 @@ class AidRecipientController extends Controller
     
     public function create()
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         $vil = \App\Models\Village::select('id','yard','zone')->get();
         // dd($vil->toArray());
         $districts = \App\Models\District::with('villages')->get();
@@ -75,6 +77,7 @@ class AidRecipientController extends Controller
 
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         $validated = $request->validate([
             'date' => 'required|date',
             'aid_type' => 'required|string|max:255',

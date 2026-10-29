@@ -51,6 +51,7 @@ class EvacuationRouteController extends Controller
      */
     public function print(Request $request)
     {
+        abort_if(!auth()->user()->can('export data'), 403);
         $query = EvacuationRoute::with('evacuationFacility');
 
         if ($request->filled('district_name')) {
@@ -88,6 +89,7 @@ class EvacuationRouteController extends Controller
      */
    public function create()
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         // ambil daftar kecamatan unik dari fasilitas
         $kec = EvacuationFacility::select('district_name')->distinct()->orderBy('district_name')->get();
         $facilities = EvacuationFacility::active()->orderBy('name')->get();
@@ -101,6 +103,7 @@ class EvacuationRouteController extends Controller
      */
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',

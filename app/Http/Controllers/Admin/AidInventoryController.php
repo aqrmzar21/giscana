@@ -55,11 +55,13 @@ class AidInventoryController extends Controller
 
     public function create()
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         return $this->partialView('admin.aid-inventories.create');
     }
 
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->can('create data'), 403);
         $validated = $request->validate([
             'item_name'       => 'required|string|max:255',
             'category'        => 'required|string|max:100',

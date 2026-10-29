@@ -22,6 +22,14 @@ class EnsureUserIsAdmin
         $user = auth()->user();
         $allowedRoles = ['admin', 'staff', 'pimpinan'];
 
+        if ($user && !empty($user->role) && !$user->hasRole($user->role)) {
+            try {
+                $user->assignRole($user->role);
+            } catch (\Throwable $e) {
+                // Abaikan jika tabel role belum siap
+            }
+        }
+
         $hasAllowedRole = in_array($user->role, $allowedRoles) || $user->hasAnyRole($allowedRoles);
 
         if (!$hasAllowedRole) {

@@ -14,9 +14,10 @@
             <!-- Badge -->
             <div class="scroll-reveal delay-75 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100/80 dark:bg-slate-800/80 border border-blue-200/80 dark:border-slate-700/80 backdrop-blur-md mb-8 shadow-md">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">WebGIS Destana & SIMBA Bone Bolango</span>
+                <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">Geographic Information System for Coastal Area Natural-disaster Alert</span>
+                <!-- <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">WebGIS Destana & SIMBA Bone Bolango</span> -->
                 <span class="text-slate-400 dark:text-slate-500">•</span>
-                <span class="text-xs sm:text-sm text-blue-600 dark:text-blue-400 font-bold">BPBD Gorontalo</span>
+                <span class="text-xs sm:text-sm text-blue-600 dark:text-blue-400 font-bold">Giscana</span>
             </div>
 
             <!-- Title -->

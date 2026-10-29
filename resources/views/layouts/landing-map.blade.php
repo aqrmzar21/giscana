@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'GIScana | Peta Interaktif Spasial')</title>
+    <title>@yield('title', 'Giscana | Peta Interaktif Spasial')</title>
 
     <!-- Dark Mode Initializer Script (prevents theme flicker) -->
     <script>
