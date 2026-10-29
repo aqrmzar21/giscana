@@ -1,8 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', 'Peta Interaktif - Admin')
+@section('title', 'Peta Dashboard - Admin')
 
-@section('page-title', 'Peta Interaktif')
+@section('page-title', 'Peta Dashboard')
 
 @section('breadcrumb')
 <li class="inline-flex items-center">
@@ -16,11 +16,6 @@
 
 @section('content')
 <div class="bg-white shadow rounded-lg p-4 sm:p-6">
-    <p class="text-md">
-        Klik disini untuk
-        <button class="text-sm text-blue-500" onclick="location.reload()">Load peta </button>
-        jika peta tidak muncul
-    </p>
     @include('map.partials.interactive')
 </div>
 @endsection

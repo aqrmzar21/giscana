@@ -137,7 +137,7 @@
 
             <!-- Header Panel -->
             <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
-                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5 dark:text-white/80">
                     <span>⚙️</span> Kontrol Peta
                 </h3>
                 <button @click="openPanel = false" class="md:hidden text-slate-400 hover:text-slate-600 font-semibold text-lg p-1 leading-none">
@@ -145,14 +145,9 @@
                 </button>
             </div>
             
-            {{-- // UPDATED FEATURE: Bagian Lokasi Saya Sesuai Prinsip "One Information = One Place" --}}
-            {{-- // REMOVED DUPLICATE UI: Menghapus label status evakuasi/lokasi dari panel kanan karena informasi navigasi sudah dipusatkan di panel kiri --}}
-            <!-- <div class="mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-200/80"> -->
-            <div class="mb-4 bg-slate-50">
-                <div class="mb-2">
-                    <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">LOKASI SAYA</span>
-                </div>
-
+            <!-- Section 0: Toggle Switch Posisi Saya -->
+            <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider block py-2 dark:text-white/80">LOKASI SAYA</span>
+            <div class="mb-4">
                 <div class="grid grid-cols-[auto_1fr_1fr] gap-2 items-center">
                     <!-- // Tombol 1: Posisi Saya (Toggle ON/OFF) -->
                     <button id="btnToggleUserPosition" type="button" class="w-9 h-9 bg-white hover:bg-white-700 text-slate-700 rounded-xl shadow-md border border-slate-200 flex items-center justify-center transition-all hover:scale-105 active:scale-95 group">
@@ -160,7 +155,7 @@
                         <!-- <span id="btnToggleUserPositionText">Posisi Saya</span> -->
                     </button>
                     <!-- // Tombol 2: Cari Titik Kumpul (Hanya aktif jika lokasi user tersedia) -->
-                    <button id="btnFindNearestFacility" type="button" class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-2.5 px-3 rounded-xl shadow-xs transition-all text-xs flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" disabled>
+                    <button id="btnFindNearestFacility" type="button" class="w-full bg-emerald-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-2.5 px-3 rounded-xl shadow-md transition-all text-xs flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" disabled>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.414 10l4.244 4.243a1 1 0 01-.707 1.707l-8.486 0M13.414 10l2.122-2.122a1 1 0 011.414 0L20 10"/>
                         </svg>
@@ -168,7 +163,7 @@
                     </button>
 
                     <!-- // Tombol 3: Reset Rute (Menghapus routing tanpa menghapus marker user) -->
-                    <button id="btnResetRoute" type="button" class="w-full bg-white hover:bg-slate-100 active:scale-[0.98] text-slate-600 font-semibold py-2 px-3 rounded-xl border border-slate-200 shadow-xs transition-all text-xs flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" disabled>
+                    <button id="btnResetRoute" type="button" class="w-full bg-white hover:bg-slate-100 active:scale-[0.98] text-slate-600 font-semibold py-2 px-3 rounded-xl border border-slate-200 shadow-md transition-all text-xs flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" disabled>
                         <span class="text-sm">⟲</span>
                         <span>Reset</span>
                     </button>
@@ -176,12 +171,13 @@
             </div>
 
             <!-- Section 1: Toggle Switch Batas Administrasi -->
+            <h6 class="text-xs font-bold text-slate-800 uppercase tracking-wider py-2 dark:text-white/80">BATAS ADMINITSRASI</h6>
             <div class="mb-4">
-                <h6 class="text-xs font-bold text-slate-800 uppercase tracking-wider py-2">FILTER BATAS ADMINITSRASI</h6>
                 @include('map.partials.map-district-checkbox')
             </div>
             
             <!-- Section 2 & 3: Sebaran Rawan Bencana & Slider Opacity -->
+            <h6 class="text-xs font-bold text-slate-800 uppercase tracking-wider py-2 dark:text-white/80">SEBARAN RAWAN BENCANA</h6>
             <div class="mb-4">
                 @include('map.partials.map-panel-hazard')
             </div>
