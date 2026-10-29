@@ -98,20 +98,6 @@
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Target Kepala Keluarga di {{ $aidDisaster->district_name }}</p>
         </div>
 
-        {{-- Bantuan Tersalurkan --}}
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700/60">
-            <div class="flex items-center justify-between text-emerald-600 dark:text-emerald-400 mb-2">
-                <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Bantuan Tersalur</span>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-            </div>
-            <h3 class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">
-                {{ number_format($aidDisaster->distributed_aid ?? 0) }} Unit
-            </h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Total barang logistik terkirim</p>
-        </div>
-
         {{-- Belum Menerima / Sisa --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700/60">
             <div class="flex items-center justify-between text-amber-500 mb-2">
@@ -124,6 +110,20 @@
                 {{ number_format($aidDisaster->remaining_aid ?? 0) }} KK
             </h3>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">KK yang belum terpenuhi</p>
+        </div>
+
+        {{-- Bantuan Tersalurkan --}}
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700/60">
+            <div class="flex items-center justify-between text-emerald-600 dark:text-emerald-400 mb-2">
+                <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Bantuan Tersalur</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h3 class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">
+                {{ number_format($aidDisaster->distributed_aid ?? 0) }} Unit
+            </h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Total barang logistik terkirim</p>
         </div>
 
         {{-- Desa Terjangkau --}}

@@ -81,12 +81,12 @@ class GiscanaDataSeeder extends Seeder
 
         // Sample disaster zones for Bone Bolango Regency (sebagai titik lokasi, bukan poligon)
         DisasterZone::create([
+            // Bonepantai
             'uuid' => (string) Str::uuid(),
-            // 'name' => 'Bonepantai',
-            'name' => 'banjir Risk Zone - Bone River',
+            'name' => 'Rawan Banjir - Sungai Bone',
             'district_id' => $districtBonepantai ? $districtBonepantai->id : null,
             'disaster_type' => 'banjir',
-            'description' => 'High-risk banjir zone along the Bone River, prone to seasonal banjiring during rainy season.',
+            'description' => 'Wilayah yang berada di sekitar aliran Sungai Bone dan memiliki potensi tinggi mengalami banjir saat curah hujan meningkat. Area ini sering terdampak luapan sungai yang mengganggu aktivitas masyarakat serta akses transportasi.',
             'risk_level' => 'high',
             // Titik representatif (lng, lat)
             'point_coordinates' => [123.20808535158405, 0.3783370772048755],
@@ -94,19 +94,18 @@ class GiscanaDataSeeder extends Seeder
             'affected_population' => 1225,
             'is_active' => true,
         ]);
-
-        DisasterZone::create([ 
+        DisasterZone::create([
+            // Kabila Bone
             'uuid' => (string) Str::uuid(),
-            // 'name' => 'Kabila Bone',
-            'name' => 'longsor Risk Zone - Hillside Area',
+            'name' => 'Rawan Longsor - Lereng Perbukitan',
             'district_id' => $districtKabilaBone ? $districtKabilaBone->id : null,
             'disaster_type' => 'longsor',
-            'description' => 'Critical longsor risk area on steep hillsides, especially vulnerable during heavy rainfall.',
+            'description' => 'Daerah perbukitan dengan kemiringan lereng yang cukup curam dan memiliki tingkat kerawanan longsor sangat tinggi. Risiko meningkat pada musim hujan akibat kondisi tanah yang labil dan erosi pada lereng.',
             'risk_level' => 'critical',
             // Titik representatif (lng, lat)
             'point_coordinates' => [123.16263718062282, 0.42377850503008574],
             'area_hectares' => 85.2,
-            'affected_population' =>625,
+            'affected_population' => 625,
             'is_active' => true,
         ]);
 
@@ -157,9 +156,9 @@ class GiscanaDataSeeder extends Seeder
             'uuid' => (string) Str::uuid(),
             'aid_disaster_id' => $kecamatanBone->id,
             'district_name' => $kecamatanBone->district_name,
-            'name' => 'SMK Negeri Bone 1',
-            'description' => 'Primary evacuation center located in Bone village.',
-            'point_coordinates' => [123.2180174509013, 0.3739372685927513],
+            'name' => 'Titik Kumpul 1',
+            'description' => 'Fasilitas evakuasi utama yang memiliki kapasitas besar serta dilengkapi ruang kelas, area berkumpul, dan akses kendaraan untuk mendukung proses pengungsian masyarakat terdampak bencana.',
+            'point_coordinates' => [123.47381830215456, 0.3723738204819497],
             'capacity' => 300,
             'address' => 'Jl. Pendidikan No. 1, Bone, Bone Bolango',
             'contact_person' => 'Bapak Ahmad',
@@ -175,7 +174,7 @@ class GiscanaDataSeeder extends Seeder
             'aid_disaster_id' => $kecamatanKabilaBone->id,
             'district_name' => $kecamatanKabilaBone->district_name,
             'name' => 'Masjid Oluhuta',
-            'description' => 'Mosque serving as evacuation center with basic facilities.',
+            'description' => 'Masjid yang difungsikan sebagai lokasi evakuasi sementara bagi warga terdampak bencana dengan dukungan fasilitas ibadah, area istirahat, dan penyimpanan logistik dasar.',
             'point_coordinates' => [123.16027286986488, 0.4298848194426226],
             'capacity' => 200,
             'address' => 'Jl. Masjid Raya, Desa Olele',
@@ -186,13 +185,13 @@ class GiscanaDataSeeder extends Seeder
             'is_accessible' => true,
             'is_active' => true,
         ]);
-        
+
         EvacuationFacility::create([
             'uuid' => (string) Str::uuid(),
             'aid_disaster_id' => $kecamatanBone->id,
             'district_name' => $kecamatanBone->district_name,
             'name' => 'Balai Desa Bone',
-            'description' => 'Village hall equipped for emergency situations.',
+            'description' => 'Balai desa yang telah dipersiapkan sebagai tempat pengungsian sementara serta pusat koordinasi penanganan dan distribusi bantuan saat keadaan darurat.',
             'point_coordinates' => [123.220285, 0.391023],
             'capacity' => 150,
             'address' => 'Jl. Pemuda No. 5, Bone, Bone Bolango',
@@ -203,13 +202,13 @@ class GiscanaDataSeeder extends Seeder
             'is_accessible' => true,
             'is_active' => true,
         ]);
-        
+
         EvacuationFacility::create([
             'uuid' => (string) Str::uuid(),
             'aid_disaster_id' => $kecamatanBulawa->id,
             'district_name' => $kecamatanBulawa->district_name,
             'name' => 'Titik Kumpul',
-            'description' => 'area null as evacuation center with basic facilities.',
+            'description' => 'Area terbuka yang ditetapkan sebagai titik kumpul awal masyarakat sebelum diarahkan menuju lokasi pengungsian yang lebih aman dan memadai.',
             'point_coordinates' => [123.2514177981202, 0.3494345195302344],
             'capacity' => 200,
             'address' => 'Jl. Masjid Raya, Bone, Bone Bolango',
@@ -220,13 +219,13 @@ class GiscanaDataSeeder extends Seeder
             'is_accessible' => true,
             'is_active' => true,
         ]);
-        
+
         EvacuationFacility::create([
-            'uuid' => (string) Str::uuid(), 
+            'uuid' => (string) Str::uuid(),
             'aid_disaster_id' => $kecamatanBulawa->id,
             'district_name' => $kecamatanBulawa->district_name,
             'name' => 'Gedung Pertemuan',
-            'description' => 'Gedung pertemuan yang sering digunakan untuk kegiatan masyarakat',
+            'description' => 'Gedung serbaguna yang dapat menampung pengungsi dalam jumlah sedang serta digunakan sebagai lokasi koordinasi relawan dan distribusi bantuan darurat.',
             'point_coordinates' => [123.28091613555262,0.3204120222883091],
             'capacity' => 150,
             'address' => 'Jl. Raya No. 8, Desa Patoa',
@@ -237,13 +236,13 @@ class GiscanaDataSeeder extends Seeder
             'is_accessible' => true,
             'is_active' => true,
         ]);
-        
+
         EvacuationFacility::create([
             'uuid' => (string) Str::uuid(),
             'aid_disaster_id' => $kecamatanBulawa->id,
             'district_name' => $kecamatanBulawa->district_name,
             'name' => 'Lapangan Pertemuan',
-            'description' => 'lahan kososng tempat kumpul masyarakat dengan ketinggian yang cukup',
+            'description' => 'Lapangan terbuka yang berada di area relatif aman dan memiliki kapasitas luas untuk menampung warga sebagai lokasi evakuasi sementara saat terjadi bencana.',
             'point_coordinates' => [123.30000155640084,0.3213922903642299],
             'capacity' => 50,
             'address' => 'Jl. Trans Sulawesi, Desa Mamunga Timur',
@@ -265,8 +264,8 @@ class GiscanaDataSeeder extends Seeder
             'uuid' => (string) Str::uuid(),
             'evacuation_facility_id' => $facilitySmk->id,
             'facility_name' => $facilitySmk->name,
-            'name' => 'Secondary Route - Village Path',
-            'description' => 'Secondary evacuation route through village paths.',
+            'name' => 'Rute Evakuasi Alternatif - Jalur Permukiman',
+            'description' => 'Jalur evakuasi alternatif yang melewati area permukiman warga dan digunakan apabila jalur utama tidak dapat dilalui akibat bencana.',
             'line_coordinates' => [
                 [123.30000216080441,0.32138895529709544],
                 [123.29920593791996,0.31983634498158153],
@@ -285,8 +284,8 @@ class GiscanaDataSeeder extends Seeder
             'uuid' => (string) Str::uuid(),
             'evacuation_facility_id' => $facilityGedung->id,
             'facility_name' => $facilityGedung->name,
-            'name' => 'Primary Evacuation Route - Main Road',
-            'description' => 'Main evacuation route connecting high-risk areas to evacuation centers.',
+            'name' => 'Rute Evakuasi Utama - Jalan Raya',
+            'description' => 'Rute evakuasi utama yang dirancang untuk menghubungkan wilayah terdampak bencana dengan lokasi pengungsian secara cepat dan aman melalui jalan utama.',
             'line_coordinates' => [
                 [123.28008744958447, 0.32173069129049736],
                 [123.28015140297714, 0.3216027865242239],
@@ -316,8 +315,8 @@ class GiscanaDataSeeder extends Seeder
             'uuid' => (string) Str::uuid(),
             'evacuation_facility_id' => $facilityMasjid->id,
             'facility_name' => $facilityMasjid->name,
-            'name' => 'Emergency Route - Hillside',
-            'description' => 'Emergency evacuation route for longsor-prone areas.',
+            'name' => 'Rute Evakuasi Darurat - Lereng Perbukitan',
+            'description' => 'Jalur evakuasi darurat yang digunakan pada kondisi bencana longsor atau ketika jalur utama tidak dapat digunakan. Rute ini mengarah ke lokasi aman di area perbukitan dan fasilitas pengungsian terdekat.',
             'line_coordinates' => [
                 [123.24333913601816, 0.3519398498250865],
                 [123.24432902864044, 0.3518498612835259],
@@ -345,11 +344,6 @@ class GiscanaDataSeeder extends Seeder
             'is_accessible' => true,
             'is_active' => true,
         ]);
-        // Stok Logistik Awal
-        // $inventories = [
-        //     ['item_name' => 'Paket Sembako Bencana', 'category' => 'sembako', 'source' => 'BPBD Provinsi', 'initial_stock' => 2000, 'remaining_stock' => 2000],
-        //     ['item_name' => 'Obat-obatan & Kit Medis', 'category' => 'obat', 'source' => 'Dinkes Bone Bolango', 'initial_stock' => 800, 'remaining_stock' => 800],
-        //     ['item_name' => 'Selimut & Pakaian Layak Pakai', 'category' => 'pakaian', 'source' => 'Donasi Tagana', 'initial_stock' => 1200, 'remaining_stock' => 1200],
-        // ];
+
     }
 }

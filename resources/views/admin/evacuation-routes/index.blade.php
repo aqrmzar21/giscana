@@ -25,7 +25,7 @@
                 <p class="mt-2 text-sm text-gray-700">Daftar semua rute alternatif evakuasi yang terdaftar dalam sistem.</p>
             </div>
             @can('create data')
-            <div class="mt-4 sm:mt-0 sm:ml-4 sm:flex-none">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
                 <a href="{{ route('admin.evacuation-routes.create') }}"
                    class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto whitespace-nowrap">
                     <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
