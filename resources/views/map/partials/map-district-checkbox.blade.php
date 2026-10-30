@@ -9,7 +9,7 @@
                 <input type="checkbox" id="toggle_district_boundaries" class="sr-only peer">
                 <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
             </div>
-            <span class="text-xs font-semibold text-slate-700 dark:text-white-900 pl-2">Batas Kecamatan</span>
+            <span class="text-xs font-semibold dark:text-white-900 pl-2">Batas Kecamatan</span>
         </label>
     </div>
 
@@ -20,7 +20,7 @@
                 <input type="checkbox" id="toggle_village_boundaries" class="sr-only peer">
                 <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
             </div>
-            <span class="text-xs font-semibold text-slate-700 dark:text-white-900 pl-2">Batas Desa</span>
+            <span class="text-xs font-semibold dark:text-white-900 pl-2">Batas Desa</span>
         </label>
     </div>
 

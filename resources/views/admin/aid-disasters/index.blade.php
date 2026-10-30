@@ -487,7 +487,7 @@
                     labels: chartLabels,
                     datasets: [
                         {
-                            label: 'Target KK',
+                            label: 'Target KK (Jiwa)',
                             data: chartTargets,
                             backgroundColor: isDark ? 'rgba(99, 102, 241, 0.7)' : 'rgba(79, 70, 229, 0.85)',
                             borderColor: '#6366f1',
