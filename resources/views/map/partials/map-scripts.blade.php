@@ -440,7 +440,7 @@
         currentRoutingData = null;
         currentRoutePolylines = {
             public: { casing: null, main: null, hit: null },
-            bpbd: { casing: null, main: null, hit: null }
+            bpbd: { casing: null, main: null, hit: null, connector: null }
         };
         activeRouteKey = 'bpbd';
 
@@ -728,6 +728,48 @@
         // Highlight kartu yang aktif vs nonaktif
         const btnPublic = document.getElementById('btnSelectRoutePublic');
         const badgePublic = document.getElementById('badgeActivePublic');
+        const radioPublic = document.getElementById('radioIconPublic');
+        const btnBpbd = document.getElementById('btnSelectRouteBpbd');
+        const badgeBpbd = document.getElementById('badgeActiveBpbd');
+        const radioBpbd = document.getElementById('radioIconBpbd');
+
+        if (isBpbd) {
+            if (btnBpbd) {
+                btnBpbd.className = 'p-2.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-purple-50/80 dark:bg-purple-950/50 border-purple-500 dark:border-purple-500 shadow-sm ring-1 ring-purple-400';
+            }
+            if (badgeBpbd) {
+                badgeBpbd.textContent = 'Aktif ✓';
+                badgeBpbd.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-purple-200 text-purple-800 dark:bg-purple-800 dark:text-purple-200';
+            }
+            if (radioBpbd) radioBpbd.textContent = '◉';
+
+            if (btnPublic) {
+                btnPublic.className = 'p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-400 shadow-xs opacity-75';
+            }
+            if (badgePublic) {
+                badgePublic.textContent = 'Pilih';
+                badgePublic.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300';
+            }
+            if (radioPublic) radioPublic.textContent = '○';
+        } else {
+            if (btnPublic) {
+                btnPublic.className = 'p-2.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-blue-50/80 dark:bg-blue-950/50 border-blue-500 dark:border-blue-500 shadow-sm ring-1 ring-blue-400';
+            }
+            if (badgePublic) {
+                badgePublic.textContent = 'Aktif ✓';
+                badgePublic.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200';
+            }
+            if (radioPublic) radioPublic.textContent = '◉';
+
+            if (btnBpbd) {
+                btnBpbd.className = 'p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-purple-400 shadow-xs opacity-75';
+            }
+            if (badgeBpbd) {
+                badgeBpbd.textContent = 'Pilih';
+                badgeBpbd.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300';
+            }
+            if (radioBpbd) radioBpbd.textContent = '○';
+        }
 
         // 4. Update Badge Jumlah Langkah Instruksi
         const instructions = currentOpt.instructions || data.instructions || [];
@@ -829,7 +871,18 @@
                 });
             }
 
-            // Public Alternatif: Muted Google Blue
+            // Garis penghubung (connector) abu-biru aktif
+            if (bpbd && bpbd.connector) {
+                bpbd.connector.setStyle({
+                    color: '#64748b',
+                    weight: 2.5,
+                    opacity: 0.95,
+                    dashArray: '5, 8'
+                });
+                bpbd.connector.bringToFront();
+            }
+
+            // Public Alternatif: Muted Blue
             if (pub && pub.main && pub.casing) {
                 pub.casing.setStyle({
                     color: '#1e3a8a',
@@ -845,14 +898,14 @@
                 const textDist = optPublic ? optPublic.distance_formatted : '';
                 const textDur = optPublic ? optPublic.duration_formatted : '';
                 pub.main.unbindTooltip();
-                pub.main.bindTooltip(`<b>🛣️ Jalur Umum (Google Maps)</b><br>Jarak: ${textDist} • Waktu: ${textDur}<br><span style="color:#2563eb;font-weight:700;">👉 Klik untuk pilih Jalur Umum</span>`, {
+                pub.main.bindTooltip(`<b>🛣️ Jalur Umum (OSRM)</b><br>Jarak: ${textDist} • Waktu: ${textDur}<br><span style="color:#2563eb;font-weight:700;">👉 Klik untuk pilih Jalur Umum</span>`, {
                     sticky: true,
                     direction: 'top',
                     className: 'route-tooltip'
                 });
             }
         } else {
-            // Public Aktif: Gaya Google Maps Biru Vibrant
+            // Public Aktif: Biru solid tebal
             if (pub && pub.main && pub.casing) {
                 pub.casing.setStyle({
                     color: '#174ea6',
@@ -860,7 +913,7 @@
                     opacity: 0.95
                 });
                 pub.main.setStyle({
-                    color: '#4285F4',
+                    color: '#2563eb',
                     weight: 6,
                     opacity: 1.0,
                     dashArray: null
@@ -872,7 +925,7 @@
                 const textDist = optPublic ? optPublic.distance_formatted : '';
                 const textDur = optPublic ? optPublic.duration_formatted : '';
                 pub.main.unbindTooltip();
-                pub.main.bindTooltip(`<b>🛣️ Jalur Umum (Rute Aktif - Google Maps)</b><br>Jarak: ${textDist} • Waktu: ${textDur}`, {
+                pub.main.bindTooltip(`<b>🛣️ Jalur Umum (OSRM - Rute Aktif)</b><br>Jarak: ${textDist} • Waktu: ${textDur}`, {
                     sticky: true,
                     direction: 'top',
                     className: 'route-tooltip'
@@ -899,6 +952,16 @@
                     sticky: true,
                     direction: 'top',
                     className: 'route-tooltip'
+                });
+            }
+
+            // Garis penghubung BPBD sedikit redup saat rute Umum aktif
+            if (bpbd && bpbd.connector) {
+                bpbd.connector.setStyle({
+                    color: '#94a3b8',
+                    weight: 1.5,
+                    opacity: 0.35,
+                    dashArray: '4, 6'
                 });
             }
         }
@@ -1039,16 +1102,45 @@
                 if (optPublic.coordinates && optPublic.coordinates.length > 0) {
                     allLatLngs = allLatLngs.concat(optPublic.coordinates);
                 }
+                if (optBpbd.connector_coordinates && optBpbd.connector_coordinates.length > 0) {
+                    allLatLngs = allLatLngs.concat(optBpbd.connector_coordinates);
+                }
                 if (allLatLngs.length === 0) {
                     allLatLngs = [[lat, lng], [fLat, fLng]];
                 }
 
                 currentRoutePolylines = {
                     public: { casing: null, main: null, hit: null },
-                    bpbd: { casing: null, main: null, hit: null }
+                    bpbd: { casing: null, main: null, hit: null, connector: null }
                 };
 
-                // 1. Gambar Jalur Resmi BPBD (Warna Ungu Terunifikasi)
+                const handleBpbdClick = function(e) {
+                    if (e && e.originalEvent) L.DomEvent.stopPropagation(e);
+                    window.selectEvacuationRoute('bpbd');
+                };
+
+                // 1. Gambar Garis Penghubung Tipis Putus-putus Abu-Biru (Feeder dari Posisi User ke Jalur BPBD)
+                if (optBpbd.connector_coordinates && optBpbd.connector_coordinates.length > 1) {
+                    const bpbdConnector = L.polyline(optBpbd.connector_coordinates, {
+                        color: '#64748b', // Abu-biru (slate-500)
+                        weight: 2.5,
+                        dashArray: '5, 8',
+                        opacity: 0.95,
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    }).addTo(userRouteLayerGroup);
+
+                    bpbdConnector.bindTooltip(`<b>Garis Penghubung ke Jalur BPBD</b><br>Menghubungkan posisi Anda ke rute evakuasi resmi`, {
+                        sticky: true,
+                        direction: 'top',
+                        className: 'route-tooltip'
+                    });
+
+                    bpbdConnector.on('click', handleBpbdClick);
+                    currentRoutePolylines.bpbd.connector = bpbdConnector;
+                }
+
+                // 2. Gambar Jalur Resmi BPBD (Warna Ungu Solid)
                 if (optBpbd.coordinates && optBpbd.coordinates.length > 1) {
                     const bpbdCasing = L.polyline(optBpbd.coordinates, {
                         color: '#581c87',
@@ -1074,16 +1166,9 @@
                         bubblingMouseEvents: false
                     }).addTo(userRouteLayerGroup);
 
-                    currentRoutePolylines.bpbd = {
-                        casing: bpbdCasing,
-                        main: bpbdMain,
-                        hit: bpbdHit
-                    };
-
-                    const handleBpbdClick = function(e) {
-                        if (e && e.originalEvent) L.DomEvent.stopPropagation(e);
-                        window.selectEvacuationRoute('bpbd');
-                    };
+                    currentRoutePolylines.bpbd.casing = bpbdCasing;
+                    currentRoutePolylines.bpbd.main = bpbdMain;
+                    currentRoutePolylines.bpbd.hit = bpbdHit;
 
                     bpbdHit.on('click', handleBpbdClick);
                     bpbdMain.on('click', handleBpbdClick);
@@ -1116,7 +1201,7 @@
                     }
                 }
 
-                // 2. Gambar Jalur Umum (Gaya Google Maps - Biru)
+                // 3. Gambar Jalur Umum (OSRM - Biru Solid)
                 if (optPublic.coordinates && optPublic.coordinates.length > 1) {
                     const publicCasing = L.polyline(optPublic.coordinates, {
                         color: '#174ea6',
@@ -1127,8 +1212,8 @@
                     }).addTo(userRouteLayerGroup);
 
                     const publicMain = L.polyline(optPublic.coordinates, {
-                        color: '#4285F4',
-                        weight: 5,
+                        color: '#2563eb', // Royal Blue
+                        weight: 6,
                         opacity: 1.0,
                         lineCap: 'round',
                         lineJoin: 'round'

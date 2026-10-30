@@ -37,7 +37,7 @@ class EvacuationRoutingService
     {
         $threshold = $customThreshold ?? (float) config('services.routing.mode_threshold_meters', 100.0);
 
-        // 1. Ambil semua fasilitas evakuasi aktif & dapat diakses
+        // 1. Ambil seluruh fasilitas titik kumpul aktif & dapat diakses
         $facilities = EvacuationFacility::active()->accessible()->get();
         if ($facilities->isEmpty()) {
             $facilities = EvacuationFacility::all();
@@ -50,105 +50,346 @@ class EvacuationRoutingService
             ];
         }
 
-        // 2. Ambil semua rute evakuasi resmi aktif
+        // Ekstraksi koordinat seluruh fasilitas titik kumpul aktif
+        $destinations = [];
+        foreach ($facilities as $facility) {
+            $fCoords = $this->extractCoordinates($facility->point_coordinates);
+            if ($fCoords) {
+                $destinations[] = [
+                    'facility' => $facility,
+                    'lat' => $fCoords['lat'],
+                    'lng' => $fCoords['lng'],
+                ];
+            }
+        }
+
+        if (empty($destinations)) {
+            return [
+                'success' => false,
+                'message' => 'Format koordinat fasilitas titik kumpul tidak valid.',
+            ];
+        }
+
+        // 2. Hitung jarak jalan OSRM ke seluruh titik kumpul (OSRM Table API)
+        $tableData = $this->fetchOsrmDistanceTable($userLat, $userLng, $destinations);
+
+        // Lakukan perankingan berdasarkan jarak tempuh jalan raya nyata OSRM (terpendek ke terpanjang)
+        $ranked = [];
+        foreach ($destinations as $idx => $d) {
+            if ($tableData && isset($tableData['distances'][$idx + 1]) && $tableData['distances'][$idx + 1] !== null) {
+                $roadDist = (float) $tableData['distances'][$idx + 1];
+                $roadDur = (float) ($tableData['durations'][$idx + 1] ?? ($roadDist / self::WALKING_SPEED_METERS_PER_MIN * 60));
+                $source = 'OSRM';
+            } else {
+                $straight = $this->haversineDistance($userLat, $userLng, $d['lat'], $d['lng']);
+                $roadDist = $straight * 1.35;
+                $roadDur = ($roadDist / self::WALKING_SPEED_METERS_PER_MIN) * 60;
+                $source = 'Direct/Haversine';
+            }
+
+            $ranked[] = [
+                'facility' => $d['facility'],
+                'lat' => $d['lat'],
+                'lng' => $d['lng'],
+                'distance' => $roadDist,
+                'duration' => $roadDur,
+                'source' => $source,
+            ];
+        }
+
+        // Urutkan berdasarkan jarak jalan OSRM terpendek
+        usort($ranked, fn($a, $b) => $a['distance'] <=> $b['distance']);
+
+        $bestCandidate = $ranked[0];
+
+        // 3. Validasi Titik Kumpul (En-route Shelter Detection):
+        // Analisis seluruh rute OSRM. Jika rute menuju kandidat melewati titik kumpul lain
+        // yang lebih dekat dan berada di sepanjang rute jalan raya (jarak <= 150m):
+        // Batalkan kandidat awal, dan jadikan titik kumpul pertama yang dilewati sebagai tujuan baru.
+        $candidateRoute = $this->fetchPublicRoadRoute($userLng, $userLat, $bestCandidate['lng'], $bestCandidate['lat']);
+        $candidatePolyline = $candidateRoute['coordinates'];
+
+        $enRouteFacilities = [];
+        foreach ($destinations as $d) {
+            if ($d['facility']->id == $bestCandidate['facility']->id) {
+                continue;
+            }
+
+            $proj = $this->pointToPolylineDistance($d['lat'], $d['lng'], $candidatePolyline);
+            if ($proj['distance'] <= 150.0) {
+                $distAlong = $this->calculateDistanceAlongPolyline($candidatePolyline, $proj['segment_index'], $proj['t']);
+                if ($distAlong < ($candidateRoute['distance_meters'] - 150.0)) {
+                    $enRouteFacilities[] = [
+                        'facility' => $d['facility'],
+                        'lat' => $d['lat'],
+                        'lng' => $d['lng'],
+                        'dist_to_line' => $proj['distance'],
+                        'dist_along' => $distAlong,
+                    ];
+                }
+            }
+        }
+
+        if (!empty($enRouteFacilities)) {
+            // Pilih titik kumpul yang paling pertama dilewati di sepanjang rute perjalanan
+            usort($enRouteFacilities, fn($a, $b) => $a['dist_along'] <=> $b['dist_along']);
+            $firstEnRoute = $enRouteFacilities[0];
+            $targetFacility = $firstEnRoute['facility'];
+            $targetCoords = ['lat' => $firstEnRoute['lat'], 'lng' => $firstEnRoute['lng']];
+            $publicRoadRoute = $this->fetchPublicRoadRoute($userLng, $userLat, $targetCoords['lng'], $targetCoords['lat']);
+        } else {
+            $targetFacility = $bestCandidate['facility'];
+            $targetCoords = ['lat' => $bestCandidate['lat'], 'lng' => $bestCandidate['lng']];
+            $publicRoadRoute = $candidateRoute;
+        }
+
+        // 4. Bangun Opsi 1: Jalur Umum (OSRM)
+        $publicTotalDist = (float) ($publicRoadRoute['distance_meters'] ?? 0);
+        $publicDurMin = max(1, (int) ceil($publicTotalDist / self::WALKING_SPEED_METERS_PER_MIN));
+        $publicDurSec = $publicDurMin * 60;
+
+        $publicInstructions = [];
+        $pStep = 1;
+        if (!empty($publicRoadRoute['steps'])) {
+            foreach ($publicRoadRoute['steps'] as $s) {
+                if (($s['type'] ?? '') === 'arrive') continue;
+                $publicInstructions[] = [
+                    'step' => $pStep++,
+                    'text' => $s['text'],
+                    'distance_meters' => $s['distance_meters'],
+                    'distance_formatted' => $this->formatDistance($s['distance_meters']),
+                    'type' => $s['type'] ?? 'straight',
+                    'icon' => $this->resolveStepIcon($s['type'] ?? 'straight'),
+                ];
+            }
+        } else {
+            $publicInstructions[] = [
+                'step' => $pStep++,
+                'text' => "Ikuti jaringan jalan umum menuju {$targetFacility->name} sejauh " . $this->formatDistance($publicTotalDist),
+                'distance_meters' => $publicTotalDist,
+                'distance_formatted' => $this->formatDistance($publicTotalDist),
+                'type' => 'straight',
+                'icon' => 'arrow-up',
+            ];
+        }
+        $publicInstructions[] = [
+            'step' => $pStep++,
+            'text' => "Tiba di Titik Kumpul: {$targetFacility->name}",
+            'distance_meters' => 0,
+            'distance_formatted' => '0 m',
+            'type' => 'arrive',
+            'icon' => 'flag',
+        ];
+
+        $publicOption = [
+            'key' => 'public',
+            'name' => 'Jalur Umum (OSRM)',
+            'label' => 'Jalur Umum (OSRM)',
+            'source' => $publicRoadRoute['source'] ?? 'OSRM',
+            'color' => '#2563eb', // Royal Blue
+            'casing_color' => '#174ea6',
+            'coordinates' => $publicRoadRoute['coordinates'],
+            'distance_meters' => round($publicTotalDist, 1),
+            'distance_formatted' => $this->formatDistance($publicTotalDist),
+            'duration_seconds' => $publicDurSec,
+            'duration_formatted' => $this->formatDuration($publicDurMin),
+            'instructions' => $publicInstructions,
+        ];
+
+        // 5. Bangun Opsi 2: Jalur Resmi BPBD
         $allRoutes = EvacuationRoute::with('evacuationFacility')->active()->accessible()->get();
         if ($allRoutes->isEmpty()) {
             $allRoutes = EvacuationRoute::all();
         }
 
-        // 3. Evaluasi setiap fasilitas dan cari titik masuk/jalur evakuasi terbaik
-        $bestFacility = null;
+        // Cari rute evakuasi resmi yang terhubung ke targetFacility
+        $facilityRoutes = $allRoutes->filter(function ($r) use ($targetFacility, $targetCoords) {
+            if ($r->evacuation_facility_id == $targetFacility->id) {
+                return true;
+            }
+            if (isset($r->facility_name) && strcasecmp(trim($r->facility_name), trim($targetFacility->name)) === 0) {
+                return true;
+            }
+            $pts = $this->extractRouteCoordinates($r);
+            if (empty($pts)) return false;
+            $first = reset($pts);
+            $last = end($pts);
+            $d1 = $this->haversineDistance($targetCoords['lat'], $targetCoords['lng'], $first['lat'], $first['lng']);
+            $d2 = $this->haversineDistance($targetCoords['lat'], $targetCoords['lng'], $last['lat'], $last['lng']);
+            return min($d1, $d2) <= 350.0;
+        });
+
+        if ($facilityRoutes->isEmpty()) {
+            $facilityRoutes = $allRoutes;
+        }
+
         $bestRoute = null;
-        $bestEntryPoint = null;
-        $minOverallScore = INF;
-        $distanceToBestRoute = INF;
-        $bestSegmentIndex = 0;
-        $facilityCoords = null;
+        $bestProj = null;
+        $bestOrientedPoints = null;
+        $minDistanceToRoute = INF;
 
-        foreach ($facilities as $facility) {
-            $fCoords = $this->extractCoordinates($facility->point_coordinates);
-            if (!$fCoords) {
-                continue;
-            }
+        foreach ($facilityRoutes as $route) {
+            $rawPoints = $this->extractRouteCoordinates($route);
+            if (count($rawPoints) < 2) continue;
 
-            $userToFacilityDirect = $this->haversineDistance($userLat, $userLng, $fCoords['lat'], $fCoords['lng']);
+            $oriented = $this->orientPolylineTowardsFacility($rawPoints, $targetCoords['lat'], $targetCoords['lng']);
+            $proj = $this->pointToPolylineDistance($userLat, $userLng, $oriented);
 
-            // Filter rute resmi yang terhubung ke fasilitas ini
-            $facilityRoutes = $allRoutes->filter(function ($r) use ($facility) {
-                return $r->evacuation_facility_id == $facility->id ||
-                    (isset($r->facility_name) && strcasecmp(trim($r->facility_name), trim($facility->name)) === 0);
-            });
-
-            // Jika tidak ada rute langsung berelasi, gunakan rute mana saja yang paling dekat dengan fasilitas ini
-            if ($facilityRoutes->isEmpty()) {
-                $facilityRoutes = $allRoutes;
-            }
-
-            foreach ($facilityRoutes as $route) {
-                $routePoints = $this->extractRouteCoordinates($route);
-                if (count($routePoints) < 2) {
-                    continue;
-                }
-
-                // Hitung proyeksi terdekat dari lokasi user ke garis rute resmi
-                $proj = $this->pointToPolylineDistance($userLat, $userLng, $routePoints);
-
-                // Skor total kombinasi (jarak user ke rute + jarak fasilitas)
-                $score = $proj['distance'] + ($userToFacilityDirect * 0.75);
-
-                if ($score < $minOverallScore) {
-                    $minOverallScore = $score;
-                    $bestFacility = $facility;
-                    $bestRoute = $route;
-                    $bestEntryPoint = $proj['closest_point'];
-                    $distanceToBestRoute = $proj['distance'];
-                    $bestSegmentIndex = $proj['segment_index'];
-                    $facilityCoords = $fCoords;
-                }
-            }
-
-            // Fallback jika tidak ada rute sama sekali
-            if (!$bestFacility && $userToFacilityDirect < $minOverallScore) {
-                $bestFacility = $facility;
-                $facilityCoords = $fCoords;
+            if ($proj['distance'] < $minDistanceToRoute) {
+                $minDistanceToRoute = $proj['distance'];
+                $bestRoute = $route;
+                $bestProj = $proj;
+                $bestOrientedPoints = $oriented;
             }
         }
 
-        if (!$bestFacility || !$facilityCoords) {
-            return [
-                'success' => false,
-                'message' => 'Fasilitas evakuasi terdekat tidak dapat ditentukan.',
+        // Fallback jika tidak ada rute BPBD langsung
+        if (!$bestRoute || !$bestProj) {
+            $bestRoute = $allRoutes->first();
+            if ($bestRoute) {
+                $rawPoints = $this->extractRouteCoordinates($bestRoute);
+                $bestOrientedPoints = $this->orientPolylineTowardsFacility($rawPoints, $targetCoords['lat'], $targetCoords['lng']);
+                $bestProj = $this->pointToPolylineDistance($userLat, $userLng, $bestOrientedPoints);
+                $minDistanceToRoute = $bestProj['distance'];
+            }
+        }
+
+        if ($bestRoute && $bestProj) {
+            $entryPoint = $bestProj['closest_point'];
+            $segmentIndex = $bestProj['segment_index'];
+
+            // Potong rute BPBD resmi dari titik masuk (entry point) menuju fasilitas titik kumpul
+            $officialCoords = $this->sliceOfficialRouteFromEntry($bestOrientedPoints, $entryPoint, $segmentIndex, $targetCoords);
+            $officialLatLngs = array_map(fn($p) => [$p['lat'], $p['lng']], $officialCoords);
+            $officialDistance = $this->calculatePolylineLength($officialLatLngs);
+
+            // Garis penghubung tipis putus-putus (connector / feeder) dari user ke segmen BPBD terdekat
+            $connectorCoords = ($minDistanceToRoute > 5)
+                ? [[$userLat, $userLng], [$entryPoint['lat'], $entryPoint['lng']]]
+                : [];
+
+            $totalBpbdDist = $minDistanceToRoute + $officialDistance;
+            $bpbdDurMin = max(1, (int) ceil($totalBpbdDist / self::WALKING_SPEED_METERS_PER_MIN));
+            $bpbdDurSec = $bpbdDurMin * 60;
+
+            // Generate instruksi navigasi jalur BPBD
+            $bpbdInstructions = [];
+            $bStep = 1;
+            if ($minDistanceToRoute > 5) {
+                $bpbdInstructions[] = [
+                    'step' => $bStep++,
+                    'text' => "Dari lokasi Anda, bergerak menuju titik masuk jalur resmi BPBD (" . $this->formatDistance($minDistanceToRoute) . ")",
+                    'distance_meters' => round($minDistanceToRoute, 1),
+                    'distance_formatted' => $this->formatDistance($minDistanceToRoute),
+                    'type' => 'straight',
+                    'icon' => 'arrow-up',
+                ];
+            }
+
+            $routeName = $bestRoute->name ?? 'Jalur Evakuasi Resmi BPBD';
+            $bpbdInstructions[] = [
+                'step' => $bStep++,
+                'text' => "Masuk ke Jalur Evakuasi Resmi BPBD ({$routeName})",
+                'distance_meters' => 0,
+                'distance_formatted' => '0 m',
+                'type' => 'enter_official',
+                'icon' => 'shield-check',
             ];
-        }
 
-        // 4. Tentukan MODE SISTEM (Jalur Resmi vs Routing Jalan Umum)
-        $isNearOfficial = ($bestRoute !== null && $distanceToBestRoute <= $threshold);
-
-        if ($isNearOfficial) {
-            return $this->buildMode1OfficialRoute(
-                $userLat,
-                $userLng,
-                $bestFacility,
-                $facilityCoords,
-                $bestRoute,
-                $bestEntryPoint,
-                $bestSegmentIndex,
-                $distanceToBestRoute,
-                $threshold
+            $officialTurnInstructions = $this->generateTurnInstructions(
+                $officialLatLngs,
+                $routeName,
+                $targetFacility->name,
+                'BPBD'
             );
+
+            foreach (array_slice($officialTurnInstructions, 1) as $step) {
+                $step['step'] = $bStep++;
+                $bpbdInstructions[] = $step;
+            }
+
+            $bpbdOption = [
+                'key' => 'bpbd',
+                'name' => 'Jalur BPBD (Resmi)',
+                'label' => 'Jalur BPBD (Resmi)',
+                'route_name' => $routeName,
+                'color' => 'rgb(153, 0, 255)', // Purple
+                'casing_color' => '#581c87',
+                'connector_color' => '#64748b', // Slate / Abu-Biru
+                'coordinates' => $officialLatLngs,
+                'connector_coordinates' => $connectorCoords,
+                'distance_meters' => round($totalBpbdDist, 1),
+                'distance_formatted' => $this->formatDistance($totalBpbdDist),
+                'duration_seconds' => $bpbdDurSec,
+                'duration_formatted' => $this->formatDuration($bpbdDurMin),
+                'instructions' => $bpbdInstructions,
+                'entry_point' => ['lat' => $entryPoint['lat'], 'lng' => $entryPoint['lng']],
+            ];
         } else {
-            return $this->buildMode2HybridRoute(
-                $userLat,
-                $userLng,
-                $bestFacility,
-                $facilityCoords,
-                $bestRoute,
-                $bestEntryPoint,
-                $bestSegmentIndex,
-                $distanceToBestRoute,
-                $threshold
-            );
+            $bpbdOption = $publicOption;
+            $bpbdOption['key'] = 'bpbd';
+            $bpbdOption['name'] = 'Jalur BPBD (Resmi)';
+            $bpbdOption['label'] = 'Jalur BPBD (Resmi)';
+            $bpbdOption['connector_coordinates'] = [];
+            $totalBpbdDist = $publicTotalDist;
+            $minDistanceToRoute = 0;
+            $entryPoint = ['lat' => $targetCoords['lat'], 'lng' => $targetCoords['lng']];
         }
+
+        // 6. Sistem Otomatis Memilih yang Terbaik Sebagai Default:
+        // Prioritaskan jalur resmi BPBD jika dekat (<= 250m) atau jaraknya kompetitif
+        if ($minDistanceToRoute <= 250.0 || $totalBpbdDist <= ($publicTotalDist * 1.15)) {
+            $selectedRouteKey = 'bpbd';
+        } else {
+            $selectedRouteKey = 'public';
+        }
+
+        $activeOption = ($selectedRouteKey === 'bpbd') ? $bpbdOption : $publicOption;
+
+        return [
+            'success' => true,
+            'mode' => ($selectedRouteKey === 'bpbd') ? 'jalur_resmi' : 'jalan_umum',
+            'mode_title' => ($selectedRouteKey === 'bpbd') ? 'Jalur Evakuasi Resmi BPBD' : 'Jalur Umum (OSRM)',
+            'mode_label' => ($selectedRouteKey === 'bpbd') ? 'Jalur BPBD (Resmi)' : 'Jalur Umum (OSRM)',
+            'mode_badge_color' => ($selectedRouteKey === 'bpbd') ? 'purple' : 'blue',
+            'threshold_meters' => $threshold,
+            'distance_to_official_route_meters' => round($minDistanceToRoute, 1),
+            'facility' => $targetFacility,
+            'routes' => $facilityRoutes,
+            'route_options' => [
+                'public' => $publicOption,
+                'bpbd' => $bpbdOption,
+            ],
+            'selected_route_key' => $selectedRouteKey,
+            'summary' => [
+                'distance_meters' => $activeOption['distance_meters'],
+                'distance_formatted' => $activeOption['distance_formatted'],
+                'duration_seconds' => $activeOption['duration_seconds'],
+                'duration_formatted' => $activeOption['duration_formatted'],
+                'user_location' => ['lat' => $userLat, 'lng' => $userLng],
+                'facility_location' => ['lat' => $targetCoords['lat'], 'lng' => $targetCoords['lng']],
+                'entry_point' => $bpbdOption['entry_point'] ?? null,
+            ],
+            'segments' => [
+                'public_road' => [
+                    'source' => $publicOption['source'] ?? 'OSRM',
+                    'coordinates' => $publicOption['coordinates'],
+                    'distance_meters' => $publicOption['distance_meters'],
+                    'distance_formatted' => $publicOption['distance_formatted'],
+                ],
+                'official_evacuation' => [
+                    'route_id' => $bestRoute->id ?? null,
+                    'route_name' => $bestRoute->name ?? 'Jalur Evakuasi BPBD',
+                    'coordinates' => $bpbdOption['coordinates'],
+                    'connector_coordinates' => $bpbdOption['connector_coordinates'] ?? [],
+                    'distance_meters' => $bpbdOption['distance_meters'],
+                    'distance_formatted' => $bpbdOption['distance_formatted'],
+                ],
+            ],
+            'full_route_latlngs' => $activeOption['coordinates'],
+            'instructions' => $activeOption['instructions'],
+            'distance_meters' => $activeOption['distance_meters'],
+        ];
     }
 
     /**
@@ -889,6 +1130,7 @@ class EvacuationRoutingService
     /**
      * Hitung jarak minimum dari titik P ke polylines (rute),
      * serta temukan titik proyeksi dan indeks segmen terdekat.
+     * Mendukung format koordinat ['lat' => x, 'lng' => y] maupun [lat, lng].
      */
     public function pointToPolylineDistance(float $pLat, float $pLng, array $coordinates): array
     {
@@ -902,13 +1144,18 @@ class EvacuationRoutingService
             $a = $coordinates[$i];
             $b = $coordinates[$i + 1];
 
+            $aLat = isset($a['lat']) ? (float)$a['lat'] : (float)$a[0];
+            $aLng = isset($a['lng']) ? (float)$a['lng'] : (float)$a[1];
+            $bLat = isset($b['lat']) ? (float)$b['lat'] : (float)$b[0];
+            $bLng = isset($b['lng']) ? (float)$b['lng'] : (float)$b[1];
+
             $res = $this->pointToSegmentDistance(
                 $pLat,
                 $pLng,
-                $a['lat'],
-                $a['lng'],
-                $b['lat'],
-                $b['lng']
+                $aLat,
+                $aLng,
+                $bLat,
+                $bLng
             );
 
             if ($res['distance'] < $minDist) {
@@ -928,6 +1175,79 @@ class EvacuationRoutingService
     }
 
     /**
+     * Hitung jarak tempuh kumulatif di sepanjang garis polyline dari titik awal (user)
+     * hingga titik proyeksi pada indeks segmen dan faktor t tertentu.
+     */
+    public function calculateDistanceAlongPolyline(array $coordinates, int $segmentIndex, float $t): float
+    {
+        $dist = 0.0;
+        $count = count($coordinates);
+
+        for ($i = 0; $i < $segmentIndex && $i < $count - 1; $i++) {
+            $a = $coordinates[$i];
+            $b = $coordinates[$i + 1];
+
+            $aLat = isset($a['lat']) ? (float)$a['lat'] : (float)$a[0];
+            $aLng = isset($a['lng']) ? (float)$a['lng'] : (float)$a[1];
+            $bLat = isset($b['lat']) ? (float)$b['lat'] : (float)$b[0];
+            $bLng = isset($b['lng']) ? (float)$b['lng'] : (float)$b[1];
+
+            $dist += $this->haversineDistance($aLat, $aLng, $bLat, $bLng);
+        }
+
+        if ($segmentIndex < $count - 1) {
+            $a = $coordinates[$segmentIndex];
+            $b = $coordinates[$segmentIndex + 1];
+
+            $aLat = isset($a['lat']) ? (float)$a['lat'] : (float)$a[0];
+            $aLng = isset($a['lng']) ? (float)$a['lng'] : (float)$a[1];
+            $bLat = isset($b['lat']) ? (float)$b['lat'] : (float)$b[0];
+            $bLng = isset($b['lng']) ? (float)$b['lng'] : (float)$b[1];
+
+            $segLen = $this->haversineDistance($aLat, $aLng, $bLat, $bLng);
+            $dist += $t * $segLen;
+        }
+
+        return $dist;
+    }
+
+    /**
+     * Panggil OSRM Table Service untuk mendapatkan matriks jarak dan durasi nyata
+     * dari lokasi user ke seluruh titik kumpul aktif sekaligus dalam 1 request cepat.
+     */
+    public function fetchOsrmDistanceTable(float $userLat, float $userLng, array $destinations): ?array
+    {
+        if (empty($destinations)) {
+            return null;
+        }
+
+        $osrmBaseUrl = rtrim(config('services.routing.osrm_url', 'https://router.project-osrm.org'), '/');
+        $coords = ["{$userLng},{$userLat}"];
+        foreach ($destinations as $d) {
+            $coords[] = "{$d['lng']},{$d['lat']}";
+        }
+
+        $url = "{$osrmBaseUrl}/table/v1/driving/" . implode(';', $coords) . "?sources=0&annotations=distance,duration";
+
+        try {
+            $resp = Http::timeout(4)->get($url);
+            if ($resp->successful()) {
+                $data = $resp->json();
+                if (($data['code'] ?? '') === 'Ok' && !empty($data['distances'][0])) {
+                    return [
+                        'distances' => $data['distances'][0],
+                        'durations' => $data['durations'][0] ?? [],
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('OSRM Table API gagal: ' . $e->getMessage());
+        }
+
+        return null;
+    }
+
+    /**
      * Pastikan arah polylines rute resmi mengalir menuju fasilitas evakuasi.
      */
     protected function orientPolylineTowardsFacility(array $points, float $fLat, float $fLng): array
@@ -939,10 +1259,16 @@ class EvacuationRoutingService
         $firstPt = reset($points);
         $lastPt = end($points);
 
-        $distFromFirst = $this->haversineDistance($firstPt['lat'], $firstPt['lng'], $fLat, $fLng);
-        $distFromLast = $this->haversineDistance($lastPt['lat'], $lastPt['lng'], $fLat, $fLng);
+        $firstLat = isset($firstPt['lat']) ? (float)$firstPt['lat'] : (float)$firstPt[0];
+        $firstLng = isset($firstPt['lng']) ? (float)$firstPt['lng'] : (float)$firstPt[1];
+        $lastLat = isset($lastPt['lat']) ? (float)$lastPt['lat'] : (float)$lastPt[0];
+        $lastLng = isset($lastPt['lng']) ? (float)$lastPt['lng'] : (float)$lastPt[1];
+
+        $distFromFirst = $this->haversineDistance($firstLat, $firstLng, $fLat, $fLng);
+        $distFromLast = $this->haversineDistance($lastLat, $lastLng, $fLat, $fLng);
 
         // Jika titik awal lebih dekat ke fasilitas dibanding titik akhir, balik urutan array
+        // agar titik akhir mengarah tepat ke fasilitas titik kumpul
         if ($distFromFirst < $distFromLast) {
             return array_reverse($points);
         }
@@ -960,23 +1286,26 @@ class EvacuationRoutingService
         array $facilityCoords
     ): array {
         $result = [];
-        $result[] = $entryPoint;
+        $result[] = ['lat' => $entryPoint['lat'], 'lng' => $entryPoint['lng']];
 
         $count = count($orientedPoints);
         $startIndex = min($count - 1, $segmentIndex + 1);
 
         for ($i = $startIndex; $i < $count; $i++) {
             $pt = $orientedPoints[$i];
+            $ptLat = isset($pt['lat']) ? (float)$pt['lat'] : (float)$pt[0];
+            $ptLng = isset($pt['lng']) ? (float)$pt['lng'] : (float)$pt[1];
+
             // Hindari duplikasi jika entryPoint berhimpitan dengan vertex
-            if ($this->haversineDistance($entryPoint['lat'], $entryPoint['lng'], $pt['lat'], $pt['lng']) > 2) {
-                $result[] = $pt;
+            if ($this->haversineDistance($entryPoint['lat'], $entryPoint['lng'], $ptLat, $ptLng) > 2) {
+                $result[] = ['lat' => $ptLat, 'lng' => $ptLng];
             }
         }
 
         // Tambahkan koordinat fasilitas di ujung akhir
         $last = end($result);
         if (!$last || $this->haversineDistance($last['lat'], $last['lng'], $facilityCoords['lat'], $facilityCoords['lng']) > 5) {
-            $result[] = $facilityCoords;
+            $result[] = ['lat' => $facilityCoords['lat'], 'lng' => $facilityCoords['lng']];
         }
 
         return $result;
@@ -993,7 +1322,13 @@ class EvacuationRoutingService
         for ($i = 0; $i < $count - 1; $i++) {
             $p1 = $latLngArray[$i];
             $p2 = $latLngArray[$i + 1];
-            $length += $this->haversineDistance($p1[0], $p1[1], $p2[0], $p2[1]);
+
+            $p1Lat = isset($p1['lat']) ? (float)$p1['lat'] : (float)$p1[0];
+            $p1Lng = isset($p1['lng']) ? (float)$p1['lng'] : (float)$p1[1];
+            $p2Lat = isset($p2['lat']) ? (float)$p2['lat'] : (float)$p2[0];
+            $p2Lng = isset($p2['lng']) ? (float)$p2['lng'] : (float)$p2[1];
+
+            $length += $this->haversineDistance($p1Lat, $p1Lng, $p2Lat, $p2Lng);
         }
 
         return $length;

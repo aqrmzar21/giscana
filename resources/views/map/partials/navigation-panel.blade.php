@@ -51,29 +51,32 @@
             </button>
         </div>
 
-        {{-- Opsi Pilihan Rute: Jalur Umum (Google Maps) vs Jalur Resmi BPBD (Ungu) --}}
+        {{-- Opsi Pilihan Rute: Jalur Umum (OSRM) vs Jalur Resmi BPBD (Ungu) --}}
         <div id="navRouteOptionsContainer" class="space-y-1.5">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">PILIHAN RUTE EVAKUASI</span>
-                <span class="text-[9px] text-slate-400">Klik rute atau kartu</span>
+                <span class="text-[9px] text-slate-400">Klik opsi atau rute</span>
             </div>
 
             <div class="grid grid-cols-2 gap-2" id="navRouteOptionCards">
-                {{-- Opsi 1: Jalur Umum (Google Maps Style - Biru) --}}
+                {{-- Opsi 1: Jalur Umum (OSRM - Biru) --}}
                 <button type="button" id="btnSelectRoutePublic" onclick="window.selectEvacuationRoute && window.selectEvacuationRoute('public')"
                     class="p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-400 shadow-xs">
                     <div class="flex items-center justify-between mb-1">
-                        <span class="text-[11px] font-bold flex items-center gap-1 text-blue-600 dark:text-blue-400">
-                            <span>🛣️</span> Jalur Umum
+                        <span class="text-[11px] font-bold flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
+                            <span id="radioIconPublic" class="text-xs font-bold text-blue-600 dark:text-blue-400">○</span>
+                            <span>Jalur Umum (OSRM)</span>
                         </span>
-                        <span id="badgeActivePublic" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">Pilih</span>
                     </div>
-                    <div class="text-xs font-black text-slate-800 dark:text-slate-100" id="cardPublicDist">--</div>
-                    <div class="text-[10px] text-slate-500 dark:text-slate-400 flex items-center justify-between mt-0.5">
-                        <span id="cardPublicDur">--</span>
-                        <span class="text-[9px] text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-0.5">
-                            <span class="inline-block w-2 h-2 rounded-full bg-blue-500"></span> Google
-                        </span>
+                    <div class="space-y-0.5 mt-1">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-[9px] text-slate-500 dark:text-slate-400 font-medium">Jarak:</span>
+                            <span class="font-black text-slate-800 dark:text-slate-100" id="cardPublicDist">--</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-[9px] text-slate-500 dark:text-slate-400 font-medium">Waktu:</span>
+                            <span class="font-bold text-blue-600 dark:text-blue-400" id="cardPublicDur">--</span>
+                        </div>
                     </div>
                 </button>
 
@@ -81,24 +84,23 @@
                 <button type="button" id="btnSelectRouteBpbd" onclick="window.selectEvacuationRoute && window.selectEvacuationRoute('bpbd')"
                     class="p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer focus:outline-none relative overflow-hidden bg-purple-50/70 dark:bg-purple-950/40 border-purple-400 dark:border-purple-600 shadow-xs">
                     <div class="flex items-center justify-between mb-1">
-                        <span class="text-[11px] font-bold flex items-center gap-1 text-purple-700 dark:text-purple-300">
-                            <span>🛡️</span> Jalur BPBD
+                        <span class="text-[11px] font-bold flex items-center gap-1.5 text-purple-700 dark:text-purple-300">
+                            <span id="radioIconBpbd" class="text-xs font-bold text-purple-700 dark:text-purple-300">◉</span>
+                            <span>Jalur BPBD (Resmi)</span>
                         </span>
-                        <span id="badgeActiveBpbd" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-purple-200 text-purple-800 dark:bg-purple-800 dark:text-purple-200">Aktif ✓</span>
                     </div>
-                    <div class="text-xs font-black text-purple-950 dark:text-purple-100" id="cardBpbdDist">--</div>
-                    <div class="text-[10px] text-purple-700/80 dark:text-purple-300 flex items-center justify-between mt-0.5">
-                        <span id="cardBpbdDur">--</span>
-                        <span class="text-[9px] text-purple-700 dark:text-purple-300 font-semibold flex items-center gap-0.5">
-                            <span class="inline-block w-2 h-2 rounded-full" style="background-color:rgb(153, 0, 255);"></span> Resmi
-                        </span>
+                    <div class="space-y-0.5 mt-1">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-[9px] text-slate-500 dark:text-slate-400 font-medium">Jarak:</span>
+                            <span class="font-black text-purple-950 dark:text-purple-100" id="cardBpbdDist">--</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-[9px] text-slate-500 dark:text-slate-400 font-medium">Waktu:</span>
+                            <span class="font-bold text-purple-700 dark:text-purple-300" id="cardBpbdDur">--</span>
+                        </div>
                     </div>
                 </button>
             </div>
-
-            <!-- <p class="text-[9px] text-slate-400 dark:text-slate-500 italic flex items-center gap-1 pt-0.5">
-                <span>💡</span> Klik garis rute pada peta atau tombol di atas untuk beralih rute
-            </p> -->
         </div>
 
         {{-- Panduan Arah (Daftar Instruksi Langkah Demi Langkah) --}}
