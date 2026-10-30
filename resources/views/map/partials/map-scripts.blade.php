@@ -1457,18 +1457,6 @@
                     }
                 }
 
-                    publicHit.on('mouseover', function() {
-                        if (activeRouteKey !== 'public') {
-                            publicMain.setStyle({ opacity: 0.9, weight: 6 });
-                        }
-                    });
-                    publicHit.on('mouseout', function() {
-                        if (activeRouteKey !== 'public') {
-                            updateRoutePolylinesVisual(activeRouteKey);
-                        }
-                    });
-                }
-
                 // Terapkan visual style rute aktif & alternatif
                 updateRoutePolylinesVisual(activeRouteKey);
 
@@ -1893,7 +1881,8 @@
                     const id = String(props.id || props.district_id || '');
 
                     // Border Tetap Hitam untuk SEMUA Kecamatan
-                    const borderColor = '#000000ff'; 
+                    // const borderColor = '#000000ff'; // hitam
+                    const borderColor = '#fffb00ff'; 
 
                     // Pembeda Warna Isi (Fill Color) Warm & Kental
                     if (name.includes('bone raya') || id === '1') {
