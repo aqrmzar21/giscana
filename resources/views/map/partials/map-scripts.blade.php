@@ -1102,8 +1102,15 @@
                 if (optPublic.coordinates && optPublic.coordinates.length > 0) {
                     allLatLngs = allLatLngs.concat(optPublic.coordinates);
                 }
-                if (optBpbd.connector_coordinates && optBpbd.connector_coordinates.length > 0) {
+                // Include feeder_coordinates (rute OSRM nyata user→entry BPBD)
+                if (optBpbd.feeder_coordinates && optBpbd.feeder_coordinates.length > 0) {
+                    allLatLngs = allLatLngs.concat(optBpbd.feeder_coordinates);
+                } else if (optBpbd.connector_coordinates && optBpbd.connector_coordinates.length > 0) {
                     allLatLngs = allLatLngs.concat(optBpbd.connector_coordinates);
+                }
+                // Include exit_coordinates (jalan lokal dari endpoint BPBD ke facility)
+                if (optBpbd.exit_coordinates && optBpbd.exit_coordinates.length > 0) {
+                    allLatLngs = allLatLngs.concat(optBpbd.exit_coordinates);
                 }
                 if (allLatLngs.length === 0) {
                     allLatLngs = [[lat, lng], [fLat, fLng]];
@@ -1119,18 +1126,24 @@
                     window.selectEvacuationRoute('bpbd');
                 };
 
-                // 1. Gambar Garis Penghubung Tipis Putus-putus Abu-Biru (Feeder dari Posisi User ke Jalur BPBD)
-                if (optBpbd.connector_coordinates && optBpbd.connector_coordinates.length > 1) {
-                    const bpbdConnector = L.polyline(optBpbd.connector_coordinates, {
-                        color: '#64748b', // Abu-biru (slate-500)
-                        weight: 2.5,
-                        dashArray: '5, 8',
-                        opacity: 0.95,
+                // 1. Gambar Garis Penghubung (Feeder: user → titik masuk BPBD)
+                // Prioritas: feeder_coordinates (rute OSRM nyata), fallback connector_coordinates (garis lurus)
+                const feederCoords = (optBpbd.feeder_coordinates && optBpbd.feeder_coordinates.length > 1)
+                    ? optBpbd.feeder_coordinates
+                    : (optBpbd.connector_coordinates && optBpbd.connector_coordinates.length > 1 ? optBpbd.connector_coordinates : null);
+
+                if (feederCoords) {
+                    const isRealRoute = optBpbd.feeder_coordinates && optBpbd.feeder_coordinates.length > 2;
+                    const bpbdConnector = L.polyline(feederCoords, {
+                        color: isRealRoute ? '#0ea5e9' : '#64748b', // Biru langit jika real route, slate jika garis lurus
+                        weight: isRealRoute ? 3.5 : 2.5,
+                        dashArray: isRealRoute ? '7, 6' : '5, 8',
+                        opacity: 0.9,
                         lineCap: 'round',
                         lineJoin: 'round'
                     }).addTo(userRouteLayerGroup);
 
-                    bpbdConnector.bindTooltip(`<b>Garis Penghubung ke Jalur BPBD</b><br>Menghubungkan posisi Anda ke rute evakuasi resmi`, {
+                    bpbdConnector.bindTooltip(`<b>Jalur Menuju Koridor BPBD</b><br>Menghubungkan posisi Anda ke rute evakuasi resmi`, {
                         sticky: true,
                         direction: 'top',
                         className: 'route-tooltip'
@@ -1199,6 +1212,25 @@
                             .bindPopup(`<b>Titik Masuk Jalur Evakuasi Resmi BPBD</b><br>${optBpbd.route_name || 'Jalur Evakuasi BPBD'}<br><button type="button" onclick="window.selectEvacuationRoute('bpbd')" style="margin-top:6px;padding:4px 8px;background:#7e22ce;color:white;border:none;border-radius:6px;font-size:10px;font-weight:bold;cursor:pointer;">Pilih Jalur Resmi BPBD</button>`);
                         jMarker.on('click', handleBpbdClick);
                     }
+                }
+
+                // 2b. Gambar Exit Route (jalan lokal dari endpoint BPBD ke titik kumpul) — teal dashed
+                if (optBpbd.exit_coordinates && optBpbd.exit_coordinates.length > 1) {
+                    const exitLine = L.polyline(optBpbd.exit_coordinates, {
+                        color: '#0d9488',  // Teal-600
+                        weight: 3,
+                        dashArray: '8, 6',
+                        opacity: 0.85,
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    }).addTo(userRouteLayerGroup);
+
+                    exitLine.bindTooltip(`<b>Jalur Keluar ke Titik Kumpul</b><br>Jalan lokal menuju ${data.facility?.name || 'titik kumpul'}`, {
+                        sticky: true,
+                        direction: 'top',
+                        className: 'route-tooltip'
+                    });
+                    exitLine.on('click', handleBpbdClick);
                 }
 
                 // 3. Gambar Jalur Umum (OSRM - Biru Solid)
