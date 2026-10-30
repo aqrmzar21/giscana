@@ -146,7 +146,7 @@
             </div>
             
             <!-- Section 0: Toggle Switch Posisi Saya -->
-            <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider block py-2 dark:text-white/80">LOKASI SAYA</span>
+            <h6 class="text-xs font-bold text-slate-700 uppercase tracking-wider py-2 dark:text-white/80">LOKASI SAYA</h6>
             <div class="mb-4">
                 <div class="grid grid-cols-[auto_1fr_1fr] gap-2 items-center">
                     <!-- // Tombol 1: Posisi Saya (Toggle ON/OFF) -->
@@ -159,7 +159,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.414 10l4.244 4.243a1 1 0 01-.707 1.707l-8.486 0M13.414 10l2.122-2.122a1 1 0 011.414 0L20 10"/>
                         </svg>
-                        <span class="text-sm">Cari</span>
+                        <span class="text-sm">Cari Rute</span>
                     </button>
 
                     <!-- // Tombol 3: Reset Rute (Menghapus routing tanpa menghapus marker user) -->

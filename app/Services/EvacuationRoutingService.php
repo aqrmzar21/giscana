@@ -143,13 +143,55 @@ class EvacuationRoutingService
             $publicRoadRoute = $candidateRoute;
         }
 
-        // 4. Bangun Opsi 1: Jalur Umum (OSRM)
-        $publicTotalDist = (float) ($publicRoadRoute['distance_meters'] ?? 0);
+        // 4. Bangun Opsi 1: Jalur Umum (OSRM) dengan jaminan keterhubungan titik awal & akhir
+        $publicCoords = $publicRoadRoute['coordinates'] ?? [];
+        $publicConnectorStart = [];
+        $publicConnectorEnd = [];
+        $extraDist = 0.0;
+        $dStart = 0.0;
+        $dEnd = 0.0;
+
+        if (!empty($publicCoords)) {
+            // Cek selisih titik user dengan awal rute OSRM
+            $firstPt = reset($publicCoords);
+            $dStart = $this->haversineDistance($userLat, $userLng, $firstPt[0], $firstPt[1]);
+            if ($dStart > 1.5) {
+                $publicConnectorStart = [[$userLat, $userLng], $firstPt];
+                array_unshift($publicCoords, [$userLat, $userLng]);
+                $extraDist += $dStart;
+            }
+
+            // Cek selisih titik akhir rute OSRM dengan titik kumpul
+            $lastPt = end($publicCoords);
+            $dEnd = $this->haversineDistance($lastPt[0], $lastPt[1], $targetCoords['lat'], $targetCoords['lng']);
+            if ($dEnd > 1.5) {
+                $publicConnectorEnd = [$lastPt, [$targetCoords['lat'], $targetCoords['lng']]];
+                $publicCoords[] = [$targetCoords['lat'], $targetCoords['lng']];
+                $extraDist += $dEnd;
+            }
+        } else {
+            $publicCoords = [[$userLat, $userLng], [$targetCoords['lat'], $targetCoords['lng']]];
+            $extraDist = $this->haversineDistance($userLat, $userLng, $targetCoords['lat'], $targetCoords['lng']);
+        }
+
+        $publicTotalDist = (float) ($publicRoadRoute['distance_meters'] ?? 0) + $extraDist;
         $publicDurMin = max(1, (int) ceil($publicTotalDist / self::WALKING_SPEED_METERS_PER_MIN));
         $publicDurSec = $publicDurMin * 60;
 
         $publicInstructions = [];
         $pStep = 1;
+
+        if (!empty($publicConnectorStart) && $dStart > 5.0) {
+            $publicInstructions[] = [
+                'step' => $pStep++,
+                'text' => "Dari lokasi Anda, berjalan menuju akses jalan raya (" . $this->formatDistance($dStart) . ")",
+                'distance_meters' => round($dStart, 1),
+                'distance_formatted' => $this->formatDistance($dStart),
+                'type' => 'straight',
+                'icon' => 'arrow-up',
+            ];
+        }
+
         if (!empty($publicRoadRoute['steps'])) {
             foreach ($publicRoadRoute['steps'] as $s) {
                 if (($s['type'] ?? '') === 'arrive') continue;
@@ -172,6 +214,18 @@ class EvacuationRoutingService
                 'icon' => 'arrow-up',
             ];
         }
+
+        if (!empty($publicConnectorEnd) && $dEnd > 5.0) {
+            $publicInstructions[] = [
+                'step' => $pStep++,
+                'text' => "Lanjutkan melalui jalur akses menuju {$targetFacility->name} (" . $this->formatDistance($dEnd) . ")",
+                'distance_meters' => round($dEnd, 1),
+                'distance_formatted' => $this->formatDistance($dEnd),
+                'type' => 'straight',
+                'icon' => 'arrow-up',
+            ];
+        }
+
         $publicInstructions[] = [
             'step' => $pStep++,
             'text' => "Tiba di Titik Kumpul: {$targetFacility->name}",
@@ -188,7 +242,9 @@ class EvacuationRoutingService
             'source' => $publicRoadRoute['source'] ?? 'OSRM',
             'color' => '#2563eb', // Royal Blue
             'casing_color' => '#174ea6',
-            'coordinates' => $publicRoadRoute['coordinates'],
+            'coordinates' => $publicCoords,
+            'connector_start' => $publicConnectorStart,
+            'connector_end' => $publicConnectorEnd,
             'distance_meters' => round($publicTotalDist, 1),
             'distance_formatted' => $this->formatDistance($publicTotalDist),
             'duration_seconds' => $publicDurSec,
@@ -390,36 +446,48 @@ class EvacuationRoutingService
         $entryPoint = ['lat' => $bestCandidate['lat'], 'lng' => $bestCandidate['lng']];
         $segmentIndex = $bestCandidate['segment_index'];
 
-        // --- C. Corridor segment: potong BPBD dari entry point menuju titik kumpul ---
-        $officialCoords = $this->sliceOfficialRouteFromEntry($bestOrientedPoints, $entryPoint, $segmentIndex, $targetCoords);
+        // --- C. Corridor segment: potong BPBD dari entry point menuju ujung rute resmi ---
+        // Catatan: Jangan paksakan garis lurus ke fasilitas di sini, agar segmen keluar (exit) dapat dihitung terpisah
+        $officialCoords = $this->sliceOfficialRouteFromEntry($bestOrientedPoints, $entryPoint, $segmentIndex, null);
         $officialLatLngs = array_map(fn($p) => [$p['lat'], $p['lng']], $officialCoords);
         $officialDistance = $this->calculatePolylineLength($officialLatLngs);
 
-        // --- D. Feeder route: OSRM nyata dari user ke entry point (bukan garis lurus) ---
-        $feederDist = $bestCandidate['road_distance'];
+        // --- D. Feeder route (Connector Awal): dari posisi user menuju entry point BPBD ---
+        $userToEntryDist = $this->haversineDistance($userLat, $userLng, $entryPoint['lat'], $entryPoint['lng']);
         $feederCoords = [];
-        $feederIsRealRoute = false;
+        $feederDist = 0.0;
 
-        if ($feederDist > 5) {
-            try {
-                $feederRoute = $this->fetchPublicRoadRoute($userLng, $userLat, $entryPoint['lng'], $entryPoint['lat']);
-                if (!empty($feederRoute['coordinates']) && count($feederRoute['coordinates']) >= 2) {
-                    $feederCoords = $feederRoute['coordinates']; // format [[lat, lng], ...]
-                    $feederDist = (float) ($feederRoute['distance_meters'] ?? $feederDist);
-                    $feederIsRealRoute = true;
+        if ($userToEntryDist > 1.0) {
+            $feederDist = $userToEntryDist;
+            if ($userToEntryDist > 25.0) {
+                try {
+                    $feederRoute = $this->fetchPublicRoadRoute($userLng, $userLat, $entryPoint['lng'], $entryPoint['lat']);
+                    if (!empty($feederRoute['coordinates']) && count($feederRoute['coordinates']) >= 2) {
+                        $feederCoords = $feederRoute['coordinates']; // format [[lat, lng], ...]
+                        $feederDist = (float) ($feederRoute['distance_meters'] ?? $userToEntryDist);
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('BPBD Feeder OSRM gagal: ' . $e->getMessage());
                 }
-            } catch (\Throwable $e) {
-                Log::warning('BPBD Feeder OSRM gagal: ' . $e->getMessage());
             }
 
-            // Fallback: garis lurus putus-putus jika OSRM gagal
-            if (!$feederIsRealRoute) {
+            // Fallback: garis lurus jika OSRM gagal atau jarak dekat
+            if (empty($feederCoords)) {
                 $feederCoords = [[$userLat, $userLng], [$entryPoint['lat'], $entryPoint['lng']]];
-                $feederDist = $this->haversineDistance($userLat, $userLng, $entryPoint['lat'], $entryPoint['lng']);
+                $feederDist = $userToEntryDist;
+            } else {
+                // Pastikan titik pertama tepat di posisi user, dan titik terakhir tepat di entryPoint
+                if ($this->haversineDistance($userLat, $userLng, $feederCoords[0][0], $feederCoords[0][1]) > 0.5) {
+                    array_unshift($feederCoords, [$userLat, $userLng]);
+                }
+                $lastF = end($feederCoords);
+                if ($this->haversineDistance($entryPoint['lat'], $entryPoint['lng'], $lastF[0], $lastF[1]) > 0.5) {
+                    $feederCoords[] = [$entryPoint['lat'], $entryPoint['lng']];
+                }
             }
         }
 
-        // --- E. Exit check: jika endpoint BPBD masih jauh dari facility, tambah OSRM exit ---
+        // --- E. Exit check (Connector Akhir): dari ujung rute BPBD menuju titik kumpul ---
         $exitCoords = [];
         $exitDist = 0.0;
 
@@ -430,21 +498,39 @@ class EvacuationRoutingService
                 $targetCoords['lat'], $targetCoords['lng']
             );
 
-            if ($distToFacility > 200) {
-                try {
-                    $exitRoute = $this->fetchPublicRoadRoute(
-                        $bpbdEndpoint[1], $bpbdEndpoint[0],
-                        $targetCoords['lng'], $targetCoords['lat']
-                    );
-                    if (!empty($exitRoute['coordinates']) && count($exitRoute['coordinates']) >= 2) {
-                        $exitCoords = $exitRoute['coordinates'];
-                        $exitDist = (float) ($exitRoute['distance_meters'] ?? $distToFacility);
-                        // Koreksi officialDistance: kurangi segmen terakhir yang digantikan exit
-                        $officialDistance = max(0, $officialDistance - $distToFacility);
+            if ($distToFacility > 1.0) {
+                $exitDist = $distToFacility;
+                if ($distToFacility > 25.0) {
+                    try {
+                        $exitRoute = $this->fetchPublicRoadRoute(
+                            $bpbdEndpoint[1], $bpbdEndpoint[0],
+                            $targetCoords['lng'], $targetCoords['lat']
+                        );
+                        if (!empty($exitRoute['coordinates']) && count($exitRoute['coordinates']) >= 2) {
+                            $exitCoords = $exitRoute['coordinates'];
+                            $exitDist = (float) ($exitRoute['distance_meters'] ?? $distToFacility);
+                        }
+                    } catch (\Throwable $e) {
+                        Log::warning('BPBD Exit OSRM gagal: ' . $e->getMessage());
                     }
-                } catch (\Throwable $e) {
-                    Log::warning('BPBD Exit OSRM gagal: ' . $e->getMessage());
                 }
+
+                if (empty($exitCoords)) {
+                    $exitCoords = [[$bpbdEndpoint[0], $bpbdEndpoint[1]], [$targetCoords['lat'], $targetCoords['lng']]];
+                    $exitDist = $distToFacility;
+                } else {
+                    // Pastikan titik pertama tepat di bpbdEndpoint, dan titik terakhir tepat di targetCoords
+                    if ($this->haversineDistance($bpbdEndpoint[0], $bpbdEndpoint[1], $exitCoords[0][0], $exitCoords[0][1]) > 0.5) {
+                        array_unshift($exitCoords, [$bpbdEndpoint[0], $bpbdEndpoint[1]]);
+                    }
+                    $lastE = end($exitCoords);
+                    if ($this->haversineDistance($targetCoords['lat'], $targetCoords['lng'], $lastE[0], $lastE[1]) > 0.5) {
+                        $exitCoords[] = [$targetCoords['lat'], $targetCoords['lng']];
+                    }
+                }
+            } else {
+                // Endpoint BPBD sudah berhimpitan dengan fasilitas (<= 1m)
+                $officialLatLngs[count($officialLatLngs) - 1] = [$targetCoords['lat'], $targetCoords['lng']];
             }
         }
 
@@ -453,15 +539,15 @@ class EvacuationRoutingService
         $bpbdDurMin = max(1, (int) ceil($totalBpbdDist / self::WALKING_SPEED_METERS_PER_MIN));
         $bpbdDurSec = $bpbdDurMin * 60;
 
-        // Connector coordinates: feeder jika real route, fallback garis lurus dua titik
-        $connectorCoords = $feederIsRealRoute ? [] : $feederCoords; // dashed line hanya jika feeder bukan road route
+        // Connector coordinates: selalu sediakan koordinat penghubung awal (feeder)
+        $connectorCoords = $feederCoords;
 
-        // --- G. Generate instruksi ---
+        // --- G. Generate instruksi terstruktur ---
         $bpbdInstructions = [];
         $bStep = 1;
         $routeName = $bestRoute->name ?? 'Jalur Evakuasi Resmi BPBD';
 
-        if ($feederDist > 5) {
+        if (!empty($feederCoords) && $feederDist > 1.0) {
             $bpbdInstructions[] = [
                 'step' => $bStep++,
                 'text' => 'Dari lokasi Anda, bergerak menuju titik masuk jalur resmi BPBD (' . $this->formatDistance($feederDist) . ')',
@@ -488,14 +574,17 @@ class EvacuationRoutingService
             'BPBD'
         );
         foreach (array_slice($officialTurnInstructions, 1) as $step) {
+            if ($step['type'] === 'arrive' && !empty($exitCoords) && $exitDist > 1.0) {
+                continue; // Jangan tiba dulu jika masih ada exit connector
+            }
             $step['step'] = $bStep++;
             $bpbdInstructions[] = $step;
         }
 
-        if (!empty($exitCoords)) {
+        if (!empty($exitCoords) && $exitDist > 1.0) {
             $bpbdInstructions[] = [
                 'step' => $bStep++,
-                'text' => 'Ikuti jalan lokal menuju ' . $targetFacility->name . ' (' . $this->formatDistance($exitDist) . ')',
+                'text' => 'Lanjutkan melalui jalan akses menuju ' . $targetFacility->name . ' (' . $this->formatDistance($exitDist) . ')',
                 'distance_meters' => round($exitDist, 1),
                 'distance_formatted' => $this->formatDistance($exitDist),
                 'type' => 'straight',
@@ -1546,7 +1635,7 @@ class EvacuationRoutingService
         array $orientedPoints,
         array $entryPoint,
         int $segmentIndex,
-        array $facilityCoords
+        ?array $facilityCoords = null
     ): array {
         $result = [];
         $result[] = ['lat' => $entryPoint['lat'], 'lng' => $entryPoint['lng']];
@@ -1565,10 +1654,12 @@ class EvacuationRoutingService
             }
         }
 
-        // Tambahkan koordinat fasilitas di ujung akhir
-        $last = end($result);
-        if (!$last || $this->haversineDistance($last['lat'], $last['lng'], $facilityCoords['lat'], $facilityCoords['lng']) > 5) {
-            $result[] = ['lat' => $facilityCoords['lat'], 'lng' => $facilityCoords['lng']];
+        // Tambahkan koordinat fasilitas di ujung akhir hanya jika diminta eksplisit
+        if ($facilityCoords !== null) {
+            $last = end($result);
+            if (!$last || $this->haversineDistance($last['lat'], $last['lng'], $facilityCoords['lat'], $facilityCoords['lng']) > 2) {
+                $result[] = ['lat' => $facilityCoords['lat'], 'lng' => $facilityCoords['lng']];
+            }
         }
 
         return $result;
