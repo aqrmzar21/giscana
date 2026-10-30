@@ -1076,7 +1076,7 @@
                     }).openPopup();
                 }
 
-                // --- B. GAMBAR DUAL RUTE HYBRID (SATU WARNA UNGU BPBD VS BIRU GOOGLE MAPS) ---
+                // --- B. GAMBAR DUAL RUTE HYBRID ---
                 userRouteLayerGroup.clearLayers();
                 currentRoutingData = data;
                 activeRouteKey = data.selected_route_key || 'bpbd';
@@ -1095,26 +1095,114 @@
                     instructions: []
                 };
 
+                // ── HELPER: hitung jarak dua koordinat [lat,lng] dalam meter ──
+                function haversinePt(a, b) {
+                    const R = 6371000, dLat = (b[0]-a[0])*Math.PI/180, dLng = (b[1]-a[1])*Math.PI/180;
+                    const s = Math.sin(dLat/2)**2 + Math.cos(a[0]*Math.PI/180)*Math.cos(b[0]*Math.PI/180)*Math.sin(dLng/2)**2;
+                    return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1-s));
+                }
+
+                // ── HELPER: pastikan ujung array koordinat terhubung ke titik referensi ──
+                // Jika jarak ujung terakhir ke ref > thresholdM, tambahkan ref sebagai titik akhir.
+                function ensureTail(coords, ref, thresholdM = 8) {
+                    if (!coords || coords.length === 0) return [[ref[0], ref[1]]];
+                    const tail = coords[coords.length - 1];
+                    if (haversinePt(tail, ref) > thresholdM) {
+                        return [...coords, [ref[0], ref[1]]];
+                    }
+                    return coords;
+                }
+
+                // ── HELPER: pastikan ujung pertama array koordinat terhubung ke titik referensi ──
+                function ensureHead(coords, ref, thresholdM = 8) {
+                    if (!coords || coords.length === 0) return [[ref[0], ref[1]]];
+                    const head = coords[0];
+                    if (haversinePt(head, ref) > thresholdM) {
+                        return [[ref[0], ref[1]], ...coords];
+                    }
+                    return coords;
+                }
+
+                // ── HELPER: jika gap antara ujung array A dan awal array B > threshold, sisipkan bridge ──
+                function bridgeGap(segA, segB, thresholdM = 8) {
+                    if (!segA || segA.length === 0 || !segB || segB.length === 0) return null;
+                    const tailA = segA[segA.length - 1];
+                    const headB = segB[0];
+                    if (haversinePt(tailA, headB) > thresholdM) {
+                        return [tailA, headB]; // garis penghubung dua titik
+                    }
+                    return null;
+                }
+
+                const userPt  = [lat, lng];
+                const destPt  = [fLat, fLng];
+
+                // ── Normalisasi: Jalur Umum (Public OSRM) ──
+                let publicCoords = (optPublic.coordinates && optPublic.coordinates.length > 1)
+                    ? optPublic.coordinates.map(p => Array.isArray(p) ? p : [p.lat, p.lng])
+                    : null;
+                if (publicCoords) {
+                    publicCoords = ensureHead(publicCoords, userPt);   // harus mulai dari user
+                    publicCoords = ensureTail(publicCoords, destPt);   // harus berakhir di titik kumpul
+                }
+
+                // ── Normalisasi: Feeder BPBD (user → entry point) ──
+                let feederCoords = null;
+                if (optBpbd.feeder_coordinates && optBpbd.feeder_coordinates.length > 1) {
+                    feederCoords = optBpbd.feeder_coordinates.map(p => Array.isArray(p) ? p : [p.lat, p.lng]);
+                    feederCoords = ensureHead(feederCoords, userPt);   // harus mulai dari user
+                } else if (optBpbd.connector_coordinates && optBpbd.connector_coordinates.length > 1) {
+                    feederCoords = optBpbd.connector_coordinates.map(p => Array.isArray(p) ? p : [p.lat, p.lng]);
+                    feederCoords = ensureHead(feederCoords, userPt);
+                }
+
+                // ── Normalisasi: Koridor BPBD (entry → endpoint BPBD) ──
+                let bpbdCorridor = (optBpbd.coordinates && optBpbd.coordinates.length > 1)
+                    ? optBpbd.coordinates.map(p => Array.isArray(p) ? p : [p.lat, p.lng])
+                    : null;
+
+                // ── Normalisasi: Exit BPBD (endpoint BPBD → titik kumpul) ──
+                let exitCoords = (optBpbd.exit_coordinates && optBpbd.exit_coordinates.length > 1)
+                    ? optBpbd.exit_coordinates.map(p => Array.isArray(p) ? p : [p.lat, p.lng])
+                    : null;
+
+                // Jika tidak ada feeder, tapi bpbdCorridor tidak dimulai dari user → buat connector bridge
+                if (!feederCoords && bpbdCorridor) {
+                    const gapToCorridorHead = haversinePt(userPt, bpbdCorridor[0]);
+                    if (gapToCorridorHead > 8) {
+                        feederCoords = [userPt, bpbdCorridor[0]];
+                    }
+                } else if (feederCoords && bpbdCorridor) {
+                    // Bridge gap antara ujung feeder dan kepala koridor (jika ada)
+                    const feederTail = feederCoords[feederCoords.length - 1];
+                    const corridorHead = bpbdCorridor[0];
+                    if (haversinePt(feederTail, corridorHead) > 8) {
+                        bpbdCorridor = ensureHead(bpbdCorridor, feederTail);
+                    }
+                }
+
+                // Jika tidak ada exit, periksa apakah ujung koridor BPBD sudah di titik kumpul
+                if (!exitCoords && bpbdCorridor) {
+                    const corridorTail = bpbdCorridor[bpbdCorridor.length - 1];
+                    if (haversinePt(corridorTail, destPt) > 20) {
+                        // Buat garis penghubung putus-putus dari endpoint BPBD ke titik kumpul
+                        exitCoords = [corridorTail, destPt];
+                    }
+                } else if (exitCoords) {
+                    exitCoords = ensureTail(exitCoords, destPt);       // exit harus berakhir di titik kumpul
+                }
+
+                // Jika tidak ada feeder dan tidak ada koridor, buat jalur langsung user → dest
+                if (!feederCoords && !bpbdCorridor) {
+                    feederCoords = [userPt, destPt];
+                }
+
+                // ── Kumpulkan allLatLngs untuk fitBounds ──
                 let allLatLngs = [];
-                if (optBpbd.coordinates && optBpbd.coordinates.length > 0) {
-                    allLatLngs = allLatLngs.concat(optBpbd.coordinates);
-                }
-                if (optPublic.coordinates && optPublic.coordinates.length > 0) {
-                    allLatLngs = allLatLngs.concat(optPublic.coordinates);
-                }
-                // Include feeder_coordinates (rute OSRM nyata user→entry BPBD)
-                if (optBpbd.feeder_coordinates && optBpbd.feeder_coordinates.length > 0) {
-                    allLatLngs = allLatLngs.concat(optBpbd.feeder_coordinates);
-                } else if (optBpbd.connector_coordinates && optBpbd.connector_coordinates.length > 0) {
-                    allLatLngs = allLatLngs.concat(optBpbd.connector_coordinates);
-                }
-                // Include exit_coordinates (jalan lokal dari endpoint BPBD ke facility)
-                if (optBpbd.exit_coordinates && optBpbd.exit_coordinates.length > 0) {
-                    allLatLngs = allLatLngs.concat(optBpbd.exit_coordinates);
-                }
-                if (allLatLngs.length === 0) {
-                    allLatLngs = [[lat, lng], [fLat, fLng]];
-                }
+                [feederCoords, bpbdCorridor, exitCoords, publicCoords].forEach(seg => {
+                    if (seg) allLatLngs = allLatLngs.concat(seg);
+                });
+                if (allLatLngs.length === 0) allLatLngs = [userPt, destPt];
 
                 currentRoutePolylines = {
                     public: { casing: null, main: null, hit: null },
@@ -1126,36 +1214,30 @@
                     window.selectEvacuationRoute('bpbd');
                 };
 
-                // 1. Gambar Garis Penghubung (Feeder: user → titik masuk BPBD)
-                // Prioritas: feeder_coordinates (rute OSRM nyata), fallback connector_coordinates (garis lurus)
-                const feederCoords = (optBpbd.feeder_coordinates && optBpbd.feeder_coordinates.length > 1)
-                    ? optBpbd.feeder_coordinates
-                    : (optBpbd.connector_coordinates && optBpbd.connector_coordinates.length > 1 ? optBpbd.connector_coordinates : null);
-
-                if (feederCoords) {
-                    const isRealRoute = optBpbd.feeder_coordinates && optBpbd.feeder_coordinates.length > 2;
+                // ── 1. Gambar Feeder BPBD: user → entry point ──
+                // Jika feeder adalah rute OSRM nyata (>2 titik): biru-langit dashed
+                // Jika feeder adalah garis lurus (2 titik):       slate dashed tipis
+                if (feederCoords && feederCoords.length > 1) {
+                    const isRealRoute = feederCoords.length > 2;
                     const bpbdConnector = L.polyline(feederCoords, {
-                        color: isRealRoute ? '#0ea5e9' : '#64748b', // Biru langit jika real route, slate jika garis lurus
-                        weight: isRealRoute ? 3.5 : 2.5,
-                        dashArray: isRealRoute ? '7, 6' : '5, 8',
-                        opacity: 0.9,
+                        color: isRealRoute ? '#0ea5e9' : '#64748b',
+                        weight: isRealRoute ? 3.5 : 2,
+                        dashArray: isRealRoute ? '8, 6' : '5, 9',
+                        opacity: 0.88,
                         lineCap: 'round',
                         lineJoin: 'round'
                     }).addTo(userRouteLayerGroup);
-
-                    bpbdConnector.bindTooltip(`<b>Jalur Menuju Koridor BPBD</b><br>Menghubungkan posisi Anda ke rute evakuasi resmi`, {
-                        sticky: true,
-                        direction: 'top',
-                        className: 'route-tooltip'
-                    });
-
+                    bpbdConnector.bindTooltip(
+                        `<b>Jalur Menuju Koridor BPBD</b><br>Menghubungkan posisi Anda ke rute evakuasi resmi`,
+                        { sticky: true, direction: 'top', className: 'route-tooltip' }
+                    );
                     bpbdConnector.on('click', handleBpbdClick);
                     currentRoutePolylines.bpbd.connector = bpbdConnector;
                 }
 
-                // 2. Gambar Jalur Resmi BPBD (Warna Ungu Solid)
-                if (optBpbd.coordinates && optBpbd.coordinates.length > 1) {
-                    const bpbdCasing = L.polyline(optBpbd.coordinates, {
+                // ── 2. Gambar Koridor Resmi BPBD (Ungu Solid) ──
+                if (bpbdCorridor && bpbdCorridor.length > 1) {
+                    const bpbdCasing = L.polyline(bpbdCorridor, {
                         color: '#581c87',
                         weight: 9,
                         opacity: 0.95,
@@ -1163,7 +1245,7 @@
                         lineJoin: 'round'
                     }).addTo(userRouteLayerGroup);
 
-                    const bpbdMain = L.polyline(optBpbd.coordinates, {
+                    const bpbdMain = L.polyline(bpbdCorridor, {
                         color: 'rgb(153, 0, 255)',
                         weight: 6,
                         opacity: 1.0,
@@ -1171,7 +1253,7 @@
                         lineJoin: 'round'
                     }).addTo(userRouteLayerGroup);
 
-                    const bpbdHit = L.polyline(optBpbd.coordinates, {
+                    const bpbdHit = L.polyline(bpbdCorridor, {
                         weight: 22,
                         opacity: 0,
                         interactive: true,
@@ -1180,62 +1262,56 @@
                     }).addTo(userRouteLayerGroup);
 
                     currentRoutePolylines.bpbd.casing = bpbdCasing;
-                    currentRoutePolylines.bpbd.main = bpbdMain;
-                    currentRoutePolylines.bpbd.hit = bpbdHit;
+                    currentRoutePolylines.bpbd.main   = bpbdMain;
+                    currentRoutePolylines.bpbd.hit    = bpbdHit;
 
                     bpbdHit.on('click', handleBpbdClick);
                     bpbdMain.on('click', handleBpbdClick);
                     bpbdCasing.on('click', handleBpbdClick);
 
                     bpbdHit.on('mouseover', function() {
-                        if (activeRouteKey !== 'bpbd') {
-                            bpbdMain.setStyle({ opacity: 0.9, weight: 6 });
-                        }
+                        if (activeRouteKey !== 'bpbd') bpbdMain.setStyle({ opacity: 0.9, weight: 6 });
                     });
                     bpbdHit.on('mouseout', function() {
-                        if (activeRouteKey !== 'bpbd') {
-                            updateRoutePolylinesVisual(activeRouteKey);
-                        }
+                        if (activeRouteKey !== 'bpbd') updateRoutePolylinesVisual(activeRouteKey);
                     });
 
-                    // Titik Masuk Jalur Evakuasi Resmi
+                    // Marker titik masuk koridor BPBD
                     const entryPoint = optBpbd.entry_point || (data.summary && data.summary.entry_point);
                     if (entryPoint && entryPoint.lat && entryPoint.lng) {
                         const junctionIcon = L.divIcon({
                             className: 'junction-marker',
-                            html: '<div title="Titik Masuk Jalur Evakuasi BPBD (Klik untuk pilih)">🛡️</div>',
+                            html: '<div title="Titik Masuk Jalur Evakuasi BPBD">🛡️</div>',
                             iconSize: [26, 26],
                             iconAnchor: [13, 13]
                         });
                         const jMarker = L.marker([entryPoint.lat, entryPoint.lng], { icon: junctionIcon })
                             .addTo(userRouteLayerGroup)
-                            .bindPopup(`<b>Titik Masuk Jalur Evakuasi Resmi BPBD</b><br>${optBpbd.route_name || 'Jalur Evakuasi BPBD'}<br><button type="button" onclick="window.selectEvacuationRoute('bpbd')" style="margin-top:6px;padding:4px 8px;background:#7e22ce;color:white;border:none;border-radius:6px;font-size:10px;font-weight:bold;cursor:pointer;">Pilih Jalur Resmi BPBD</button>`);
+                            .bindPopup(`<b>Titik Masuk Koridor BPBD</b><br>${optBpbd.route_name || 'Jalur Evakuasi BPBD'}<br><button type="button" onclick="window.selectEvacuationRoute('bpbd')" style="margin-top:6px;padding:4px 8px;background:#7e22ce;color:white;border:none;border-radius:6px;font-size:10px;font-weight:bold;cursor:pointer;">Pilih Jalur Resmi BPBD</button>`);
                         jMarker.on('click', handleBpbdClick);
                     }
                 }
 
-                // 2b. Gambar Exit Route (jalan lokal dari endpoint BPBD ke titik kumpul) — teal dashed
-                if (optBpbd.exit_coordinates && optBpbd.exit_coordinates.length > 1) {
-                    const exitLine = L.polyline(optBpbd.exit_coordinates, {
-                        color: '#0d9488',  // Teal-600
-                        weight: 3,
+                // ── 2b. Gambar Exit BPBD → Titik Kumpul (Teal Dashed) ──
+                if (exitCoords && exitCoords.length > 1) {
+                    const exitLine = L.polyline(exitCoords, {
+                        color: exitCoords.length > 2 ? '#0d9488' : '#94a3b8', // Teal jika OSRM, slate jika bridge
+                        weight: exitCoords.length > 2 ? 3.5 : 2,
                         dashArray: '8, 6',
                         opacity: 0.85,
                         lineCap: 'round',
                         lineJoin: 'round'
                     }).addTo(userRouteLayerGroup);
-
-                    exitLine.bindTooltip(`<b>Jalur Keluar ke Titik Kumpul</b><br>Jalan lokal menuju ${data.facility?.name || 'titik kumpul'}`, {
-                        sticky: true,
-                        direction: 'top',
-                        className: 'route-tooltip'
-                    });
+                    exitLine.bindTooltip(
+                        `<b>Jalur Menuju Titik Kumpul</b><br>${data.facility?.name || 'Titik Kumpul'}`,
+                        { sticky: true, direction: 'top', className: 'route-tooltip' }
+                    );
                     exitLine.on('click', handleBpbdClick);
                 }
 
-                // 3. Gambar Jalur Umum (OSRM - Biru Solid)
-                if (optPublic.coordinates && optPublic.coordinates.length > 1) {
-                    const publicCasing = L.polyline(optPublic.coordinates, {
+                // ── 3. Gambar Jalur Umum OSRM (Biru Solid) ──
+                if (publicCoords && publicCoords.length > 1) {
+                    const publicCasing = L.polyline(publicCoords, {
                         color: '#174ea6',
                         weight: 8,
                         opacity: 0.8,
@@ -1243,15 +1319,15 @@
                         lineJoin: 'round'
                     }).addTo(userRouteLayerGroup);
 
-                    const publicMain = L.polyline(optPublic.coordinates, {
-                        color: '#2563eb', // Royal Blue
+                    const publicMain = L.polyline(publicCoords, {
+                        color: '#2563eb',
                         weight: 6,
                         opacity: 1.0,
                         lineCap: 'round',
                         lineJoin: 'round'
                     }).addTo(userRouteLayerGroup);
 
-                    const publicHit = L.polyline(optPublic.coordinates, {
+                    const publicHit = L.polyline(publicCoords, {
                         weight: 22,
                         opacity: 0,
                         interactive: true,
