@@ -21,63 +21,174 @@
 @section('content')
 <div class="space-y-6">
 
-    {{-- HEADER CARD WITH NAVIGATION & ACTIONS --}}
-    <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700/60 rounded-2xl p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-                <div class="flex items-center gap-2">
-                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                        Kecamatan Focus
-                    </span>
-                    @if($aidDisaster->is_active)
-                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                            Aktif
-                        </span>
-                    @else
-                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
-                            Nonaktif
-                        </span>
-                    @endif
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {{-- GRAFIK CARD WITH NAVIGATION & ACTIONS --}}
+        <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700/60 rounded-2xl p-6">
+
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white">
+                        Tren Distribusi Bantuan
+                    </h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Jumlah bantuan logistik yang disalurkan berdasarkan tanggal distribusi
+                    </p>
                 </div>
-                <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2">
-                    Kecamatan {{ $aidDisaster->district_name }}
-                </h1>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Detail rekapitulasi bantuan bencana logistik & progres penyaluran warga
-                </p>
             </div>
 
-            <div class="flex items-center gap-3">
-                <!-- @can('update data')
-                <a href="{{ route('admin.aid-disasters.edit', $aidDisaster) }}"
-                   class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    Edit Data
-                </a>
-                @endcan -->
-                <a href="{{ route('admin.aid-disasters.index') }}"
-                   class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-colors">
-                    &larr; Kembali
-                </a>
+            <div class="h-[320px]">
+                <canvas id="distributionTrendChart"></canvas>
             </div>
+
         </div>
 
-        {{-- PROGRESS BANNER --}}
         @php
-            // Persentase dihitung dari KK yang sudah menerima (total_received) dibanding Target KK (total_recipients)
-            $percentage = $aidDisaster->total_recipients > 0 ? min(100, round(($aidDisaster->total_received / $aidDisaster->total_recipients) * 100, 1)) : 0;
-                
-            $barColor = $percentage >= 80 ? 'bg-emerald-500' : ($percentage >= 40 ? 'bg-indigo-500' : 'bg-amber-500');
+            $chartData = collect($distributions)->groupBy(function ($item) {
+                    return \Carbon\Carbon::parse($item->distribution_date)->format('d M');
+                })->map(function ($items) {
+                    return $items->sum('quantity_received');
+                });
+
+            $chartLabels = $chartData->keys()->values();
+            $chartValues = $chartData->values();
         @endphp
-        <div class="mt-6 p-4 rounded-xl bg-gray-50 dark:bg-gray-700/40 border border-gray-100 dark:border-gray-700/60">
-            <div class="flex items-center justify-between text-xs font-bold mb-2 text-gray-700 dark:text-gray-300">
-                <span>Progres Penyaluran Bantuan</span>
-                <span class="text-sm text-indigo-600 dark:text-indigo-400 font-extrabold">{{ $percentage }}% Terpenuhi</span>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+
+                const ctx = document.getElementById('distributionTrendChart');
+
+                if (!ctx) return;
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: @json($chartLabels),
+                        datasets: [{
+                            label: 'Bantuan Tersalurkan',
+                            data: @json($chartValues),
+
+                            borderColor: '#53e546ff',
+                            backgroundColor: 'rgba(70, 229, 131, 0.15)',
+
+                            fill: true,
+                            tension: 0.4,
+
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+
+                            pointBackgroundColor: '#04c51eff',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+
+                        plugins: {
+                            legend: {
+                                display: true
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.parsed.y.toLocaleString('id-ID') + ' Unit';
+                                    }
+                                }
+                            }
+                        },
+
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: document.documentElement.classList.contains('dark')
+                                        ? '#D1D5DB'
+                                        : '#374151'
+                                }
+                            },
+
+                            y: {
+                                beginAtZero: true,
+
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toLocaleString('id-ID');
+                                    },
+                                    color: document.documentElement.classList.contains('dark')
+                                        ? '#D1D5DB'
+                                        : '#374151'
+                                },
+
+                                grid: {
+                                    color: document.documentElement.classList.contains('dark')
+                                        ? 'rgba(255,255,255,0.08)'
+                                        : 'rgba(0,0,0,0.05)'
+                                }
+                            }
+                        }
+                    }
+                });
+
+            });
+        </script>
+
+        {{-- HEADER CARD WITH NAVIGATION & ACTIONS --}}
+        <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700/60 rounded-2xl p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <!-- <div class="flex items-center gap-2">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">Kecamatan Focus</span>
+                        @if($aidDisaster->is_active)
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Aktif</span>
+                        @else
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">Nonaktif</span>
+                        @endif
+                    </div> -->
+                    <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white mt-2">
+                        Kecamatan {{ $aidDisaster->district_name }}
+                    </h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Detail rekapitulasi bantuan bencana logistik & progres penyaluran warga
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- @can('update data')
+                    <a href="{{ route('admin.aid-disasters.edit', $aidDisaster) }}"
+                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit Data
+                    </a>
+                    @endcan -->
+                    <a href="{{ route('admin.aid-disasters.index') }}"
+                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-colors">
+                        &larr; Kembali
+                    </a>
+                </div>
             </div>
-            <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden">
-                <div class="{{ $barColor }} h-3 rounded-full transition-all duration-700" style="width: {{ $percentage }}%"></div>
+
+            {{-- PROGRESS BANNER --}}
+            @php
+                // Persentase dihitung dari KK yang sudah menerima (total_received) dibanding Target KK (total_recipients)
+                $percentage = $aidDisaster->total_recipients > 0 ? min(100, round(($aidDisaster->total_received / $aidDisaster->total_recipients) * 100, 1)) : 0;
+                    
+                $barColor = $percentage >= 80 ? 'bg-emerald-500' : ($percentage >= 40 ? 'bg-indigo-500' : 'bg-amber-500');
+            @endphp
+            <div class="mt-6 p-4 rounded-xl bg-gray-50 dark:bg-gray-700/40 border border-gray-100 dark:border-gray-700/60">
+                <div class="flex items-center justify-between text-xs font-bold mb-2 text-gray-700 dark:text-gray-300">
+                    <span>Progres Penyaluran Bantuan</span>
+                    <span class="text-sm text-indigo-600 dark:text-indigo-400 font-extrabold">{{ $percentage }}% Terpenuhi</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden">
+                    <div class="{{ $barColor }} h-3 rounded-full transition-all duration-700" style="width: {{ $percentage }}%"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -95,7 +206,7 @@
             <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white">
                 {{ number_format($aidDisaster->total_recipients ?? 0) }} KK
             </h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Target Kepala Keluarga di {{ $aidDisaster->district_name }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Total Kepala Keluarga Terdata di {{ $aidDisaster->district_name }}</p>
         </div>
 
         {{-- Belum Menerima / Sisa --}}
@@ -109,7 +220,7 @@
             <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white">
                 {{ number_format($aidDisaster->remaining_aid ?? 0) }} KK
             </h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">KK yang belum terpenuhi</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">KK yang belum menerima</p>
         </div>
 
         {{-- Bantuan Tersalurkan --}}

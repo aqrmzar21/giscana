@@ -4,7 +4,7 @@
 <div class="map-page map-ui--admin space-y-3">
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-5">
-            <p class="text-md">Klik disini untuk <button class="text-sm text-blue-500 px-2" onclick="location.reload()">Load peta </button>jika peta tidak muncul</p>
+            <p class="text-md">Klik disini untuk <button class="text-sm text-blue-500 px-2" onclick="location.reload()">⟲ Load peta </button>jika peta tidak muncul</p>
             <h3 class="text-base font-semibold text-gray-900 mb-1">Peta Interaktif Admin</h3>
             <p class="text-xs text-gray-500 mb-4">Wilayah: <span class="font-medium text-gray-700">Kabupaten Bone Bolango</span>, Prov. Gorontalo</p>
             <!-- {{-- Toggle batas wilayah --}} -->
